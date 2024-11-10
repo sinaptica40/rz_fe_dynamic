@@ -7,7 +7,7 @@ let pagesCache = null;
 const fetchPages = async () => {
   if (!pagesCache) {
     try {
-      const response = await fetch('http://192.168.235.245:4065/api/v1/pages');
+      const response = await fetch('http://127.0.0.1:5000/api/v1/pages');
       const data = await response.json();
       pagesCache = data.data.pages.reduce((acc, page) => {
         acc[page.page_name_label] = page.id_page;
@@ -29,7 +29,7 @@ const fetchData = async (route) => {
   const pageId = pages[route] ?? route;
 
   const url = pageId
-    ? `http://192.168.235.245:4065/api/v1/page-data-retriever/${pageId}`
+    ? `http://127.0.0.1:5000/api/v1/page-data-retriever/${pageId}`
     : null;
 
   if (!url) {
