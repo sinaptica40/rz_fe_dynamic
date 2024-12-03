@@ -1,14 +1,100 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const IspezioniElement2 = ({ areas, api }) => {
+const IspezioniElement2 = ({ areas, handleModal,deleteInspection,showModal,setShowModal,TableData2,nestedElements }) => {
+    
     const navigate = useNavigate();
-    const handleClick = (id_page) => {
-        navigate(`${id_page}`); 
+  
+
+    const filteredData = areas?.table_columns
+    .filter(item => item.table_fields.data_type !== "api");
+
+    const filterApis =  areas?.table_columns
+    .filter(item => item.table_fields.data_type =="api");
+
+    console.log("filterApis",filterApis)
+    console.log("filterApis",filterApis?.table_fields?.label)
+
+    const viewIcon = areas?.table_columns.find(item=> item.table_fields.field_name=="/ispezioni-view");
+    const editIcon = areas?.table_columns.find(item=> item.table_fields.field_name=="/ispezioni-edito");
+    const deleteIcon = areas?.table_columns.find(item=> item.table_fields.field_name=="Delete-order");
+
+
+    // let getapi = filterApis.reduce((acc, user) => {
+    //     const functionName = user?.table_fields?.field_name;
+    //     const PageName = user?.table_fields?.page;
+    //     if (functionName.includes("ispezioni-view")) {
+    //         acc.viewIspezione = PageName;
+    //     }
+    //     if (functionName.includes("ispezioni-edito")) {
+    //         acc.editIspezione = PageName;
+    //     }
+       
+    //     return acc;
+    // }, {});
+
+    const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
+        const area = nestedElements.find(area => area.key && area.key.startsWith(prefix));
+  
+        if (area) {
+  
+            // Function to recursively clone elements and add extra props
+            const deepCloneChildren = (children, extraProps) => {
+                return React.Children.map(children, (child) => {
+                    if (React.isValidElement(child)) {
+                        // Clone child and pass down extraProps
+                        const clonedChild = React.cloneElement(child, { ...extraProps });
+  
+                        // If the child has its own children, recurse through them
+                        if (child.props && child.props.children) {
+                            const updatedChildren = deepCloneChildren(child.props.children, extraProps);
+                            return React.cloneElement(clonedChild, { children: updatedChildren });
+                        }
+  
+                        return clonedChild;
+                    }
+  
+                    return child; // Return non-element children as is (e.g., strings, numbers)
+                });
+            };
+  
+            // Clone the area element itself and its nested children
+            const clonedArea = React.cloneElement(area, {
+                ...extraProps,
+                children: deepCloneChildren(area.props.children, extraProps),
+            });
+            return clonedArea;
+        }
+  
+        return null;
     };
+
+    let viewRoute;
+    let editRoute;
+
+   filterApis.forEach(element => {
+    console.log("element",element)
+        if(element?.table_fields?.field_name?.includes("view")){
+            viewRoute= element?.table_fields?.page;  
+        }
+        if(element?.table_fields?.field_name?.includes("edit")){
+         editRoute = element?.table_fields?.page;
+        }
+    });
+
+    const handleViewClick = (id) => {
+        localStorage.setItem("ispenzioViewID",id);
+        navigate(`/${viewRoute}`); 
+    };
+
+    const handleEditClick = (id) => {
+        localStorage.setItem("ispenzioEditID",id)
+        navigate(`/${editRoute}`); 
+    };
+
     return (
         <>
-            <div className="card-header border-0 pb-0 add-form-header">
+            {/* <div className="card-header border-0 pb-0 add-form-header">
                 <div className="card-title">
                     <span className="title-icon">
                         <svg
@@ -38,23 +124,146 @@ const IspezioniElement2 = ({ areas, api }) => {
                     </span>
                     <span>{areas?.table_name}</span>
                 </div>
-            </div>
+                <div className="cardSearchBox">
+                    <button className="cardSearchIcon">
+                        <svg
+                            width={24}
+                            height={24}
+                            viewBox="0 0 27 27"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M25.4781 25.034L19.8631 19.409M22.9741 11.89C22.9741 13.9944 22.3501 16.0515 21.1809 17.8013C20.0118 19.551 18.3501 20.9148 16.4058 21.7201C14.4616 22.5254 12.3223 22.7361 10.2583 22.3256C8.19438 21.915 6.29851 20.9016 4.81048 19.4136C3.32245 17.9256 2.30909 16.0297 1.89854 13.9658C1.48799 11.9018 1.6987 9.76245 2.50402 7.81825C3.30933 5.87404 4.67309 4.2123 6.42283 3.04316C8.17257 1.87403 10.2297 1.25 12.3341 1.25C15.156 1.25 17.8623 2.371 19.8577 4.36638C21.8531 6.36177 22.9741 9.0681 22.9741 11.89Z"
+                                stroke="#252525"
+                                strokeWidth={2}
+                                strokeLinecap="round"
+                            />
+                        </svg>
+                    </button>
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Cerca una commessa"
+                    />
+                </div>
+            </div> */}
 
             <div className="card-block-body">
                 <div className="table-responsive">
                     <table className="table m b-0">
                         <thead className="thbold">
                             <tr>
-                                <th scope="col">ID Ispezione</th>
+                                {filteredData?.map((item)=>
+                                  (
+                                        <th>{item?.table_fields?.field_name}</th>
+                                    )
+                                )}
+                                {/* <th scope="col">ID Ispezione</th>
                                 <th scope="col">ID Codice</th>
                                 <th scope="col">Data ispezione</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Ispettori</th>
-                                <th scope="col">Dettagli</th>
+                                <th scope="col">Dettagli</th> */}
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            {TableData2?.data?.map((item)=>(
+                                <tr>
+                                <td>{item?.client}</td>
+                                <td>
+                                    <div className="complete-label">
+                                        <svg
+                                            width={19}
+                                            height={19}
+                                            viewBox="0 0 19 19"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M12.807 6.74805H11.858C11.756 6.74802 11.6554 6.77231 11.5646 6.81892C11.4738 6.86553 11.3955 6.93311 11.336 7.01605L8.16504 11.416L6.72904 9.42305C6.66942 9.34028 6.59102 9.27284 6.50028 9.22625C6.40954 9.17966 6.30904 9.15526 6.20704 9.15505H5.26104C5.23137 9.15522 5.20232 9.16354 5.17705 9.17909C5.15179 9.19464 5.13128 9.21684 5.11776 9.24325C5.10425 9.26966 5.09824 9.29928 5.10041 9.32887C5.10257 9.35846 5.11282 9.38688 5.13004 9.41105L7.64304 12.896C7.70235 12.979 7.78061 13.0467 7.87131 13.0933C7.96201 13.14 8.06254 13.1643 8.16454 13.1643C8.26654 13.1643 8.36707 13.14 8.45777 13.0933C8.54847 13.0467 8.62673 12.979 8.68604 12.896L12.934 7.00705C12.9523 6.98326 12.9635 6.95484 12.9665 6.925C12.9695 6.89516 12.9641 6.86509 12.9509 6.83816C12.9377 6.81124 12.9172 6.78854 12.8918 6.77261C12.8664 6.75669 12.837 6.74818 12.807 6.74805Z"
+                                                fill="#22B735"
+                                            />
+                                            <path
+                                                d="M9.036 0.919922C7.24885 0.919922 5.50183 1.44987 4.01587 2.44276C2.52991 3.43565 1.37174 4.84688 0.687829 6.49799C0.00391507 8.14911 -0.175028 9.96595 0.173628 11.7188C0.522284 13.4716 1.38288 15.0816 2.64659 16.3453C3.91029 17.609 5.52036 18.4696 7.27317 18.8183C9.02598 19.167 10.8428 18.988 12.4939 18.3041C14.145 17.6202 15.5563 16.462 16.5492 14.9761C17.5421 13.4901 18.072 11.7431 18.072 9.95592C18.072 7.55943 17.12 5.26108 15.4254 3.5665C13.7308 1.87193 11.4325 0.919922 9.036 0.919922ZM9.036 17.4579C7.55264 17.4579 6.1026 17.0181 4.86923 16.1939C3.63586 15.3698 2.67456 14.1985 2.10691 12.828C1.53925 11.4576 1.39073 9.9496 1.68011 8.49474C1.9695 7.03989 2.68381 5.70352 3.7327 4.65462C4.7816 3.60573 6.11797 2.89142 7.57283 2.60203C9.02768 2.31264 10.5357 2.46117 11.9061 3.02883C13.2766 3.59648 14.4479 4.55778 15.272 5.79115C16.0961 7.02451 16.536 8.47456 16.536 9.95792C16.536 10.9428 16.342 11.9181 15.9651 12.828C15.5882 13.738 15.0357 14.5648 14.3393 15.2612C13.6429 15.9577 12.8161 16.5101 11.9061 16.887C10.9962 17.2639 10.0209 17.4579 9.036 17.4579Z"
+                                                fill="#22B735"
+                                            />
+                                        </svg>{" "}
+                                        Completato
+                                    </div>
+                                </td>
+                                <td>{item?.order_code}</td>
+                             
+                                <td>{item?.ispectors}</td>
+                                <td>{item?.inspections?.[0]?.calendar_info?.date}</td>
+                                <td>
+                                    <div className="table_action_list">
+                                        <a
+                                          onClick={()=>handleViewClick(item?.id_order)}
+                                          className="table_actionBtn">
+                                            
+                                            <img src={viewIcon?.table_fields?.label}  />
+                                            {/* <svg
+                                                width={24}
+                                                height={24}
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    d="M9.873 2.05128C8.27532 2.05128 6.71352 2.52505 5.3851 3.41267C4.05668 4.30029 3.02131 5.56191 2.4099 7.03797C1.7985 8.51403 1.63853 10.1382 1.95022 11.7052C2.26191 13.2722 3.03126 14.7116 4.16099 15.8413C5.29072 16.971 6.73008 17.7404 8.29706 18.0521C9.86404 18.3638 11.4883 18.2038 12.9643 17.5924C14.4404 16.981 15.702 15.9456 16.5896 14.6172C17.4772 13.2888 17.951 11.727 17.951 10.1293C17.951 9.06847 17.7421 8.01804 17.3361 7.03797C16.9301 6.0579 16.3351 5.16739 15.585 4.41728C14.8349 3.66716 13.9444 3.07214 12.9643 2.66619C11.9842 2.26023 10.9338 2.05128 9.873 2.05128ZM2.16654e-07 10.1303C0.000399033 8.54483 0.382611 6.9828 1.11431 5.57629C1.84601 4.16978 2.90567 2.96017 4.20367 2.04977C5.50168 1.13936 6.99984 0.554943 8.57145 0.345934C10.1431 0.136926 11.7419 0.309479 13.2327 0.848998C14.7236 1.38852 16.0625 2.27913 17.1364 3.44552C18.2103 4.61191 18.9874 6.01975 19.4022 7.54999C19.8169 9.08023 19.8571 10.6878 19.5192 12.2369C19.1813 13.7859 18.4753 15.2308 17.461 16.4493L23.074 22.0623C23.1682 22.143 23.2447 22.2423 23.2988 22.3539C23.3528 22.4656 23.3831 22.5872 23.3879 22.7111C23.3927 22.8351 23.3718 22.9587 23.3266 23.0742C23.2813 23.1897 23.2127 23.2946 23.125 23.3823C23.0373 23.47 22.9324 23.5386 22.8169 23.5839C22.7014 23.6291 22.5778 23.65 22.4539 23.6452C22.3299 23.6404 22.2083 23.6101 22.0966 23.556C21.985 23.502 21.8857 23.4255 21.805 23.3313L16.192 17.7183C14.7502 18.9193 12.9959 19.6846 11.1348 19.9244C9.27362 20.1642 7.38267 19.8687 5.68347 19.0724C3.98427 18.2761 2.54719 17.012 1.5406 15.4283C0.534011 13.8446 -0.00039283 12.0068 2.16654e-07 10.1303ZM9.873 5.64228C10.1117 5.64228 10.3406 5.73711 10.5094 5.90589C10.6782 6.07467 10.773 6.30359 10.773 6.54228V9.23528H13.466C13.7047 9.23528 13.9336 9.3301 14.1024 9.49889C14.2712 9.66767 14.366 9.89659 14.366 10.1353C14.366 10.374 14.2712 10.6029 14.1024 10.7717C13.9336 10.9405 13.7047 11.0353 13.466 11.0353H10.771V13.7283C10.771 13.967 10.6762 14.1959 10.5074 14.3647C10.3386 14.5335 10.1097 14.6283 9.871 14.6283C9.63231 14.6283 9.40339 14.5335 9.2346 14.3647C9.06582 14.1959 8.971 13.967 8.971 13.7283V11.0273H6.283C6.04431 11.0273 5.81539 10.9325 5.6466 10.7637C5.47782 10.5949 5.383 10.366 5.383 10.1273C5.383 9.88859 5.47782 9.65967 5.6466 9.49089C5.81539 9.3221 6.04431 9.22728 6.283 9.22728H8.976V6.53928C8.97679 6.30163 9.07155 6.07393 9.2396 5.90588C9.40765 5.73783 9.63534 5.64307 9.873 5.64228Z"
+                                                    fill="currentcolor"
+                                                />
+                                            </svg> */}
+                                        </a>
+                                        <a 
+                                         onClick={()=>handleEditClick(item?.id_order)}
+                                         className="table_actionBtn">
+                                             <img src={editIcon?.table_fields?.label}  />
+                                            {/* <svg
+                                                width={26}
+                                                height={26}
+                                                viewBox="0 0 26 26"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    d="M22.619 18.1552L6.65001 2.18517C6.01951 1.57864 5.17625 1.24363 4.30142 1.25211C3.42659 1.26059 2.58998 1.61188 1.97135 2.23051C1.35273 2.84914 1.00143 3.68574 0.992955 4.56058C0.984476 5.43541 1.31949 6.27866 1.92601 6.90917L17.9 22.8782C18.2644 23.2427 18.7286 23.4911 19.234 23.5922L24.361 24.6182L23.332 19.4892C23.231 18.9838 22.9835 18.5196 22.619 18.1552Z"
+                                                    stroke="currentcolor"
+                                                    strokeWidth="1.5"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                />
+                                                <path
+                                                    d="M10.188 4.83984L4.43103 10.0088"
+                                                    stroke="currentcolor"
+                                                    strokeWidth="1.5"
+                                                />
+                                            </svg> */}
+                                        </a>
+                                        <a onClick={()=>handleModal(item?.id_order)} className="table_actionBtn">
+                                        <img src={deleteIcon?.table_fields?.label}  />
+                                            {/* <svg
+                                                width={26}
+                                                height={25}
+                                                viewBox="0 0 26 25"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    d="M1.5 5.5138H24.859M10.844 11.3538V17.1938M15.516 11.3538V17.1938M3.836 5.5138H22.523L20.677 22.1218C20.6137 22.6934 20.3418 23.2215 19.9134 23.6052C19.485 23.9888 18.9301 24.2008 18.355 24.2008H8C7.42544 24.2001 6.87129 23.9877 6.44348 23.6042C6.01567 23.2206 5.74421 22.6929 5.681 22.1218L3.836 5.5138ZM7.743 2.1818C7.93182 1.78122 8.23061 1.44256 8.60455 1.20531C8.97848 0.968063 9.41215 0.841992 9.855 0.841797H16.5C16.9432 0.841612 17.3773 0.967505 17.7516 1.20478C18.1259 1.44205 18.425 1.78091 18.614 2.1818L20.184 5.5138H6.172L7.743 2.1818Z"
+                                                    stroke="currentcolor"
+                                                    strokeWidth="1.5"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                />
+                                            </svg> */}
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr> 
+                            ))}
+                            {/* <tr>
                                 <td>Ener consulting S.r.l</td>
                                 <td>012345789</td>
                                 <td>00/00/0000</td>
@@ -465,11 +674,67 @@ const IspezioniElement2 = ({ areas, api }) => {
                                         </a>
                                     </div>
                                 </td>
-                            </tr>
+                            </tr> */}
                         </tbody>
                     </table>
                 </div>
             </div>
+            {/* {showModal && (
+                <div className="modal-main-box">
+                    <div className="modal-inner-box">
+                        <span className="info-iocn">
+                            !
+                        </span>
+                       
+                            <span>
+                             Are You Sure
+                            </span>
+                            <div>
+                            <span>
+                            You Would not be able to revert this!
+                            </span>
+                            </div>
+                                
+                                <div className="modal-btn-group">
+                                  
+                                    <div className="col-md-4">
+                                     <div className="form-floating">
+                                    <button onClick={deleteInspection}>
+                                       Yes
+                                      </button>
+                                      </div>
+                                     </div>
+                                      <div className="col-md-4">
+                                     <div className="form-floating">
+                                     <button onClick={()=>setShowModal(false)}>
+                                      No
+                                     </button>
+
+                                     </div>
+                                     </div>
+                              
+                        </div>
+                    </div>
+                </div>
+      )} */}
+
+{showModal && (
+            <div className="modal-main-box">
+                <div className="modal-inner-box">
+                    {/* <span className="info-iocn">
+                        !
+                    </span> */}
+                    {findAreaByKeyPrefix("FormArea8")}
+                   {findAreaByKeyPrefix("FormArea9")}
+                   {findAreaByKeyPrefix("FormArea10")}
+                    <div className="modal-btn-group">
+                        {findAreaByKeyPrefix("FormArea11",{deleteInspection})}
+                        {findAreaByKeyPrefix("FormArea12",{setShowModal})}
+                   </div>
+                   
+                </div>
+            </div>
+            )}
         </>
     )
 }

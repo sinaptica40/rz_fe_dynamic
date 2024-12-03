@@ -201,7 +201,7 @@ body.scroll-off {
   opacity: 1;
   visibility: visible;
   background-color: #fff;
-  color: rgba(255, 255, 255, 0.6);
+  /* color: rgba(255, 255, 255, 0.6); */
   right: 1px;
   box-shadow: 0 1px 14px rgba(60, 64, 67, 0.15);
   font-size: 12px;
@@ -209,6 +209,7 @@ body.scroll-off {
   border: 0;
   padding: 0;
 }
+
 
 .user_name > div {
   white-space: nowrap;
@@ -1773,7 +1774,7 @@ svg.css-tj5bde-Svg {
   align-items: center;
   gap: 11px;
   font-size: 24px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /*  26 - 7 - 2024 */
@@ -2156,6 +2157,7 @@ svg.css-tj5bde-Svg {
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 10px;
+  margin-bottom: 15px;
 }
 
 .btn-set-left,
@@ -2401,7 +2403,6 @@ svg.css-tj5bde-Svg {
   border-bottom: 1px solid #000 !important;
   padding: 0 0 3px 0 !important;
   min-height: 26px !important;
-
 }
 .react-select__indicator-separator{
   display: none;  
@@ -2640,3 +2641,155 @@ table .thbold tr th {
   color: #fff;
 }
 
+.modal-main-box{
+  background: rgba(0, 0, 0, .4);
+  display: flex;
+  position: fixed;
+  z-index: 1060;
+  inset: 0;
+  box-sizing: border-box;
+  grid-template-areas:
+      "top-start top top-end"
+      "center-start center center-end"
+      "bottom-start bottom-center bottom-end";
+  grid-template-rows: minmax(min-content, auto) minmax(min-content, auto) minmax(min-content, auto);
+  height: 100%;
+  padding: .625em;
+  overflow-x: hidden;
+  transition: background-color .1s;
+  -webkit-overflow-scrolling: touch;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -ms-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -webkit-transition: all 0.5s ease;
+}
+.modal-inner-box {
+  position: relative;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 5px;
+  background: #fff;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+  padding: 20px 20px;
+}
+
+
+.modal-inner-box h3:first-of-type {
+  color: #545454;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 20px 0;
+}
+.modal-inner-box h3 {
+  color: #545454;
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 30px;
+}
+.modal-btn-group {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.modal-btn-group .form-floating {
+  margin-bottom: 0;
+}
+.modal-btn-group .form-floating button {
+  width: 100%;
+  background-color: #3085d6;
+}
+.modal-btn-group .form-floating button:hover{
+  background-color: #2b77c0;
+}
+.modal-btn-group button {
+  border: none;
+  color: #fff;
+  border-radius: 5px;
+  font-weight: 500;
+  background-color: #dd3333;
+  padding: 10px 16px;
+}
+.modal-btn-group button:hover{
+  background-color: #c72e2e;
+}
+.modal-btn-group .col-md-4 {
+  width: 130px;
+}
+
+.info-iocn{
+  display: block;
+  margin-bottom: 20px;
+}
+.info-iocn {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid #facea8;
+  color: #f8bb86;
+  font-size: 60px;
+  margin: auto;
+  margin-block: 28px;
+}
+
+/* Add this CSS to your stylesheet */
+.page-link {
+  color: #ecad42; /* Set the color to your desired value */
+  text-decoration: none;
+}
+
+.page-link:hover {
+  color: #ecad42; /* Optional: Change color on hover */
+}
+
+.active .page-link {
+  color: white; /* Active page link color */
+  background-color: #ecad42; /* Active page background color */
+  border-color: #ecad42; /* Active page border color */
+}
+
+
+
+/*  */
+.form-select.form-control .react-select__control {
+  border: 0 !important;
+  border-bottom: 0 !important;
+}
+.form-floating .react-datepicker-wrapper  .form-control {
+  border-radius: 0;
+  padding: 0;
+  height: 51px;
+  min-height: 51px;
+  font-style: italic;
+  padding-top: 18px;
+  padding-bottom: 0;
+  z-index: 3;
+}
+.form-floating > label {
+  transform: scale(.89) translateY(-1rem) translateX(0rem) !important;
+  z-index: 0;
+}
+
+.date_modalCustome .modal-inner-box {
+  border-radius: 0.5rem !important;
+  max-width: 1140px !important;
+  padding: 0 !important;
+}
+.date_modalCustome .heading-bg-element {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+.modal_inner_body{
+  padding: 1rem;
+}
+
+.dash_nav_item a:hover .icon_holder img {
+  filter: brightness(0) invert(1);
+}

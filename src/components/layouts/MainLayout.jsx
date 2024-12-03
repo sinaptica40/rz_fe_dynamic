@@ -1,10 +1,88 @@
 import React from "react";
+import { useState } from "react";
+import { useGetCalenderQuery, useGetInspectionsOrderQuery } from "../../services/apiSlice";
 
 const MainLayout = ({ areas }) => {
-    console.warn('==MainLayout111=areas==', areas);
+    console.log('mainAdmin', areas);
 
-    // Helper function to find area by key prefix (e.g., 'HeaderArea1')
-    const findAreaByKeyPrefix = (prefix) => areas.find(area => area.key && area.key.startsWith(prefix));
+    const [showModal, setShowModal] = useState(false);
+
+    const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
+        const area = areas.find(area => area?.key && area?.key.startsWith(prefix));
+        if (area) {
+
+            // Function to recursively clone elements and add extra props
+            const deepCloneChildren = (children, extraProps) => {
+                return React.Children.map(children, (child) => {
+                    if (React.isValidElement(child)) {
+                        // Clone child and pass down extraProps
+                        const clonedChild = React.cloneElement(child, { ...extraProps });
+
+                        // If the child has its own children, recurse through them
+                        if (child.props && child.props.children) {
+                            const updatedChildren = deepCloneChildren(child.props.children, extraProps);
+                            return React.cloneElement(clonedChild, { children: updatedChildren });
+                        }
+
+                        return clonedChild;
+                    }
+
+                    return child; // Return non-element children as is (e.g., strings, numbers)
+                });
+            };
+
+            // Clone the area element itself and its nested children
+            const clonedArea = React.cloneElement(area, {
+                ...extraProps,
+                children: deepCloneChildren(area.props.children, extraProps),
+            });
+            return clonedArea;
+        }
+
+        return null;
+    };
+
+    const handleModal = (clickedDateData) => {
+        console.log("Handling modal for clicked date:", clickedDateData);
+        setShowModal(true);
+    }
+
+    // function for get All apis
+    let getApi = areas.filter((item) => item?.props?.children?.props?.children?.props?.api != null
+    ).reduce((acc,user)=>{
+        const functionName = user.props.children.props.children.props.api.function_name;
+        const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
+
+        if (functionName.includes("getOrders")) {
+            acc.getInspectionOrder = functionName;
+            acc.getOderApiMethod = api_Method;
+        }
+        if (functionName.includes("rz-calendar")) {
+            acc.calenderApi = functionName;
+            acc.calenderApiApiMethod = api_Method;
+        }
+        return acc;
+    },{})
+
+     const {data:inspectionData,isFetching:isFetchingOrder} =useGetInspectionsOrderQuery({
+       url: getApi.getInspectionOrder,
+       params:{
+         id_state:0,
+       },
+       refetchOnMountOrArgChange: true,
+     },
+     );
+
+     console.log("inspectionData",inspectionData)
+
+     const {data:calenderData,isFetching} =useGetCalenderQuery({
+        url: getApi.calenderApi,
+        refetchOnMountOrArgChange: true,
+      },
+      );
+
+   
+     
 
     return (
         <>
@@ -64,20 +142,14 @@ const MainLayout = ({ areas }) => {
                 </div>
             </header>
             <div className="webcontent-wrapper">
-                {/* {findAreaByKeyPrefix('BodyArea') || <div>- -</div>} */}
                 <div className="row g-xxl-5">
                     {findAreaByKeyPrefix('MainBodyArea1')}
                     {findAreaByKeyPrefix('MainBodyArea2')}
                     {findAreaByKeyPrefix('MainBodyArea3')}
-                    {/* {children[0]}
-                {children[1]}
-                {children[2]} */}
                 </div>
                 <div className="row g-xxl-5">
-                    {findAreaByKeyPrefix('MainBodyArea4')}
-                    {findAreaByKeyPrefix('MainBodyArea5')}
-                    {/* {children[3]}
-                {children[4]} */}
+                    {findAreaByKeyPrefix('MainBodyArea4',{inspectionData})}
+                    {findAreaByKeyPrefix('MainBodyArea5',{calenderData,showModal,setShowModal,handleModal})}
                 </div>
             </div>
         </>

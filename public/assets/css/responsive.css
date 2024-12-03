@@ -339,6 +339,9 @@ top: 110px;
   .form-floating, .form-group {
     margin-bottom: 22px;
 }
+.date_modalCustome .heading-bg-element {
+  margin-top: 0px !important;
+}
 .form-custom-check.inline-check {
   gap: 25px;
 }
@@ -385,6 +388,7 @@ top: 110px;
   .user_dropdown .dropdown-menu.show {
     padding: 6px 0 0;
   }
+  
 
   .user_dropdown img {
     height: 45px;
@@ -830,6 +834,7 @@ top: 110px;
 }
 
 @media (max-width: 575.98px) {
+
   table .thbold tr th {
     font-size: 15px;
 }

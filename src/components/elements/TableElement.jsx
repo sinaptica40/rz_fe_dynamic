@@ -2,6 +2,8 @@ import React from "react";
 
 const TableElement = ({areas}) => {
     console.log('===TableElement===', areas)
+    // console.log("tableIcon", areas?.table_columns?.table_fields)
+    const tableHeading = areas?.table_columns;
     return (
         <>
             <div className="card-header nowrap-mobile">
@@ -68,17 +70,23 @@ const TableElement = ({areas}) => {
                     <table className="table">
                         <thead>
                             <tr>
-                                <th scope="col">ID commessa</th>
+                                {tableHeading?.map((item)=>(
+                                   <th scope="col">
+                                    
+                                    {item?.table_fields?.field_name}
+                                    </th>
+                                ))}
+                                {/* <th scope="col">ID commessa</th>
                                 <th scope="col">ID cliente</th>
                                 <th scope="col">Data creazione</th>
-                                <th scope="col" />
+                                <th scope="col" /> */}
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>012345789</td>
-                                <td>012345789</td>
                                 <td>00/00/0000</td>
+                                <td>012345789</td>
+                                <td>012345789</td>
                                 <td>
                                     <div className="download-icon">
                                         <a href="#!">

@@ -1,10 +1,434 @@
 import React from "react";
 
+import { useLocation, useNavigate,useParams } from "react-router-dom";
+import { useState, useEffect,useCallback } from "react";
+import { useAddMachineryMutation, useEditMachineryMutation, useGetEditNormDataQuery,useGetNormeLanguageQuery, useGetNormeStandardTypeQuery } from "../../services/apiSlice";
+
 const MainLayout4 = ({ areas }) => {
-    console.warn('==MainLayout444=areas==', areas);
+    const location = useLocation();
+    const route = location.pathname.substring('/');
+
+   
+    const navigate = useNavigate();
+    const params = useParams();
+
+
+
+    const [formValues, setFormValues] = useState({
+        name: "",
+        brand_name: "",
+        typology: "",
+        norm_specification: [],
+        atex: false,
+        ce: false,
+        year: "",
+    });
+    const [normeOptions, setNormeOptions] = useState([]);
+    const [selectedNormsByType, setSelectedNormsByType] = useState({});
+    const [selectedOption, setSelectedOption] = useState([]);
+    const [isSelectActive, setIsSelectActive] = useState(false);
+
+    const [errors, setErrors] = useState({});
+
+    // const handleClose=()=>{
+    //     navigate(-1);
+    // }
 
     // Helper function to find area by key prefix (e.g., 'HeaderArea1')
-    const findAreaByKeyPrefix = (prefix) => areas.find(area => area.key && area.key.startsWith(prefix));
+    // const findAreaByKeyPrefix = (prefix) => areas.find(area => area.key && area.key.startsWith(prefix));
+
+    const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
+        const area = areas.find(area => area.key && area.key.startsWith(prefix));
+        if (area) {
+
+            // Function to recursively clone elements and add extra props
+            const deepCloneChildren = (children, extraProps) => {
+                return React.Children.map(children, (child) => {
+                    if (React.isValidElement(child)) {
+                        // Clone child and pass down extraProps
+                        const clonedChild = React.cloneElement(child, { ...extraProps });
+
+                        // If the child has its own children, recurse through them
+                        if (child.props && child.props.children) {
+                            const updatedChildren = deepCloneChildren(child.props.children, extraProps);
+                            return React.cloneElement(clonedChild, { children: updatedChildren });
+                        }
+
+                        return clonedChild;
+                    }
+
+                    return child; // Return non-element children as is (e.g., strings, numbers)
+                });
+            };
+
+            // Clone the area element itself and its nested children
+            const clonedArea = React.cloneElement(area, {
+                ...extraProps,
+                children: deepCloneChildren(area.props.children, extraProps),
+            });
+            return clonedArea;
+        }
+
+        return null;
+    };
+
+    let allApis = areas.filter((item) => {
+        return item?.props?.children?.props?.children?.props?.api != null;
+    });
+
+    
+
+    let getapi;
+    getapi = allApis.reduce((acc, user) => {
+
+       
+        const functionName = user.props.children.props.children.props.api.function_name;
+        const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
+
+        if (functionName.includes("add-machinery")) {
+            acc.addMachinery = functionName;
+            acc.addMachineryApiMethod = api_Method;
+        }
+        if (functionName.includes("standard-types")) {
+            acc.standardApi = functionName;
+            acc.standardTypeApiMethod = api_Method;
+        }
+        if (functionName.includes("get-norme")) {
+            acc.getNormeApi = functionName;
+            acc.getNormeApiMethod = api_Method;
+        }
+        if (functionName.includes("edit-machinery")) {
+            acc.editApi = functionName;
+            acc.editApiMethod = api_Method;
+        }
+        if (functionName.includes("get-machinery?id_machinery_type=".toLowerCase())) {
+            acc.getEditNorme = functionName;
+            acc.getApiMethod = api_Method;
+        }
+        return acc;
+    }, {});
+
+   
+   
+
+    const { data: standardData } = useGetNormeStandardTypeQuery({
+        endpointName: getapi.standardApi,
+        method: getapi.standardTypeApiMethod,
+
+    });
+
+    const { data: normeData } = useGetNormeStandardTypeQuery({
+        endpointName: getapi.getNormeApi,
+        method: getapi.getNormeApiMethod,
+        
+
+    });
+    const edit_id = localStorage.getItem("machinery_id")
+
+    const {data:editNormedata ,isFetching,refetch} =  useGetEditNormDataQuery({
+        url:getapi.getEditNorme,
+        method: getapi.getApiMethod,
+        params :{
+            id:`${edit_id}`,
+        }
+    })
+
+
+
+    useCallback(()=>{
+        if(params["*"]){
+             refetch();
+          getapi={}
+         
+      }
+    },[params["*"]])  
+
+    
+    
+    useEffect(() => {
+        const clearLocalStorageOnRouteChange = () => {
+          refetch();
+        };
+        clearLocalStorageOnRouteChange();
+    }, [location.pathname]);
+
+    
+    useEffect(() => {
+        if (editNormedata?.data && !isFetching) {
+            const editValue = editNormedata?.data;           
+            setFormValues({
+                name: editValue?.name || "",
+                brand_name: editValue?.brand_name || "",
+                typology: editValue?.typology || "",
+                norm_specification: editValue?.norm_specification || [],
+                atex: editValue?.atex || false,
+                ce: editValue?.ce || false,
+                year: editValue?.year || "",
+                id_standard :editValue.id_machinery_type|| "",
+                id_standard_type:editValue?.norm_specification[0]?.id_standard_type
+            });
+            console.warn("formmmmmmmeeeeeee",formValues.norm_specification)
+            console.log("selectedNormsByType[[[[[[]]]]]]:", formValues.id_standard);
+            
+            if (editValue?.norm_specification[0]?.id_standard_type) {
+                const normSpecificationOptions =
+                    normeData?.data
+                        ?.filter((item) => item.id_standard_type == editValue?.norm_specification[0]?.id_standard_type)
+                        .map((item) => ({
+                            value: item.id_standard,
+                            label: item.name,
+                        })) || [];
+             
+                setNormeOptions(normSpecificationOptions);
+
+                const previouslySelected = [editValue?.norm_specification[0]?.id_standard ]|| [];
+             
+
+                // const previouslySelected = [editValue?.id_machinery_type] || [];
+                // const previouslySelected = selectedNormsByType[editValue?.norm_specification[0]?.id_standard_type] || [];
+                
+                console.warn("]]]]]]]",previouslySelected)
+           
+                let arr= editValue?.norm_specification.map((it)=>({
+                    value:it?.id_standard,
+                    label: it?.name,
+                }))
+                setSelectedOption(arr); 
+
+    
+                setFormValues((prevData) => ({
+                    ...prevData,
+                    norm_specification:  previouslySelected,
+                }));
+            }
+            console.warn("Final formValues:", formValues);
+        }
+    }, [editNormedata, isFetching]);
+    
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        if (type === "checkbox") {
+            setFormValues((prevData) => ({
+                ...prevData,
+                [name]: checked,
+            }));
+        } else {
+            setFormValues((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        }
+
+
+        if (name === "id_standard_type") {
+            const normSpecificationOptions =
+                normeData?.data
+                    ?.filter((item) => item.id_standard_type == value)
+                    .map((item) => ({
+                        value: item.id_standard,
+                        label: item.name,
+                    })) || [];
+         
+            setNormeOptions(normSpecificationOptions);
+
+            const previouslySelected = selectedNormsByType[value] || [];
+        
+            setSelectedOption(previouslySelected);
+
+            setFormValues((prevData) => ({
+                ...prevData,
+                norm_specification: previouslySelected.map((option) => option.value),
+            }));
+        }
+
+        if (name === "year" && value !== "" && !Number.isInteger(Number(value))) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                year: "Please enter a valid year. The value must be a number.",
+            }));
+            return;
+        }
+
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [name]: "",
+        }));
+    };
+
+
+    const handleSelectChange = (selectedOptions) => {
+
+        const selectedValues = selectedOptions.map((option) => option.value);
+
+        setSelectedOption(selectedOptions);
+
+        setFormValues((prevData) => ({
+            ...prevData,
+            norm_specification: selectedValues,
+        }));
+        
+
+        setSelectedNormsByType((prevState) => ({
+            ...prevState,
+            [formValues.id_standard_type]: selectedOptions,
+        }));
+
+        setIsSelectActive(selectedOptions && selectedOptions.length > 0);
+   
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            norm_specification: "",
+        }));
+    };
+
+
+    const validate = () => {
+        const newErrors = {};
+
+        if (!formValues.name) {
+            newErrors.name = "Nome Macchinario is required.";
+        }
+
+        if (!formValues.id_standard_type) {
+          newErrors.id_standard_type = "Blocco Norme Base is required.";
+        }
+
+        if (!formValues.year){
+          newErrors.year = "Costrizione is required.";
+        }
+
+        if (formValues.year.toString().length > 5) {
+          newErrors.year = "Costrizione must be 5 digits or less.";
+        }
+
+        // if (!fromData.type) {
+        //   newErrors.type = "Tipologia Macchinario is required.";
+        // }
+
+        if (formValues.norm_specification.length === 0) {
+            newErrors.norm_specification =
+                "At least one Norma Specifica must be selected.";
+        }
+        // setErrors(newErrors);
+        // return Object.keys(newErrors).length === 0;
+        return newErrors;
+    };
+
+
+
+
+
+    const [addMachinery] = useAddMachineryMutation();
+
+    const [EditMachinery] = useEditMachineryMutation()
+
+    // const editMachineryData = JSON.parse(localStorage.getItem("NormeItemData"));
+    // console.warn("editMachineryData:", editMachineryData); 
+    // useEffect(() => {
+    //     if (editMachineryData) {
+
+    //         setFormValues({
+    //             name: editMachineryData?.name || "",
+    //             brand_name: editMachineryData?.brand_name || "",
+    //             typology: editMachineryData?.typology || "",
+    //             norm_specification: editMachineryData?.norm_specification || [],
+    //             atex: editMachineryData?.atex || false,
+    //             ce: editMachineryData?.ce || false,
+    //             year: editMachineryData?.year || "",
+    //             id_standard  :editMachineryData?.id_machinery_type|| "",
+    //         });
+    //     }
+    // }, [getapi?.editApi == route]);
+
+   
+
+
+    useEffect(() => {
+        const clearLocalStorageOnRouteChange = () => {
+            localStorage.removeItem("NormeItemData");
+        };
+        clearLocalStorageOnRouteChange();
+    }, [location.pathname]);
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+
+        const validationErrors = validate();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        // if (!formValues.id_standard_type) {
+        //     formValues.id_standard_type = "1";
+        // }
+
+        // if (!formValues.language) {
+        //     formValues.language = "EN";
+        // }
+    
+        
+        const { id_standard_type, ...filteredFormValues } = formValues;
+
+        
+    //    console.warn("formvalue",formValues)
+    //    console.warn("filtfhhf",filteredFormValues)
+        try {
+            if (getapi?.addMachinery) {
+
+                let obj = {
+                    url: getapi.addMachinery,
+                    method: getapi.addMachineryApiMethod,
+                    data: filteredFormValues
+                }
+                console.warn("obj.data",obj.data)
+                const res = await addMachinery(obj);
+               
+                if (res?.data?.status === "success" || res?.data?.status === "SUCCESS") {
+                    navigate(`/${res?.data?.navigate}`);
+                } else {
+                    console.error(res?.error?.data?.message || "An error occurred");
+
+                }
+                // if (res?.data?.status === "success" || res?.data?.status === "SUCCESS") {
+                //     console.warn("Machinery added successfully:", res);
+                //     // navigate("/5");
+                //     // location.reload(); 
+                // } else {
+                //     console.error(res?.error?.data?.message || "An error occurred");
+                // }
+            }
+            
+            else if(getapi?.editApi){
+                const objEdit ={
+                    url:getapi.editApi,
+                    method:getapi.editApiMethod,
+                    params : edit_id,
+                    // params: editMachineryData?.id_machinery_type,
+                    data:formValues,
+                }
+                console.warn("aasdsdffssdfd",objEdit.data)
+                const res = await EditMachinery(objEdit);
+               
+
+                console.warn("API Response of editMachinery:", res);
+                if (res?.data?.status === "success" || res?.data?.status === "SUCCESS") {
+                //    navigate(res?.data?.navigate);
+                   navigate(`/${res?.data?.navigate}`);
+                   
+                } else {
+                    console.error(res?.error?.data?.message || "An error occurred");
+                
+            }
+
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+        }
+    
+    };
 
     return (
         <>
@@ -72,7 +496,10 @@ const MainLayout4 = ({ areas }) => {
                                 {findAreaByKeyPrefix('FormArea7') || <div>- -</div>}
                                 {findAreaByKeyPrefix('FormArea8') || <div>- -</div>}
                             </div>
-                            {/* <a href="macchinari.html" className="close-iconBtn">
+                            {/* <a 
+                            
+                            onClick={handleClose}
+                            className="close-iconBtn">
                                 <svg
                                     width={26}
                                     height={26}
@@ -89,18 +516,31 @@ const MainLayout4 = ({ areas }) => {
                             {findAreaByKeyPrefix('EditArea4') || <div>- -</div>}
                         </div>
                         <div className="form-input-block">
-                            <form action="#!">
+                            <form onSubmit={handleSubmit}>
                                 <div className="row row-gap">
                                     {/* <div className="col-md-6"> */}
-                                    {findAreaByKeyPrefix('FormArea9') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('FormArea10') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('FormArea11') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('FormArea12') || <div>- -</div>}
+
+
+                                    {findAreaByKeyPrefix('FormArea10', { handleChange, errors, formValues }) || <div>- -</div>}
+                                    {findAreaByKeyPrefix('FormArea15', { handleChange, errors, formValues }) || <div>- -</div>}
+                                    {findAreaByKeyPrefix('FormArea13', { handleChange, errors, formValues }) || <div>- -</div>}
+                                    {findAreaByKeyPrefix('FormArea9', { handleChange, errors, formValues }) || <div>- -</div>}
+                                    <div className="col-md-2">
+                                        <div className="form-custom-check inline-check ccmt-50">
+                                            {findAreaByKeyPrefix('EditCheckArea1', { formValues, errors, handleChange }) || <div> -- </div>}
+                                            {findAreaByKeyPrefix('EditCheckArea2', { formValues, errors, handleChange }) || <div> -- </div>}
+                                        </div>
+                                    </div>
+                                    {findAreaByKeyPrefix('FormArea16', { handleChange, errors, formValues, standardData }) || <div>- -</div>}
+                                    {findAreaByKeyPrefix('FormArea12', { handleSelectChange, errors, formValues, normeOptions, selectedOption, isSelectActive }) || <div>- -</div>}
+
+                                    {/* {findAreaByKeyPrefix('FormArea11') || <div>- -</div>}   */}
+
                                     {/* </div> */}
                                     <div className="col-md-12">
-                                        {findAreaByKeyPrefix('FormArea13') || <div>- -</div>}
                                         {findAreaByKeyPrefix('FormArea14') || <div>- -</div>}
                                     </div>
+
                                 </div>
                             </form>
                         </div>

@@ -1,6 +1,7 @@
 import React from "react";
 
 const NotifyElement = (props) => {
+    console.log("props",props)
     return (
         <>
             <a className="nav-link" href="notifiche.html">

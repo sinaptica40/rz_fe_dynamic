@@ -3,7 +3,7 @@ import React from "react";
 const EditArea4 =({children})=>{
     return(
         <>
-            <a href="#!" className="close-iconBtn">
+            <a className="close-iconBtn">
                 {children}
             </a>
         </>

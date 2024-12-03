@@ -1,6 +1,57 @@
 import React from "react";
 
-const EditTableElement = ({areas}) => {
+const EditTableElement = ({
+                areas,rzOrderdetails,
+                deleteInspection,setShowModal,
+                showModal,handleModal,
+                handleFormPage,
+                nestedElements
+              }) => {
+  const filterHeading = areas?.table_columns.filter((item)=>item?.table_fields?.data_type != "api")
+ 
+
+  const editIcon = areas?.table_columns.find(item=> item.table_fields.field_name=="edit icon");
+  
+ 
+    const deleteIcon = areas?.table_columns.find(item=> item.table_fields.field_name=="Delete-ispection");
+
+    const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
+      const area = nestedElements.find(area => area.key && area.key.startsWith(prefix));
+
+      if (area) {
+
+          // Function to recursively clone elements and add extra props
+          const deepCloneChildren = (children, extraProps) => {
+              return React.Children.map(children, (child) => {
+                  if (React.isValidElement(child)) {
+                      // Clone child and pass down extraProps
+                      const clonedChild = React.cloneElement(child, { ...extraProps });
+
+                      // If the child has its own children, recurse through them
+                      if (child.props && child.props.children) {
+                          const updatedChildren = deepCloneChildren(child.props.children, extraProps);
+                          return React.cloneElement(clonedChild, { children: updatedChildren });
+                      }
+
+                      return clonedChild;
+                  }
+
+                  return child; // Return non-element children as is (e.g., strings, numbers)
+              });
+          };
+
+          // Clone the area element itself and its nested children
+          const clonedArea = React.cloneElement(area, {
+              ...extraProps,
+              children: deepCloneChildren(area.props.children, extraProps),
+          });
+          return clonedArea;
+      }
+
+      return null;
+  };
+   
+   
   return (
     <>
       <div className="heading-bg-element">
@@ -12,66 +63,103 @@ const EditTableElement = ({areas}) => {
         <table className="table m b-0">
           <thead className="thbold">
             <tr>
-              <th scope="col">Macchinario</th>
+              {filterHeading?.map(({table_fields})=>{
+                return(
+               <th scope="col">{table_fields?.field_name}</th>
+              )})}
+              {/* <th scope="col">Macchinario</th>
               <th scope="col">Ispettore</th>
               <th scope="col">Area Lavoro</th>
               <th scope="col">Data Ispezione</th>
-              <th scope="col" />
+              <th scope="col" /> */}
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Pellizzatore</td>
-              <td>Mario Rossi</td>
-              <td>Area Lavoro x</td>
-              <td>00/00/0000</td>
-              <td>
-                <div className="table_action_list">
-                  <a href="#!" className="table_actionBtn">
-                    <svg
-                      width={26}
-                      height={26}
-                      viewBox="0 0 26 26"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M22.619 18.1552L6.65001 2.18517C6.01951 1.57864 5.17625 1.24363 4.30142 1.25211C3.42659 1.26059 2.58998 1.61188 1.97135 2.23051C1.35273 2.84914 1.00143 3.68574 0.992955 4.56058C0.984476 5.43541 1.31949 6.27866 1.92601 6.90917L17.9 22.8782C18.2644 23.2427 18.7286 23.4911 19.234 23.5922L24.361 24.6182L23.332 19.4892C23.231 18.9838 22.9835 18.5196 22.619 18.1552Z"
-                        stroke="currentcolor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M10.188 4.83984L4.43103 10.0088"
-                        stroke="currentcolor"
-                        strokeWidth="1.5"
-                      />
-                    </svg>
+           
+
+              {rzOrderdetails?.data?.inspections?.map((item,index)=>{
+                return(
+                  <tr key={index}>
+                  <td>{item?.calendar_info?.date}</td>
+                 <td>{item?.ispector_info?.name}</td>
+                  <td>{item?.working_area_info?.wa_name}</td>
+                  <td>{item?.machinery_info?.brand_name}</td>
+                  <td>
+                  <div className="table_action_list">
+                  <a onClick={()=>handleFormPage(item,index)} className="table_actionBtn">
+                    <img src={editIcon?.table_fields?.label} />
+                   
                   </a>
-                  <a href="#!" className="table_actionBtn">
-                    <svg
-                      width={26}
-                      height={25}
-                      viewBox="0 0 26 25"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M1.5 5.5138H24.859M10.844 11.3538V17.1938M15.516 11.3538V17.1938M3.836 5.5138H22.523L20.677 22.1218C20.6137 22.6934 20.3418 23.2215 19.9134 23.6052C19.485 23.9888 18.9301 24.2008 18.355 24.2008H8C7.42544 24.2001 6.87129 23.9877 6.44348 23.6042C6.01567 23.2206 5.74421 22.6929 5.681 22.1218L3.836 5.5138ZM7.743 2.1818C7.93182 1.78122 8.23061 1.44256 8.60455 1.20531C8.97848 0.968063 9.41215 0.841992 9.855 0.841797H16.5C16.9432 0.841612 17.3773 0.967505 17.7516 1.20478C18.1259 1.44205 18.425 1.78091 18.614 2.1818L20.184 5.5138H6.172L7.743 2.1818Z"
-                        stroke="currentcolor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                  <a onClick={()=>handleModal(item?.id_inspection)}
+                   className="table_actionBtn">
+                    <img src = {deleteIcon?.table_fields?.label} />
+                
                   </a>
                 </div>
               </td>
-            </tr>
+                  </tr>
+                )
+              })}
           </tbody>
         </table>
       </div>
+
+      {/* {showModal && (
+                <div className="modal-main-box">
+                    <div className="modal-inner-box">
+                        <span className="info-iocn">
+                            !
+                        </span>
+                       
+                            <span>
+                             Are You Sure
+                            </span>
+                            <div>
+                            <span>
+                            You Would not be able to revert this!
+                            </span>
+                            </div>
+                                
+                                <div className="modal-btn-group">
+                                    
+                                    <div className="col-md-4">
+                                     <div className="form-floating">
+                                    <button onClick={deleteInspection}>
+                                       Yes
+                                      </button>
+                                      </div>
+                                     </div>
+                                      <div className="col-md-4">
+                                     <div className="form-floating">
+                                     <button onClick={()=>setShowModal(false)}>
+                                      No
+                                     </button>
+
+                                     </div>
+                                     </div>
+                              
+                        </div>
+                    </div>
+                </div>
+      )} */}
+
+{showModal && (
+            <div className="modal-main-box">
+                <div className="modal-inner-box">
+                    {/* <span className="info-iocn">
+                        !
+                    </span> */}
+                    {findAreaByKeyPrefix("FormArea8")}
+                   {findAreaByKeyPrefix("FormArea9")}
+                   {findAreaByKeyPrefix("FormArea10")}
+                    <div className="modal-btn-group">
+                        {findAreaByKeyPrefix("FormArea11",{deleteInspection})}
+                        {findAreaByKeyPrefix("FormArea12",{setShowModal})}
+                   </div>
+                   
+                </div>
+            </div>
+            )}
     </>
   )
 }

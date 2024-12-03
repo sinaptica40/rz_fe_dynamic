@@ -1,9 +1,9 @@
 import React from "react";
 
-const EditElement2 =()=>{
+const EditElement2 =({areas,handleSubmit})=>{
     return(
-        <>
-            <span className="check-icon">
+        <div onClick={handleSubmit}>
+            <span className="check-icon" >
               <svg
                 width={14}
                 height={10}
@@ -19,8 +19,10 @@ const EditElement2 =()=>{
                 />
               </svg>
             </span>{" "}
-            Pianificazione completata
-        </>
+            {areas?.element_data.block_name}
+          
+            
+        </div>
     )
 }
 

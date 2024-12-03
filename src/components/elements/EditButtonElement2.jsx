@@ -2,6 +2,7 @@ import React from "react";
 
 const EditButtonElement2 = ({areas})=>{
     const name = areas.element_data.block_name
+    console.log("name",name)
     return(
         <>
              <span className="importIcon">
@@ -17,7 +18,8 @@ const EditButtonElement2 = ({areas})=>{
                       fill="white"
                     />
                   </svg>
-                </span>{" "}
+                </span>
+                {" "}
                 {name}
         </>
     )

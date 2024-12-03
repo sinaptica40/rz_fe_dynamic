@@ -1,8 +1,12 @@
 import React from "react";
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const MenuElement = ({ data }) => {
+const MenuElement = ({ data}) => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const route = location.pathname.substring(1) || '/';
+  
+   
     return (
         <>
             <button className="navbar-toggler menuClose-icon" type="button">
@@ -22,9 +26,11 @@ const MenuElement = ({ data }) => {
             <ul className="navbar-nav ms-auto">
                 {data.data.map((item) => {
                     return (
-                        <li className="nav-item">
+                        <li className={`nav-item ${route==item.id_page ? "active":""}`}>
                             <a className="nav-link" onClick={() => navigate(`/${item.id_page}`)}>
                                 <span className="header_menuIcon">
+
+                                    {/* <img src={item?.image_icon} /> */}
                                     <svg
                                         width={36}
                                         height={36}

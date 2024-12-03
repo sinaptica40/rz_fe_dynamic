@@ -1,9 +1,10 @@
 import React from "react";
 
-const EditButtonArea0 = ({areas})=>{
+const EditButtonArea0 = ({areas,handleClientSubmit})=>{
     const name = areas.element_data.block_name
     return(
-        <>
+        
+           <button onClick ={handleClientSubmit} className="btn-primary btn-default">
              <span className="plusIcon">
                     <svg
                         width={24}
@@ -20,7 +21,8 @@ const EditButtonArea0 = ({areas})=>{
                 </span>{" "}
                 {name}
                 {/* Aggiungi elemento ispezione */}
-        </>
+            </button>
+       
     )
 }
 

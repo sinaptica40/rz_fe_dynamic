@@ -3,7 +3,7 @@ import React from "react";
 const NewMachineryArea4 = ({ children }) => {
     return (
         <>
-            <div className="col-md-6">
+            <div className="col-md-4">
                 <div className="form-floating">
                         {children}
                 </div>

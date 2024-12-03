@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const MachineryElement1 = ({ api, areas, data }) => {
     const navigate = useNavigate();
-
+    console.log("api",api)
     const handleClick = (id_page) => {
         navigate(`${id_page}`); 
     };
@@ -12,7 +12,8 @@ const MachineryElement1 = ({ api, areas, data }) => {
         <>
             <a onClick={() => handleClick(api?.function_name)} className="dash_navTitle">
                 <span className="icon_holder">
-                    <svg
+                    <img src={data?.image_icon} />
+                    {/* <svg
                         width={34}
                         height={37}
                         viewBox="0 0 34 37"
@@ -26,7 +27,7 @@ const MachineryElement1 = ({ api, areas, data }) => {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                         />
-                    </svg>
+                    </svg> */}
                 </span>
                 {data?.data[0]?.menu_item_name}
             </a>

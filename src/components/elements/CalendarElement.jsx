@@ -1,10 +1,164 @@
-import React from "react";
+import React, { useState } from "react";
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
-const CalendarElement = ({ areas }) => {
-    console.log('==CalendarElement==', areas)
+const css = `
+.react-calendar, .react-calendar *, .react-calendar *:before, .react-calendar *:after {
+    color: #000;
+}
+    span.react-calendar__navigation__label__labelText.react-calendar__navigation__label__labelText--from {
+    font-weight: 700;
+    font-size: 21px;
+}
+    
+    .react-calendar__navigation button {
+   font-size: 30px;
+    color: #ecad42;
+}
+    .react-calendar__navigation button:enabled:hover, .react-calendar__navigation button:enabled:focus {
+    background-color: transparent;
+    color: #000;
+}
+   .react-calendar {
+    width: 100%; 
+    border: 0; 
+}
+    .react-calendar__tile:enabled:hover, .react-calendar__tile:enabled:focus {
+    background-color: #fff;
+}
+    .react-calendar .react-calendar__month-view__days button {
+    color: #000;
+}
+    abbr[title] {
+    -webkit-text-decoration: none;
+    text-decoration: none;
+    cursor: text;
+    -webkit-text-decoration-skip-ink: none;
+    text-decoration-skip-ink: none;
+}
+    .react-calendar__month-view__weekdays { 
+    text-transform: none; 
+    font-size: 14px;
+    font-weight: bold; 
+}
+    .react-calendar__tile--active {
+    background: #fff;
+    color: #000;
+}
+
+.react-calendar__tile {
+    padding: 0; 
+    min-height: 40px;
+}
+.react-calendar__tile--now {
+    background: #fff;
+}
+.highlighted-date abbr{
+    background: #ecad42;
+    color:#000;
+    border-radius:50%;
+    width:38px;
+    height:38px;
+        display: block;
+    margin: 0 auto;
+    line-height: 38px;
+     box-sizing: content-box;
+}  
+.react-calendar__navigation button:nth-child(2){
+    flex: auto;
+    order: -1;
+    width: auto;
+    text-align: left;
+    background:none;
+     justify-content: left;
+}
+.react-calendar__navigation button {
+    min-width: 35px;
+    height: 35px;
+    width: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+    padding: 0 0 4px;
+    background-color: #ecad42;
+}
+.react-calendar__navigation {
+    gap: 10px;
+    height: 35px;
+    align-items: baseline;
+    padding: 0 10px;
+}
+    .react-calendar__navigation button:enabled:hover, .react-calendar__navigation button:enabled:focus {
+    background-color: #ecad42;
+    color: #fff;
+}
+.react-calendar__navigation button {
+    color: #fff;
+}
+    .react-calendar__navigation button:nth-child(2):enabled:hover, .react-calendar__navigation button:nth-child(2):enabled:focus {
+    background-color:#fff;
+}
+    @media (max-width: 575.98px) {
+  span.react-calendar__navigation__label__labelText.react-calendar__navigation__label__labelText--from {
+    font-size: 18px;
+  }
+  .react-calendar__navigation button {
+    font-size: 25px;
+  }
+  .react-calendar__navigation button {
+    min-width: 30px;
+    height: 30px;
+    width: 30px;
+}
+.highlighted-date abbr {
+    width: 32px;
+    height: 32px;
+    line-height: 35px;
+}
+}
+
+`
+
+const CalendarElement = ({ areas, calenderData, showModal, setShowModal, handleModal }) => {
+    const [selectedDateData, setSelectedDateData] = useState(null);
+
+
+    const isHighlightedDate = (date) => {
+        if (!calenderData || !calenderData.data) return false;
+        return calenderData.data.some((item) => new Date(item.date).toDateString() === date.toDateString());
+    };
+
+    const handleDateClick = (date) => {
+        const clickedDateData = calenderData.data.find(
+            (item) => new Date(item.date).toDateString() === date.toDateString()
+        );
+        if (clickedDateData) {
+            console.log(clickedDateData, 'clickedDateDataclickedDateData')
+            setSelectedDateData(clickedDateData);
+            setShowModal(true); // Open the modal
+            const handleDateClick = (date) => {
+                const clickedDateData = calenderData.data.find(
+                    (item) => new Date(item.date).toDateString() === date.toDateString()
+                );
+                if (clickedDateData) {
+                    console.log(clickedDateData, 'clickedDateDataclickedDateData')
+                    setSelectedDateData(clickedDateData);
+                    console.log("selectedDate", selectedDateData)
+                    setShowModal(true); // Open the modal
+                    handleModal(clickedDateData);
+
+                }
+
+            };
+        }
+
+    };
+
     return (
         <>
             <div className="card-header nowrap-mobile">
+                <style>{css}</style>
                 <div className="card-title">
                     <span className="title-icon">
                         <svg
@@ -65,9 +219,56 @@ const CalendarElement = ({ areas }) => {
             </div>
             <div className="card-block-body">
                 <div className="calender text-center">
-                    <img src="img/calender.png" alt="" />
+                    <Calendar
+                        prev2Label={null}  // Hide the previous year button
+                        next2Label={null}  // Hide the next year button
+                        tileClassName={({ date, view }) => {
+                            if (view === 'month' && isHighlightedDate(date)) {
+                                return 'highlighted-date';
+                            }
+                            return null;
+                        }}
+                        onClickDay={handleDateClick} // Handle clicking on a date
+                    />
                 </div>
             </div>
+            {showModal && selectedDateData && (
+                <div className="modal-main-box date_modalCustome">
+                    <div className="modal-inner-box">
+                        <div className="heading-bg-element">
+                            <div className="modal-header p-0 heading-bg-element">
+                                <h5 className="modal-title text-start">Ispezioni programmate attivate{selectedDateData.date}</h5>
+                                <button type="button" onClick={() => setShowModal(false)} class="btn-close text-white"></button>
+                            </div>
+                        </div>
+                        <div className="modal_inner_body">
+                            <div className="table-responsive">
+                                <table className="table m b-0">
+                                    <thead className="thbold">
+                                        <tr>
+                                            <th scope="col">ID Ispezione</th>
+                                            <th scope="col">ID Codice</th>
+                                            <th scope="col">Descrizione</th>
+                                            <th scope="col">Status</th>
+                                            <th scope="col">Dettagli</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {selectedDateData?.order?.map((item) => (
+                                            <tr key={item.id_order}>
+                                                <th>{item.client_name}</th>
+                                                <th>{item.order_code}</th>
+                                                <th>{item.description}</th>
+                                                <th>{item.state?.name}</th>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                    </div>
+                    </div>
+                </div>
+            )}
         </>
 
     )

@@ -1,11 +1,21 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const NormaElement1 = () => {
+const NormaElement1 = ({api,data}) => {
+    const navigate = useNavigate();
+    console.log("data",data)
+   
+    const handleClick = (id_page) => {
+        navigate(`${id_page}`); 
+    };
     return (
         <>
-            <a href="new-norme.html" className="dash_navTitle">
+            <a 
+              onClick={()=>handleClick(api?.function_name)}
+            className="dash_navTitle">
                 <span className="icon_holder">
-                    <svg
+                  <img src={data?.image_icon} />
+                    {/* <svg
                         width={32}
                         height={32}
                         viewBox="0 0 32 32"
@@ -40,9 +50,9 @@ const NormaElement1 = () => {
                             d="M23.5 21H11.5C10.6716 21 10 21.6716 10 22.5C10 23.3284 10.6716 24 11.5 24H23.5C24.3284 24 25 23.3284 25 22.5C25 21.6716 24.3284 21 23.5 21Z"
                             fill="#ECAD42"
                         />
-                    </svg>
+                    </svg> */}
                 </span>
-                Aggiungi uova Norma
+                {data?.data?.[0]?.menu_item_name}
             </a>
         </>
     )

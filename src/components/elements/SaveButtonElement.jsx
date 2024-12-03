@@ -1,9 +1,17 @@
 import React from "react";
 
-const NewMachineryElement7 =()=>{
+const NewMachineryElement7 =({areas})=>{
+    
     return(
         <>
-             Salva Nome Macchinario
+         <button
+         type="submit"
+         className="btn-primary"
+        // onclick="document.location='macchinari.html'"
+                >  
+               {/* Salva Nome Macchinario */}
+               {areas?.element_data?.block_name}
+                </button>
         </>
     )
 }

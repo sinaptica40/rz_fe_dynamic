@@ -1,41 +1,49 @@
 import React from "react";
+import { getClassName } from "../../utils/helper";
 
-const EditElement3 = () => {
+const EditElement3 = ({areas,stateListing,status,setStatus}) => {
     return (
         <>
-            <span className="drop-statusText">Status</span>
-            <div className="dropdown">
-                <button
-                    className="action-btn dropdown-toggle"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                >
-                    In pianificazione
-                </button>
-                <ul className="dropdown-menu dropdown-menu-dark">
-                    <li>
-                        <a className="dropdown-item buleColor" href="#">
-                            Action
-                        </a>
+        <div className="action_dropdownBox">
+          {/* <span className="drop-statusText">{areas?.element_data?.block_name}</span> */}
+          <span className="drop-statusText">Status</span>
+          <div className="dropdown">
+            <button
+              className={`action-btn dropdown-toggle ${getClassName(
+                status?.id_state
+              )}`}
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              {status?.state ? status?.state : stateListing?.[0]?.state}
+            </button>
+            <ul className="dropdown-menu dropdown-menu-dark">
+              {stateListing &&
+                stateListing.length > 0 &&
+                stateListing.map((state, index) =>
+                  
+                    <li key={index}>
+                      <a
+                        className={`dropdown-item ${getClassName(
+                          state?.id_state
+                        )}`}
+                        href="#"
+                        onClick={() =>
+                          setStatus({
+                            state: state?.state,
+                            id_state: state?.id_state,
+                          })
+                        }
+                      >
+                        {state.state}
+                      </a>
                     </li>
-                    <li>
-                        <a className="dropdown-item greenColor" href="#">
-                            Another action
-                        </a>
-                    </li>
-                    <li>
-                        <a className="dropdown-item yellowColor" href="#">
-                            Something else here
-                        </a>
-                    </li>
-                    <li>
-                        <a className="dropdown-item redColor" href="#">
-                            Separated link
-                        </a>
-                    </li>
-                </ul>
-            </div>
+                 
+                )}
+            </ul>
+          </div>
+        </div>
         </>
     )
 }

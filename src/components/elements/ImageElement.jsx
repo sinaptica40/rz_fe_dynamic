@@ -1,7 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const ImageElement = ({api}) => {
+const ImageElement = ({api,areas}) => {
+    console.log("areas",areas)
     const navigate = useNavigate();
     const handleClick = (id_page) => {
         navigate(`${id_page}`); 
@@ -9,7 +10,8 @@ const ImageElement = ({api}) => {
 
     return (
         <>
-            <img src="img/logo.png" alt="" onClick={() => handleClick(api?.function_name)}/>
+            <img src={areas?.element_data?.data?.html_name} alt="" onClick={() => handleClick(api?.function_name)}/>
+            
         </>
     )
 };

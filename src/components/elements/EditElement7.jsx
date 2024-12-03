@@ -1,21 +1,34 @@
 import React from "react";
+import CreatableSelect from "react-select/creatable";
 
-const EditElement7 =({areas})=>{
-  const name = areas.element_data.block_name
+const EditElement7 =({areas,normeDellData,handleSelectMachinery,formData})=>{
+  const name = areas.element_data.block_name;
+
+  console.log(formData,"normeele")
+ 
+
     return(
         <>
-            <select
-                  className="form-select form-control"
-                  id="floatingSelect"
-                  aria-label="Floating label select example"
-                >
-                  <option selected="">Seleziona {name}</option>
-                  <option value={1}>One</option>
-                  <option value={2}>Two</option>
-                  <option value={3}>Three</option>
-                </select>
+            <CreatableSelect
+                id="floatingSelect"
+                name="machineId"
+                onChange={handleSelectMachinery}
+                defaultValue={formData?.normedefaultValue}
+                 options={normeDellData?.data?.map((item)=>{
+                  return{
+                    id_machinery_type:item?.id_machinery_type,
+                    value: item?.name,
+                    label: item?.name,
+                  }
+                 })}
+               // isMulti
+                classNamePrefix="react-select"
+                className="form-select form-control"
+             />
+                 
+              
                 <label htmlFor="floatingSelect">{name}</label>
         </>
     )
 }
-export default EditElement7
+export default EditElement7;

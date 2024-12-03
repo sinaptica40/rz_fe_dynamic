@@ -1,10 +1,549 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import moment from 'moment';
+import { useCreateInspectionMutation, useDeleInspectionMutation, useGetAddDropDownListQuery, useGetEditIDOrderQuery, useGetMachineryIDOrderQuery, useGetRzOrderQuery, useUpdateInspectionMutation } from "../../services/apiSlice";
+import { toast } from "react-toastify";
+import { useCallback } from "react";
+import { useMemo } from "react";
 
 const MainLayout6 = ({ areas }) => {
-    console.warn('==MainLayout777=areas==', areas);
 
-    // Helper function to find area by key prefix (e.g., 'HeaderArea1')
-    const findAreaByKeyPrefix = (prefix) => areas.find(area => area.key && area.key.startsWith(prefix));
+    const id_order = localStorage.getItem("id_order");
+
+   // const editIdIspenzio = localStorage.getItem("ispenzioEditID");
+    
+    const [MachineryID, setMachineryID] = useState(null);
+    const [topologyName, setTopologyName] = useState(null);
+    const [showNextForm, setShowNextForm] = useState(false);
+
+
+    const [status, setStatus] = useState({ id_state: 2, state: "Pianificata" });
+    const [isSelectActive, setIsSelectActive] = useState(false);
+
+    const [editShowFormData, setEditShowFormData] = useState({});
+
+    const [errors, setErrors] = useState({});
+    const [errorsForm1, setErrorsForm1] = useState({});
+
+    const [showModal, setShowModal] = useState();
+    const [editId, seteditId] = useState();
+    const [upDateOrderId, setupDateOrderId] = useState(null);
+    const [deletedInspectionId, setDeletedInspectionId] = useState(null);
+    const [showButton, setshowButton] = useState(null)
+
+
+
+
+    const [clientformData, setClientformData] = useState({
+        description: "",
+        created_by: "",
+        client: "",
+        orderId: "",
+        date: null,
+    });
+
+
+    const [formData, setFormData] = useState(
+        {
+            machineId: "",
+            inspectorId: {},
+            areaId: "",
+            year: "",
+            defaultValue: "",
+            notes: "",
+            normeId: "",
+            ce: false,
+            atex: false,
+        }
+    );
+
+    const validateForm = () => {
+        let isValid = true;
+        let validationErrors = {};
+        formData.forEach((item, index) => {
+            let itemErrors = {};
+            if (!item.machineId) {
+                itemErrors.machineId = "Macchinario is required";
+                isValid = false;
+            }
+
+            if (Object.keys(itemErrors).length > 0) {
+                validationErrors[index] = itemErrors;
+            }
+        });
+
+        setErrors(validationErrors);
+        return isValid;
+    };
+
+    const validateClientForm = () => {
+        const newErrors = {};
+        let isValid = true;
+
+        // if (!clientformData.date && !data?.data?.inspections[0]?.calendar_info?.date) {
+        if (!clientformData.date) {
+            newErrors.date = "Date is required";
+            isValid = false;
+        }
+
+        setErrorsForm1(newErrors);
+        return isValid;
+    };
+
+
+
+
+
+    const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
+        const area = areas.find(area => area.key && area.key.startsWith(prefix));
+        if (area) {
+            // Function to recursively clone elements and add extra props
+            const deepCloneChildren = (children, extraProps) => {
+                return React.Children.map(children, (child) => {
+                    if (React.isValidElement(child)) {
+                        // Clone child and pass down extraProps
+                        const clonedChild = React.cloneElement(child, { ...extraProps });
+
+                        // If the child has its own children, recurse through them
+                        if (child.props && child.props.children) {
+                            const updatedChildren = deepCloneChildren(child.props.children, extraProps);
+                            return React.cloneElement(clonedChild, { children: updatedChildren });
+                        }
+
+                        return clonedChild;
+                    }
+
+                    return child;
+                });
+            };
+
+            // Clone the area element itself and its nested children
+            const clonedArea = React.cloneElement(area, {
+                ...extraProps,
+                children: deepCloneChildren(area.props.children, extraProps),
+            });
+            return clonedArea;
+        }
+
+        return null;
+    };
+
+
+    const filterApi = areas.filter(
+        (item) => item?.props?.children?.props?.children?.props?.api != null)
+        .reduce((acc, user) => {
+            const function_name = user?.props?.children?.props?.children?.props?.api?.function_name;
+            const apiMethod = user?.props?.children?.props?.children?.props?.api?.method_type;
+
+            if (function_name.includes("getDropdownList")) {
+                acc.getDropDownUrl = function_name;
+                acc.getDropdownMethod = apiMethod;
+            }
+            if (function_name.includes("/api/v1/inspections/rz-order")) {
+                acc.getRzOrderUrl = function_name;
+                acc.getRzOrderMethod = apiMethod
+            }
+            if (function_name.includes("/machinery/get-machinery")) {
+                acc.getMachineryUrl = function_name;
+                acc.getMachineryMethod = apiMethod;
+            }
+            if (function_name.includes("filter-machinery")) {
+                acc.MachineryFilter = function_name;
+            }
+            if (function_name.includes("brand_name")) {
+                acc.MachineryFilterBrandName = function_name;
+            }
+            if (function_name.includes("create-inspections")) {
+                acc.createInspectionUrl = function_name;
+                acc.CreateInspectionMethod = apiMethod;
+            }
+            if (function_name.includes("inspections/update-inspection")) {
+                acc.updateInspectionUrl = function_name;
+                acc.updateInspectionMethod = apiMethod;
+            }
+
+
+            return acc;
+        }, {})
+
+    // api for Delete inspection 
+    const apiData = areas?.find(
+        (item) => item?.props?.children?.props?.children?.[0]?.props?.areas?.element_type === "table"
+    );
+
+    // console.log("apiData", apiData);
+
+
+    const getDeleteApi = apiData?.props?.children?.props?.children?.[0]?.props?.nestedElements?.reduce((acc, data) => {
+        const function_name = data?.props?.children?.props?.children?.props?.api?.function_name;
+
+
+        const methodType = data?.props?.children?.props?.children?.props?.api?.method_type;
+
+        if (function_name?.includes("inspection-delete")) {
+            acc.deleteApiURL = function_name;
+            acc.deleteApiMethod = methodType;
+        }
+        if (function_name?.includes("/get-inspection?id_inspection=")) {
+            acc.EditGetApiURL = function_name;
+        }
+        return acc;
+    }, {});
+    // console.log("getData",getDeleteApi);
+
+
+
+
+
+
+
+    // api calls 
+    const { data: dropdownList, refetch: refetchDropDown } = useGetAddDropDownListQuery(filterApi.getDropDownUrl);
+    const { data: rzOrderdetails, refetch } = useGetRzOrderQuery({
+        url: filterApi.getRzOrderUrl,
+        params: id_order,
+        refetchOnMountOrArgChange: true,
+    });
+
+    console.log("rzOrderdetails",rzOrderdetails);
+
+    const { data } = useGetEditIDOrderQuery({
+        // url:editId? filterApi.EditInspectionUrl:"",
+        url: editId ? "/api/v1/inspections/get-inspection?id_inspection=" : "",
+
+        params: editId,
+
+
+    })
+
+
+    // console.log(data,"editdata")
+
+
+
+    // api delete inspection
+    const [deleInspection] = useDeleInspectionMutation()
+
+    /// api for create Inspecton
+    const [createInspection] = useCreateInspectionMutation();
+
+    // api for uddate inspection 
+    const [updateInspection] = useUpdateInspectionMutation();
+
+    const ispectorListing = dropdownList?.data?.ispectorListing;
+
+    //  const machineListing = dropdownList?.data?.machineListing;
+    //  const machineBrand = dropdownList?.data?.machineBrand;
+    const machineTypology = dropdownList?.data?.machineTypology;
+
+    //  const normeListing = dropdownList?.data?.normeListing;
+    const stateListing = dropdownList?.data?.stateListing;
+    const workingListing = dropdownList?.data?.workingListing;
+
+
+
+    useEffect(() => {
+        const rzData = rzOrderdetails?.data;
+        setClientformData({
+            description: rzData?.description,
+            created_by: rzData?.created_by_name,
+            Machinery_created_id: rzData?.created_by,
+            orderId: rzData?.id_order,
+            client: rzData?.client,
+            date: rzData?.inspections?.[0]?.calendar_info?.date,
+        });
+    }, [rzOrderdetails]);
+
+    const handleSelectIspector = (selectedOption) => {
+        if (selectedOption) {
+            setFormData({
+                ...formData,
+                inspectorId: selectedOption
+            })
+        }
+    }
+
+    const handleClientSubmit = (e) => {
+
+        e.preventDefault();
+        setEditShowFormData({})
+        setshowButton("add");
+        if (validateClientForm()) {
+            setShowNextForm(true)
+            //   setSectionAdded(true);
+        }
+    };
+
+
+
+    //selected change 2 input
+    const handleSelectChange = (selectedOption) => {
+        if (selectedOption) {
+            setMachineryID(selectedOption?.value);
+        }
+    }
+
+    const handleSelectMachineryTopology = (selectedOption) => {
+        if (selectedOption) {
+            setTopologyName(selectedOption.value);
+        }
+    };
+
+
+    const handleSelectArea = (selectedOption) => {
+        if (selectedOption) {
+            setFormData({
+                ...formData,
+                areaId: selectedOption?.areaId
+            });
+        }
+    }
+
+    // function for handleNotes
+    const handleNotes = (e) => {
+        setFormData({
+            ...formData,
+            notes: e.target.value,
+        });
+    };
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        // if (validateForm()){
+        try {
+            let body = {
+                // machineId: formData.machineId,
+                description: clientformData?.description,
+                created_by: clientformData?.Machinery_created_id,
+                id_order: clientformData?.orderId,
+                date: moment(clientformData?.date).format("YYYY-MM-DD"),
+                id_state: status?.id_state,
+                inspections: [{
+                    machineId: formData.machineId,
+                    inspectorId: formData?.inspectorId.inspectorId,
+                    notes: formData?.notes,
+                    areaId: formData?.areaId,
+                }]
+            }
+            const response = await createInspection({
+                url: filterApi?.createInspectionUrl,
+                method: filterApi.CreateInspectionMethod,
+                body: body,
+            })
+            if (response?.data?.status == "SUCCESS") {
+                toast.success(response?.data?.message)
+                setFormData({
+                    machineId: "",
+                    inspectorId: {},
+                    areaId: "",
+                    year: "",
+                    notes: "",
+                    normeId: "",
+                    ce: false,
+                    atex: false,
+                });
+                window.location.reload();
+                // refetchDropDown();
+                // refetch();
+                showNextForm(false);
+                setMachineryID("");
+                setTopologyName("");
+
+            }
+            else {
+                toast.error(response?.data?.message);
+            }
+
+        }
+
+
+        catch (error) {
+            console.log(error);
+        }
+
+    }
+
+
+    // function for delete Modal 
+    const handleModal = (id) => {
+        console.log("deletedId", id);
+        setDeletedInspectionId(id)
+        setShowModal(true);
+    }
+
+    // function for  delete inspection in add form  
+    const deleteInspection = async (id) => {
+        try {
+            const response = await deleInspection({
+                url: getDeleteApi?.deleteApiURL,
+                method: getDeleteApi?.deleteApiMethod,
+                id: deletedInspectionId,
+            });
+
+            if (response?.data?.status == "SUCCESS") {
+                toast.success(response?.data?.message);
+                setShowModal(false);
+                refetch();
+            } else {
+                toast.error(response?.data?.message);
+            }
+        } catch (error) {
+            console.error("Error deleting inspection:", error);
+        }
+    };
+
+
+    // handle Edit form In Add Inspection Form Page 
+    const { data: MachineryData, isLoading, isError, refetch: machineryOrder } = useGetMachineryIDOrderQuery(
+        topologyName ? { url: filterApi.MachineryFilter, params: topologyName } : null
+    );
+    //   const query=useQu
+
+
+    const handleFormPage = (item, index) => {
+        setShowNextForm(true);
+        setshowButton("edit");
+        setFormData([])
+        seteditId(item?.id_inspection)
+        setupDateOrderId(item?.id_order)
+        setMachineryID(item?.machinery_info?.brand_name)
+        setTopologyName(item?.machinery_info?.typology);
+    }
+
+
+
+
+    const { data: normeDellData } = useGetMachineryIDOrderQuery(
+        MachineryID ? { url: filterApi.MachineryFilterBrandName, params: MachineryID } : null
+    );
+
+    const handleSelectMachinery = (selectedoption) => {
+        if (selectedoption) {
+            const filterMachineryIdData = normeDellData?.data?.find((item) => item?.name == selectedoption?.value);
+            console.log("filterMachineryIdData", filterMachineryIdData)
+            setFormData({
+                inspectorId: { label: filterMachineryIdData?.name },
+                year: filterMachineryIdData?.year,
+                normeId: filterMachineryIdData?.norm_specification,
+                ce: filterMachineryIdData?.ce,
+                atex: filterMachineryIdData?.atex,
+                machineId: selectedoption.id_machinery_type
+            })
+            // console.log("formData",filterMachineryIdData)
+        }
+
+    }
+
+
+
+
+
+
+
+    const handleDateChange = (date) => {
+
+        if (date) {
+            // Ensure that date is a valid Date object or string.
+            const formattedDate = moment(date).isValid() ? moment(date).format('MMMM D, YYYY') : null;
+            if (formattedDate) {
+                setClientformData({ ...clientformData, date: formattedDate });
+                setIsSelectActive(true);
+            } else {
+                console.error("Invalid date format");
+                setIsSelectActive(false);
+            }
+        } else {
+            // If the date is null or undefined
+            setIsSelectActive(false);
+            setClientformData({ ...clientformData, date: null });
+        }
+    };
+
+
+    useMemo(() => {
+        if (data) {
+            let datas = data?.data
+            setFormData([])
+            setMachineryID(datas?.brand_name)
+            setTopologyName(datas?.typology);
+            const machinaryInfo =
+                MachineryData?.data?.find(
+                    (machineData) => {
+                        console.log("machineId", machineData?.id_machinery_type)
+                        return machineData?.id_machinery_type === datas?.id_machinery_type
+                    }
+                ) || {};
+
+            console.log("machinaryInfo", datas);
+
+            const newdata = {
+                topologyDefaultValues: { value: datas?.typology, lable: datas?.typology },
+                normedefaultValue: { value: datas?.machine_name, label: datas?.machine_name },
+                defaultValue: { value: datas.brand_name, label: datas.brand_name },
+                brand_name: datas.brand_name,
+                inspectorId: datas.id_ispector,
+                machineId: datas?.id_machinery_type,
+                atex: datas?.atex,
+                ce: datas?.ce,
+                norm_specification: machinaryInfo?.norm_specification,
+                year: datas?.year,
+                typology: datas?.typology,
+                areaId: datas?.id_working_area,
+                inspectionId: datas?.id_inspection,
+                normeId: [{ name: datas?.norms?.map((item) => item?.name) }],
+                arealavoe_defaultvalue: { value: datas?.wa_name, label: datas?.wa_name },
+                notes: datas?.notes
+            };
+            setStatus({ status: datas?.order_state, id_state: datas?.id_state });
+            handleSelectMachinery({ value: datas?.machine_name, label: datas?.machine_name })
+            setFormData(newdata);
+        }
+    }, [data])
+
+
+    // function for Edited Data
+    const submitEditedForm = async () => {
+        try {
+
+            let body = {
+                // machineId: formData.machineId,
+                description: clientformData?.description,
+                created_by: clientformData?.Machinery_created_id,
+                id_order: clientformData?.orderId,
+                date: moment(clientformData?.date).format("YYYY-MM-DD"),
+                id_state: status?.id_state,
+                inspections: [{
+                    machineId: formData.machineId,
+                    inspectorId: (typeof formData?.inspectorId === "object" && formData?.inspectorId !== null)
+                        ? formData?.inspectorId?.inspectorId
+                        : formData?.inspectorId,
+                    notes: formData?.notes,
+                    inspectionId: formData?.inspectionId,
+                    areaId: formData?.areaId,
+                }]
+            }
+
+            const response = await updateInspection({
+                url: filterApi?.updateInspectionUrl,
+                method: filterApi?.updateInspectionMethod,
+                params: upDateOrderId,
+                body: body,
+            })
+
+            if (response?.data?.status == "SUCCESS") {
+                toast.success(response?.data?.message);
+                setShowNextForm(false)
+                window.location.reload();
+            } else if (response?.data?.status == "ERROR" || response?.data?.status == "FAIL") {
+                toast.error(response?.data?.message);
+            }
+
+        } catch (error) {
+            console.log("error", error);
+        }
+
+    }
+
 
     return (
         <>
@@ -63,84 +602,7 @@ const MainLayout6 = ({ areas }) => {
                     </div>
                 </div>
             </header>
-            {/* <div className="webcontent-wrapper">
-                <div className="container-fluid p-0">
-                    <div className="cards-block">
-                        <div className="card-header add-form-header">
-                            {/* {findAreaByKeyPrefix('EditArea1') || <div>- -</div>} 
-                            <div className="card-title">
-                                <span className="title-icon">
-                                    {findAreaByKeyPrefix('EditArea1') || <div>- -</div>}
-                                </span>
-                                <span>{findAreaByKeyPrefix('EditArea2') || <div>- -</div>}</span>
-                            </div>
-                            {findAreaByKeyPrefix('EditArea3') || <div>- -</div>}
-                            {findAreaByKeyPrefix('EditArea4') || <div>- -</div>}
 
-                        </div>
-                        {/* <a href="#!" className="close-iconBtn">
-                            <svg
-                                width={26}
-                                height={26}
-                                viewBox="0 0 26 26"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M1.05096 1.10498C1.21899 0.936596 1.41859 0.803006 1.63831 0.711857C1.85804 0.620708 2.09358 0.573792 2.33146 0.573792C2.56934 0.573792 2.80489 0.620708 3.02462 0.711857C3.24434 0.803006 3.44393 0.936596 3.61196 1.10498L13.184 10.681L22.756 1.10498C23.0968 0.771233 23.5555 0.58543 24.0325 0.587931C24.5095 0.590431 24.9663 0.781033 25.3036 1.11834C25.6409 1.45564 25.8315 1.9124 25.834 2.38941C25.8365 2.86642 25.6507 3.32516 25.317 3.66598L15.741 13.238L25.317 22.81C25.6507 23.1508 25.8365 23.6095 25.834 24.0865C25.8315 24.5636 25.6409 25.0203 25.3036 25.3576C24.9663 25.6949 24.5095 25.8855 24.0325 25.888C23.5555 25.8905 23.0968 25.7047 22.756 25.371L13.184 15.795L3.61196 25.371C3.27114 25.7047 2.81241 25.8905 2.3354 25.888C1.85838 25.8855 1.40162 25.6949 1.06432 25.3576C0.727017 25.0203 0.536415 24.5636 0.533915 24.0865C0.531414 23.6095 0.717216 23.1508 1.05096 22.81L10.627 13.238L1.05096 3.66598C0.88258 3.49795 0.748989 3.29836 0.657841 3.07863C0.566692 2.85891 0.519775 2.62336 0.519775 2.38548C0.519775 2.1476 0.566692 1.91205 0.657841 1.69233C0.748989 1.4726 0.88258 1.27301 1.05096 1.10498Z"
-                                    fill="currentcolor"
-                                />
-                            </svg>
-                        </a> 
-                        {findAreaByKeyPrefix('EditArea5') || <div>- -</div>}
-                        <div className="form-input-block">
-                            <form action="#!">
-                                <div className="row row-gap">
-                                    {findAreaByKeyPrefix('EditArea6') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea7') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea8') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea9') || <div>- -</div>}
-                                </div>
-                            </form>
-                            <div className="col-md-12">
-                                <div className="form-btn-sets">
-                                    {findAreaByKeyPrefix('EditButtonArea1') || <div>- -</div>}
-                                    <div className="btn-set-right">
-                                        {findAreaByKeyPrefix('EditButtonArea2') || <div>- -</div>}
-                                        {findAreaByKeyPrefix('EditButtonArea3') || <div>- -</div>}
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="new-added">
-                                <div className="itemTitle">Inspection Item 1</div>
-                                <div className="row row-gap">
-                                    {findAreaByKeyPrefix('EditArea9') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea10') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea11') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea12') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea13') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea14') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea15') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea16') || <div>- -</div>}
-                                    <div className="col-md-4">
-                                        <div className="form-custom-check inline-check ccmt-50">
-                                            {findAreaByKeyPrefix('EditCheckArea1') || <div>- -</div>}
-                                            {findAreaByKeyPrefix('EditCheckArea2') || <div>- -</div>}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {findAreaByKeyPrefix('EditTitleArea') || <div>- -</div>}
-                            <div className="table-responsive">
-                                <table className="table m b-0">
-                                    {findAreaByKeyPrefix('EditTableArea') || <div>- -</div>}
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> */}
             <div className="webcontent-wrapper">
                 <div className="container-fluid p-0">
                     <div className="cards-block">
@@ -151,10 +613,10 @@ const MainLayout6 = ({ areas }) => {
                             </div>
                             <div className="ispezione-detaBox">
                                 {findAreaByKeyPrefix('EditArea1') || <div>- -</div>}
-                                {findAreaByKeyPrefix('EditArea2') || <div>- -</div>}
+                                {findAreaByKeyPrefix('EditArea2', { handleSubmit }) || <div>- -</div>}
 
                             </div>
-                            {findAreaByKeyPrefix('EditArea3') || <div>- -</div>}
+                            {findAreaByKeyPrefix('EditArea3', { stateListing, status, setStatus }) || <div>- -</div>}
 
                         </div>
                         {findAreaByKeyPrefix('EditArea4') || <div>- -</div>}
@@ -162,17 +624,21 @@ const MainLayout6 = ({ areas }) => {
                         <div className="form-input-block">
                             <form action="#!">
                                 <div className="row row-gap">
-                                    {findAreaByKeyPrefix('EditArea5') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea6') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea7') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea8') || <div>- -</div>}
+                                    {findAreaByKeyPrefix('EditArea5', { value:clientformData?.description, label:"description" }) || <div>- -</div>}
+                                    {findAreaByKeyPrefix('EditArea6', { clientformData }) || <div>- -</div>}
+                                    {findAreaByKeyPrefix('EditArea8', { formValues: clientformData?.created_by, formName: { name: "created_by" } }) || <div>- -</div>}
+                                    {findAreaByKeyPrefix('EditArea7', { clientformData, isSelectActive, handleDateChange, errorsForm1 }) || <div>- -</div>}
                                 </div>
                             </form>
                             <div className="col-md-12">
                                 <div className="form-btn-sets">
                                     <div className="btn-set-left">
-                                        {findAreaByKeyPrefix('EditButtonArea0') || <div>- -</div>}
-                                        {findAreaByKeyPrefix('EditButtonArea1') || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditButtonArea0', { handleClientSubmit }) || <div>- -</div>}
+                                        {showNextForm && showButton == "add" ? (
+                                            findAreaByKeyPrefix('EditButtonArea1', { handleSubmit }) || <div>- -</div>
+                                        ) : showButton == "edit" ? (
+                                            findAreaByKeyPrefix('EditButtonArea4', { submitEditedForm }) || <div>- -</div>
+                                        ) : ""}
                                     </div>
                                     <div className="btn-set-right">
                                         {findAreaByKeyPrefix('EditButtonArea2') || <div>- -</div>}
@@ -182,105 +648,37 @@ const MainLayout6 = ({ areas }) => {
                                 {/* form-btn-sets END */}
                             </div>
                             {/* Add Element */}
-                            <div className="new-added">
-                                {findAreaByKeyPrefix('EditArea9') || <div>- -</div>}
-
-                                <div className="row row-gap">
-                                    {findAreaByKeyPrefix('EditArea10') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea11') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea12') || <div>- -</div>}
 
 
-                                    {findAreaByKeyPrefix('EditArea13') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea14') || <div>- -</div>}
-
-                                    {findAreaByKeyPrefix('EditArea15') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('EditArea16') || <div>- -</div>}
-
-                                    {findAreaByKeyPrefix('EditArea17') || <div>- -</div>}
-
-                                    <div className="col-md-4">
-                                        <div className="form-custom-check inline-check ccmt-50">
-                                            {findAreaByKeyPrefix('EditCheckArea1') || <div>- -</div>}
-                                            {findAreaByKeyPrefix('EditCheckArea2') || <div>- -</div>}
+                            {showNextForm && (
+                                <div className="new-added" >
+                                    {findAreaByKeyPrefix('EditArea9') || <div>- -</div>}
+                                    {findAreaByKeyPrefix('BodyArea') || <div>- -</div>}
+                                    <div className="row row-gap">
+                                        {findAreaByKeyPrefix('EditArea13', { machineTypology, handleSelectMachineryTopology, formData }) || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditArea14', { MachineryData, formData, handleSelectChange }) || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditArea10', { normeDellData, handleSelectMachinery, formData }) || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditArea15', { formValues: formData.year }) || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditArea17', { formData }) || <div>- -</div>}
+                                        <div className="col-md-4">
+                                            <div className="form-custom-check inline-check ccmt-50">
+                                                {findAreaByKeyPrefix('EditCheckArea1', { formValues: formData }) || <div>- -</div>}
+                                                {findAreaByKeyPrefix('EditCheckArea2', { formValues: formData }) || <div>- -</div>}
+                                            </div>
                                         </div>
+
+                                        {findAreaByKeyPrefix('EditArea12', { handleSelectArea, formData, workingListing }) || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditArea11', { formData, formValues: clientformData?.created_by, formData, ispectorListing, handleSelectIspector }) || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditArea16', { formData, formValues: formData.notes, handleNotes, formName: { name: "notes" } }) || <div>- -</div>}
+
                                     </div>
                                 </div>
-                            </div>
-                            {/* Add Element End */}
-                            {/* Added Elements Table */}
-
-                            {findAreaByKeyPrefix('EditTableArea') || <div>- -</div>}
-
-                            {/* <div className="heading-bg-element">
-                                <div className="heading-elm-itle">
-                                    Elementi di ispezione pianificati
-                                </div>
-                            </div> */}
-                            {/* <div className="table-responsive">
-                                <table className="table m b-0">
-                                    <thead className="thbold">
-                                        <tr>
-                                            <th scope="col">Macchinario</th>
-                                            <th scope="col">Ispettore</th>
-                                            <th scope="col">Area Lavoro</th>
-                                            <th scope="col">Data Ispezione</th>
-                                            <th scope="col" />
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Pellizzatore</td>
-                                            <td>Mario Rossi</td>
-                                            <td>Area Lavoro x</td>
-                                            <td>00/00/0000</td>
-                                            <td>
-                                                <div className="table_action_list">
-                                                    <a href="#!" className="table_actionBtn">
-                                                        <svg
-                                                            width={26}
-                                                            height={26}
-                                                            viewBox="0 0 26 26"
-                                                            fill="none"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                        >
-                                                            <path
-                                                                d="M22.619 18.1552L6.65001 2.18517C6.01951 1.57864 5.17625 1.24363 4.30142 1.25211C3.42659 1.26059 2.58998 1.61188 1.97135 2.23051C1.35273 2.84914 1.00143 3.68574 0.992955 4.56058C0.984476 5.43541 1.31949 6.27866 1.92601 6.90917L17.9 22.8782C18.2644 23.2427 18.7286 23.4911 19.234 23.5922L24.361 24.6182L23.332 19.4892C23.231 18.9838 22.9835 18.5196 22.619 18.1552Z"
-                                                                stroke="currentcolor"
-                                                                strokeWidth="1.5"
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                            />
-                                                            <path
-                                                                d="M10.188 4.83984L4.43103 10.0088"
-                                                                stroke="currentcolor"
-                                                                strokeWidth="1.5"
-                                                            />
-                                                        </svg>
-                                                    </a>
-                                                    <a href="#!" className="table_actionBtn">
-                                                        <svg
-                                                            width={26}
-                                                            height={25}
-                                                            viewBox="0 0 26 25"
-                                                            fill="none"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                        >
-                                                            <path
-                                                                d="M1.5 5.5138H24.859M10.844 11.3538V17.1938M15.516 11.3538V17.1938M3.836 5.5138H22.523L20.677 22.1218C20.6137 22.6934 20.3418 23.2215 19.9134 23.6052C19.485 23.9888 18.9301 24.2008 18.355 24.2008H8C7.42544 24.2001 6.87129 23.9877 6.44348 23.6042C6.01567 23.2206 5.74421 22.6929 5.681 22.1218L3.836 5.5138ZM7.743 2.1818C7.93182 1.78122 8.23061 1.44256 8.60455 1.20531C8.97848 0.968063 9.41215 0.841992 9.855 0.841797H16.5C16.9432 0.841612 17.3773 0.967505 17.7516 1.20478C18.1259 1.44205 18.425 1.78091 18.614 2.1818L20.184 5.5138H6.172L7.743 2.1818Z"
-                                                                stroke="currentcolor"
-                                                                strokeWidth="1.5"
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                            />
-                                                        </svg>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div> */}
+                            )}
+                            {findAreaByKeyPrefix('EditTableArea', {
+                                rzOrderdetails, deleteInspection,
+                                showModal, setShowModal, handleModal,
+                                handleFormPage
+                            }) || <div>- -</div>}
                             {/* Added Elements Table END*/}
                         </div>
                     </div>

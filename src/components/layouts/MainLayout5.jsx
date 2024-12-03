@@ -1,13 +1,283 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import Loader from "../../lib/loader/loader";
+import { useAddNormeMutation, useEditNormeMutation, useGetEditNormDataQuery, useGetNormeLanguageQuery, useGetNormeStandardTypeQuery } from "../../services/apiSlice";
+
 
 const MainLayout5 = ({ areas }) => {
-    console.warn('==MainLayout5555=areas==', areas);
+    const location = useLocation();
+    const route = location.pathname.substring(1) || '/';
 
-    // Helper function to find area by key prefix (e.g., 'HeaderArea1')
-    const findAreaByKeyPrefix = (prefix) => areas.find(area => area.key && area.key.startsWith(prefix));
+    const params = useParams();
+
+
+    const [isFormData, setisFormData] = useState(false);
+    const navigate = useNavigate();
+    const [formValues, setFormValues] = useState({
+        file: null,
+        id_standard_type: "",
+        language: "",
+        description: "",
+        language: "",
+        standard_code: "",
+    });
+
+    const [errors, setErrors] = useState({});
+
+
+
+
+    // const findAreaByKeyPrefix = (prefix) => areas.find(area => area.key && area.key.startsWith(prefix));
+    const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
+        const area = areas.find(area => area.key && area.key.startsWith(prefix));
+        if (area) {
+
+            // Function to recursively clone elements and add extra props
+            const deepCloneChildren = (children, extraProps) => {
+                return React.Children.map(children, (child) => {
+                    if (React.isValidElement(child)) {
+                        // Clone child and pass down extraProps
+                        const clonedChild = React.cloneElement(child, { ...extraProps });
+
+                        // If the child has its own children, recurse through them
+                        if (child.props && child.props.children) {
+                            const updatedChildren = deepCloneChildren(child.props.children, extraProps);
+                            return React.cloneElement(clonedChild, { children: updatedChildren });
+                        }
+
+                        return clonedChild;
+                    }
+
+                    return child; // Return non-element children as is (e.g., strings, numbers)
+                });
+            };
+
+            // Clone the area element itself and its nested children
+            const clonedArea = React.cloneElement(area, {
+                ...extraProps,
+                children: deepCloneChildren(area.props.children, extraProps),
+            });
+            return clonedArea;
+        }
+
+        return null;
+    };
+
+    let allApis = areas.filter((item) => {
+        return item?.props?.children?.props?.children?.props?.api != null;
+    });
+
+    let getapi;
+    getapi = allApis.reduce((acc, user) => {
+        const functionName = user.props.children.props.children.props.api.function_name;
+        const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
+
+        if (functionName.includes("add-norme")) {
+            acc.addNorme = functionName;
+            acc.addNormeApiMethod = api_Method;
+        }
+        if (functionName.includes("standard-types")) {
+            acc.standardApi = functionName;
+            acc.standardTypeApiMethod = api_Method;
+        }
+        if (functionName.includes("language")) {
+            acc.languageApi = functionName;
+            acc.languageApiMethod = api_Method;
+        }
+        if (functionName.includes("edit-norme")) {
+            acc.editApi = functionName;
+            acc.editApiMethod = api_Method;
+        }
+        if (functionName.includes("get-norme?id=".toLowerCase())) {
+            acc.getEditNorme = functionName;
+            acc.getApiMethod = api_Method;
+        }
+
+        return acc;
+    }, {});
+
+
+
+    const validate = () => {
+        const newErrors = {};
+
+        if (!formValues.file) {
+            newErrors.file = "Please upload a PDF file.";
+        }
+
+        if (!formValues.description) {
+            newErrors.description = "Please enter a Description.";
+        }
+
+
+        return newErrors;
+    };
+
+
+    const { data: languageData, isFetching: fetchLanguage, } = useGetNormeLanguageQuery({
+        endpointName: getapi.languageApi,
+        method: getapi.languageApiMethod,
+        refetchOnMountOrArgChange: true,
+
+    })
+
+    const { data: standardData, isFetching: fetchstandard, } = useGetNormeStandardTypeQuery({
+        endpointName: getapi.standardApi,
+        method: getapi.standardTypeApiMethod,
+        refetchOnMountOrArgChange: true,
+
+    });
+
+    const edit_id = localStorage.getItem("id_standard")
+
+    // console.warn("qwert",edit_id)
+    const { data: editNormedata, isFetching, refetch } = useGetEditNormDataQuery({
+        url: getapi.getEditNorme,
+        method: getapi.getApiMethod,
+        params: {
+            id: `${edit_id}`,
+        },
+        refetchOnMountOrArgChange: true,
+    })
+
+
+
+
+    useCallback(() => {
+        if (params["*"]) {
+            refetch();
+            getapi = {}
+        }
+    }, [params["*"]])
+
+
+
+    const [addNorme] = useAddNormeMutation();
+
+    const [EditNorme] = useEditNormeMutation()
+
+    useEffect(() => {
+        if (editNormedata?.data && !isFetching) {
+            const editValue = editNormedata?.data;
+            console.warn("Fetched data for editing:", editValue);
+            setFormValues({
+                file: editValue?.pdf_name || null,
+                file_name: editValue?.name || null,
+                id_standard_type: editValue.id_standard_type || "",
+                language: editValue.language || "",
+                description: editValue.description || "",
+                standard_code: editValue.standard_code || "",
+                // id_standard: editValue?.id_standard || "",
+            });
+
+
+        }
+    }, [editNormedata, isFetching]);
+
+
+    const handleChange = (e) => {
+        const { name, value, files } = e.target;
+
+        setFormValues((prevState) => {
+            return {
+                ...prevState,
+                [name]: files ? files[0] : value,
+                file_name: files ? "" : prevState.file_name,
+            };
+        });
+        if (files) {
+            setisFormData(true);
+        }
+    }
+
+
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Validate form values
+        const validationErrors = validate();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        // Set default values for missing fields
+        if (!formValues.id_standard_type) {
+            formValues.id_standard_type = "1";
+        }
+
+        if (!formValues.language) {
+            formValues.language = "EN";
+        }
+
+        try {
+
+            if (getapi?.addNorme) {
+
+                console.log("formValues", formValues);
+
+                const formData = new FormData();
+                formData.append('file', formValues.file);
+                formData.append('id_standard_type', formValues.id_standard_type);
+                formData.append('language', formValues.language);
+                formData.append('description', formValues.description);
+                formData.append('standard_code', formValues.standard_code);
+
+                let obj = {
+                    url: getapi.addNorme,
+                    method: getapi.addNormeApiMethod,
+                    data: formData
+                };
+
+                const res = await addNorme(obj);
+                if (res?.data?.status == "success" || res?.data?.status == "SUCCESS") {
+                    navigate(`/${res?.data?.navigate}`);
+                } else {
+                    console.error(res?.error?.data?.message || "An error occurred");
+
+                }
+            }
+            else if (getapi?.editApi) {
+
+
+                const formData = new FormData();
+                // if (formValues.file) {
+                //     formData.append("file", formValues.file);
+                // }
+                isFormData && formData.append('file', formValues.file);
+                formData.append('id_standard_type', formValues.id_standard_type);
+                formData.append('language', formValues.language);
+                formData.append('description', formValues.description);
+                formData.append('standard_code', formValues.standard_code);
+
+                const objEdit = {
+                    url: getapi.editApi,
+                    method: getapi.editApiMethod,
+                    params: edit_id,
+                    data: formData,
+                }
+                console.warn("objEdit", objEdit.data)
+                const res = await EditNorme(objEdit);
+                console.warn("resss", res)
+                if (res?.data?.status == "success" || res?.data?.status == "SUCCESS") {
+                    // localStorage.removeItem("id_standard");
+                    navigate(`/${res?.data?.navigate}`);
+                } else {
+                    console.error(res?.error?.data?.message || "An error occurred");
+                }
+
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+        }
+    };
+
 
     return (
         <>
+            {isFetching && (<Loader />)}
             <div className="loader-wrapper" style={{ display: "none" }}>
                 <div className="loader">
                     <img src="img/logo.png" alt="" />
@@ -72,34 +342,25 @@ const MainLayout5 = ({ areas }) => {
                                 {findAreaByKeyPrefix('FormArea7') || <div>- -</div>}
                                 {findAreaByKeyPrefix('FormArea8') || <div>- -</div>}
                             </div>
-                            <a href="macchinari.html" className="close-iconBtn">
-                                <svg
-                                    width={26}
-                                    height={26}
-                                    viewBox="0 0 26 26"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M1.05096 1.10498C1.21899 0.936596 1.41859 0.803006 1.63831 0.711857C1.85804 0.620708 2.09358 0.573792 2.33146 0.573792C2.56934 0.573792 2.80489 0.620708 3.02462 0.711857C3.24434 0.803006 3.44393 0.936596 3.61196 1.10498L13.184 10.681L22.756 1.10498C23.0968 0.771233 23.5555 0.58543 24.0325 0.587931C24.5095 0.590431 24.9663 0.781033 25.3036 1.11834C25.6409 1.45564 25.8315 1.9124 25.834 2.38941C25.8365 2.86642 25.6507 3.32516 25.317 3.66598L15.741 13.238L25.317 22.81C25.6507 23.1508 25.8365 23.6095 25.834 24.0865C25.8315 24.5636 25.6409 25.0203 25.3036 25.3576C24.9663 25.6949 24.5095 25.8855 24.0325 25.888C23.5555 25.8905 23.0968 25.7047 22.756 25.371L13.184 15.795L3.61196 25.371C3.27114 25.7047 2.81241 25.8905 2.3354 25.888C1.85838 25.8855 1.40162 25.6949 1.06432 25.3576C0.727017 25.0203 0.536415 24.5636 0.533915 24.0865C0.531414 23.6095 0.717216 23.1508 1.05096 22.81L10.627 13.238L1.05096 3.66598C0.88258 3.49795 0.748989 3.29836 0.657841 3.07863C0.566692 2.85891 0.519775 2.62336 0.519775 2.38548C0.519775 2.1476 0.566692 1.91205 0.657841 1.69233C0.748989 1.4726 0.88258 1.27301 1.05096 1.10498Z"
-                                        fill="currentcolor"
-                                    />
-                                </svg>
-                            </a>
+
+                            {findAreaByKeyPrefix('EditArea4') || <div>- -</div>}
                         </div>
                         <div className="form-input-block">
-                            <form action="#!">
+                            <form onSubmit={handleSubmit}>
                                 <div className="row row-gap">
-                                    {/* <div className="col-md-6"> */}
-                                        {findAreaByKeyPrefix('FormArea17') || <div>- -</div>}
-                                        {findAreaByKeyPrefix('FormArea11') || <div>- -</div>}
-                                        {findAreaByKeyPrefix('FormArea12') || <div>- -</div>}
-                                        {/* {findAreaByKeyPrefix('NewMachineryArea5') || <div>- -</div>} */}
+
+                                    {findAreaByKeyPrefix('FormArea17', { handleChange, errors, formValues }) || <div>- -</div>}
+                                    {findAreaByKeyPrefix('FormArea11', { standardData, handleChange, errors, formValues }) || <div>- -</div>}
+                                    {findAreaByKeyPrefix('FormArea10', { languageData, errors, handleChange, formValues }) || <div>- -</div>}
+                                    {findAreaByKeyPrefix('FormArea13', { errors, handleChange, formValues }) || <div>- -</div>}
+                                    {findAreaByKeyPrefix('FormArea12', { errors, handleChange, formValues }) || <div>- -</div>}
+                                    {/* {findAreaByKeyPrefix('NewMachineryArea5') || <div>- -</div>} */}
                                     {/* </div> */}
                                     <div className="col-md-12">
-                                    {findAreaByKeyPrefix('FormArea13') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('FormArea14') || <div>- -</div>}
+
+                                        {findAreaByKeyPrefix('FormArea14') || <div>- -</div>}
                                     </div>
+
                                 </div>
                             </form>
                         </div>
