@@ -1,9 +1,20 @@
 
 import React from 'react'
 import Select from "react-select";
-const EditElement10 = ({areas,workingListing,handleSelectArea,formData})=>{
+const EditElement10 = ({areas,workingListing,handleSelectArea,formData,errors})=>{
     const {element_data} = areas;
-    console.log(formData,"formData")
+
+  const options=workingListing?.map((item)=>{
+      return{
+        areaId:item?.id_working_area,
+        value:item?.wa_name,
+        label:item?.wa_name,
+      }
+    })
+
+   const defaultValue = options?.find((option) => option.areaId === formData?.areaId);
+
+   console.log("defaultValue==",defaultValue);
     return(
         <>
           
@@ -17,22 +28,24 @@ const EditElement10 = ({areas,workingListing,handleSelectArea,formData})=>{
                 name="areaId"
                 onChange={handleSelectArea}
                 defaultValue={formData?.arealavoe_defaultvalue}
-                options={workingListing?.map((item)=>{
-                  return{
-                    areaId:item?.id_working_area,
-                    value:item?.wa_name,
-                    label:item?.wa_name,
-                  }
-                })}
+                value = {{label :defaultValue?.value}}
+                options={options}
+                // options={workingListing?.map((item)=>{
+                //   return{
+                //     areaId:item?.id_working_area,
+                //     value:item?.wa_name,
+                //     label:item?.wa_name,
+                //   }
+                // })}
                 
                 classNamePrefix="react-select"
                 className="form-select form-control"
              />
-              {/* {errors.norm_specification && (
+              {errors.areaId && (
                 <div className="error-message text-danger">
-                  {errors.norm_specification}
+                  {errors.areaId}
                 </div>
-              )} */}
+              )}
               
               <label htmlFor="floating-select">{element_data.block_name}</label>
               

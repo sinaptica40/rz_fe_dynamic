@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import ReactPaginate from 'react-paginate';
 
 
-const MachineryElement2 = ({ areas, data: machineryData, showModal, handleModal, handleDeleteNorme, setShowModal, nestedElements }) => {
+const MachineryElement2 = ({ areas, data: machineryData, showModal, handleModal,modalRef, handleDeleteNorme, setShowModal, nestedElements }) => {
 
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
         const area = nestedElements.find(area => area.key && area.key.startsWith(prefix));
@@ -528,8 +528,8 @@ const MachineryElement2 = ({ areas, data: machineryData, showModal, handleModal,
             </div>
 
             {showModal && (
-                <div className="modal-main-box">
-                    <div className="modal-inner-box">
+                <div className="modal-main-box" >
+                    <div className="modal-inner-box" ref={modalRef}>
                         {/* <span className="info-iocn">
                             !
                         </span> */}

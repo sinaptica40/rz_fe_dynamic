@@ -1,3 +1,4 @@
+import moment from "moment";
 import React from "react";
 
 const TableElement2 = ({ areas,inspectionData }) => {
@@ -127,7 +128,7 @@ const TableElement2 = ({ areas,inspectionData }) => {
                                     console.log("client",client)
                                     return(
                                       <tr key={index}>
-                                        <td>{client?.create_at}</td>
+                                        <td>{moment(client?.create_at).format("YYYY-MM-DD HH:mm:ss")}</td>
                                         <td>{10000 + client?.id_order}</td>
                                         <td className='wrapText'>
                                             {client?.ispectors} 

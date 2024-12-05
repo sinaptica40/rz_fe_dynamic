@@ -4,16 +4,32 @@ import { useCreateInspectionMutation, useDeleInspectionMutation, useGetAddDropDo
 import { toast } from "react-toastify";
 import { useCallback } from "react";
 import { useMemo } from "react";
+import { useLocation } from "react-router-dom";
 
 const MainLayout6 = ({ areas }) => {
+    const location = useLocation();
+    const route = location.pathname.substring(1) || '/';
 
+    const userId = localStorage.getItem("user_id");
+    
+
+    // id for add Ispenzio Mainlayout Table Add  
     const id_order = localStorage.getItem("id_order");
+    const AddRoute = localStorage.getItem("addRoute");
 
-   // const editIdIspenzio = localStorage.getItem("ispenzioEditID");
+  
+    
+
+    // id for Edit ispenzio MainLayout Table edit 
+    const editIdIspenzio = localStorage.getItem("ispenzioEditID");
+    const editroute = localStorage.getItem("editroute");
+
+    // console.log("editIdIspenzio",editIdIspenzio);
     
     const [MachineryID, setMachineryID] = useState(null);
     const [topologyName, setTopologyName] = useState(null);
     const [showNextForm, setShowNextForm] = useState(false);
+    const [addButttonApi,setAddButtonApi] = useState(false);
 
 
     const [status, setStatus] = useState({ id_state: 2, state: "Pianificata" });
@@ -59,21 +75,40 @@ const MainLayout6 = ({ areas }) => {
     const validateForm = () => {
         let isValid = true;
         let validationErrors = {};
-        formData.forEach((item, index) => {
-            let itemErrors = {};
-            if (!item.machineId) {
-                itemErrors.machineId = "Macchinario is required";
-                isValid = false;
-            }
-
-            if (Object.keys(itemErrors).length > 0) {
-                validationErrors[index] = itemErrors;
-            }
-        });
-
+    
+        // Check each individual field of formData
+        // if (!formData.machineId) {
+        //     validationErrors.machineId = "Macchinario is required";
+        //     isValid = false;
+        // }
+    
+        // if (!formData.inspectorId) {
+        //     validationErrors.inspectorId = "Inspector Name is required";
+        //     isValid = false;
+        // }
+    
+        if (!formData.areaId) {
+            validationErrors.areaId = "Area Name is required";
+            isValid = false;
+        }
+        // if (!MachineryID) {
+        //     validationErrors.brand_name = "Norme Dell Name is required";
+        //     isValid = false;
+        // }
+        if (!topologyName) {
+            validationErrors.topology = "Machinrio is required";
+            isValid = false;
+        }
+        
+        // if (!formData.norm) {
+        //     validationErrors.norm = "Norm is required";
+        //     isValid = false;
+        // }
         setErrors(validationErrors);
+    
         return isValid;
     };
+    
 
     const validateClientForm = () => {
         const newErrors = {};
@@ -188,23 +223,21 @@ const MainLayout6 = ({ areas }) => {
         }
         return acc;
     }, {});
-    // console.log("getData",getDeleteApi);
-
-
-
-
-
-
+    
 
     // api calls 
     const { data: dropdownList, refetch: refetchDropDown } = useGetAddDropDownListQuery(filterApi.getDropDownUrl);
     const { data: rzOrderdetails, refetch } = useGetRzOrderQuery({
         url: filterApi.getRzOrderUrl,
-        params: id_order,
+        params: (() => {
+            if (route === AddRoute) return id_order;
+            if (route === editroute) return editIdIspenzio;
+            return id_order;
+        })(),
         refetchOnMountOrArgChange: true,
     });
+    
 
-    console.log("rzOrderdetails",rzOrderdetails);
 
     const { data } = useGetEditIDOrderQuery({
         // url:editId? filterApi.EditInspectionUrl:"",
@@ -216,33 +249,32 @@ const MainLayout6 = ({ areas }) => {
     })
 
 
-    // console.log(data,"editdata")
-
-
-
     // api delete inspection
     const [deleInspection] = useDeleInspectionMutation()
 
     /// api for create Inspecton
     const [createInspection] = useCreateInspectionMutation();
 
-    // api for uddate inspection 
+    // api for update inspection 
     const [updateInspection] = useUpdateInspectionMutation();
-
+    
+    //data for inspection listing 
     const ispectorListing = dropdownList?.data?.ispectorListing;
 
-    //  const machineListing = dropdownList?.data?.machineListing;
-    //  const machineBrand = dropdownList?.data?.machineBrand;
+    // data machineTopology getting for dropdownList api 
     const machineTypology = dropdownList?.data?.machineTypology;
 
-    //  const normeListing = dropdownList?.data?.normeListing;
+    // data for state Listing for getting from dropdownList api
     const stateListing = dropdownList?.data?.stateListing;
+
+    // data for working area listing getting from dropdown listing 
     const workingListing = dropdownList?.data?.workingListing;
 
 
 
     useEffect(() => {
         const rzData = rzOrderdetails?.data;
+        console.log("rzData",rzData);
         setClientformData({
             description: rzData?.description,
             created_by: rzData?.created_by_name,
@@ -251,7 +283,17 @@ const MainLayout6 = ({ areas }) => {
             client: rzData?.client,
             date: rzData?.inspections?.[0]?.calendar_info?.date,
         });
+
+        const inspectorData = ispectorListing?.find((item)=>item?.id_user == userId);
+        setFormData({
+            ...formData,
+            inspector_name:inspectorData?.name,
+            inspectorId : {inspectorId :inspectorData?.id_ispector}, 
+        })
     }, [rzOrderdetails]);
+
+
+    
 
     const handleSelectIspector = (selectedOption) => {
         if (selectedOption) {
@@ -269,20 +311,23 @@ const MainLayout6 = ({ areas }) => {
         setshowButton("add");
         if (validateClientForm()) {
             setShowNextForm(true)
+            setAddButtonApi(true);
             //   setSectionAdded(true);
-        }
+        } 
     };
 
 
 
     //selected change 2 input
     const handleSelectChange = (selectedOption) => {
+        console.log("selectedOption",selectedOption)
         if (selectedOption) {
             setMachineryID(selectedOption?.value);
         }
     }
 
     const handleSelectMachineryTopology = (selectedOption) => {
+        console.log("selectedOption",selectedOption)
         if (selectedOption) {
             setTopologyName(selectedOption.value);
         }
@@ -307,61 +352,7 @@ const MainLayout6 = ({ areas }) => {
     };
 
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        // if (validateForm()){
-        try {
-            let body = {
-                // machineId: formData.machineId,
-                description: clientformData?.description,
-                created_by: clientformData?.Machinery_created_id,
-                id_order: clientformData?.orderId,
-                date: moment(clientformData?.date).format("YYYY-MM-DD"),
-                id_state: status?.id_state,
-                inspections: [{
-                    machineId: formData.machineId,
-                    inspectorId: formData?.inspectorId.inspectorId,
-                    notes: formData?.notes,
-                    areaId: formData?.areaId,
-                }]
-            }
-            const response = await createInspection({
-                url: filterApi?.createInspectionUrl,
-                method: filterApi.CreateInspectionMethod,
-                body: body,
-            })
-            if (response?.data?.status == "SUCCESS") {
-                toast.success(response?.data?.message)
-                setFormData({
-                    machineId: "",
-                    inspectorId: {},
-                    areaId: "",
-                    year: "",
-                    notes: "",
-                    normeId: "",
-                    ce: false,
-                    atex: false,
-                });
-                window.location.reload();
-                // refetchDropDown();
-                // refetch();
-                showNextForm(false);
-                setMachineryID("");
-                setTopologyName("");
-
-            }
-            else {
-                toast.error(response?.data?.message);
-            }
-
-        }
-
-
-        catch (error) {
-            console.log(error);
-        }
-
-    }
+  
 
 
     // function for delete Modal 
@@ -370,6 +361,37 @@ const MainLayout6 = ({ areas }) => {
         setDeletedInspectionId(id)
         setShowModal(true);
     }
+
+
+    // function for close Form 
+
+    const handleClose = () => {
+        setFormData({
+          ...formData,
+          topologyDefaultValues: "",
+          normedefaultValue: "",
+          defaultValue: "",
+          brand_name: "",
+        //   inspectorId: "",
+        //   inspector_name: "",
+          machineId: "",
+          atex: "",
+          ce: "",
+          norm_specification: "",
+          year: "",
+          areaId: "",
+          inspectionId: "",
+          norm: "",
+          topology:"",
+          arealavoe_defaultvalue: "",
+          notes: ""
+        });
+        setMachineryID(null);
+        setTopologyName(null);
+        setShowNextForm(false);
+        setAddButtonApi(false);
+      };
+      
 
     // function for  delete inspection in add form  
     const deleteInspection = async (id) => {
@@ -382,8 +404,9 @@ const MainLayout6 = ({ areas }) => {
 
             if (response?.data?.status == "SUCCESS") {
                 toast.success(response?.data?.message);
-                setShowModal(false);
                 refetch();
+                setShowModal(false);
+                showNextForm(false);
             } else {
                 toast.error(response?.data?.message);
             }
@@ -397,7 +420,12 @@ const MainLayout6 = ({ areas }) => {
     const { data: MachineryData, isLoading, isError, refetch: machineryOrder } = useGetMachineryIDOrderQuery(
         topologyName ? { url: filterApi.MachineryFilter, params: topologyName } : null
     );
-    //   const query=useQu
+     
+    useMemo(()=>{
+        if(MachineryData){
+            setFormData({...formData,MachineryData:MachineryData})
+        }
+    },[MachineryData])
 
 
     const handleFormPage = (item, index) => {
@@ -417,14 +445,22 @@ const MainLayout6 = ({ areas }) => {
         MachineryID ? { url: filterApi.MachineryFilterBrandName, params: MachineryID } : null
     );
 
+
+    useMemo(()=>{
+        if(normeDellData){
+            setFormData({...formData,normeDellData:normeDellData})
+        }
+    },[normeDellData])
+    
     const handleSelectMachinery = (selectedoption) => {
         if (selectedoption) {
             const filterMachineryIdData = normeDellData?.data?.find((item) => item?.name == selectedoption?.value);
             console.log("filterMachineryIdData", filterMachineryIdData)
             setFormData({
-                inspectorId: { label: filterMachineryIdData?.name },
+                ...formData,
+                // inspectorId: { label: filterMachineryIdData?.name },
                 year: filterMachineryIdData?.year,
-                normeId: filterMachineryIdData?.norm_specification,
+                norm: filterMachineryIdData?.norm_specification,
                 ce: filterMachineryIdData?.ce,
                 atex: filterMachineryIdData?.atex,
                 machineId: selectedoption.id_machinery_type
@@ -467,30 +503,30 @@ const MainLayout6 = ({ areas }) => {
             setMachineryID(datas?.brand_name)
             setTopologyName(datas?.typology);
             const machinaryInfo =
-                MachineryData?.data?.find(
+                formData?.MachineryData?.data?.find(
                     (machineData) => {
                         console.log("machineId", machineData?.id_machinery_type)
                         return machineData?.id_machinery_type === datas?.id_machinery_type
                     }
                 ) || {};
-
-            console.log("machinaryInfo", datas);
-
             const newdata = {
                 topologyDefaultValues: { value: datas?.typology, lable: datas?.typology },
                 normedefaultValue: { value: datas?.machine_name, label: datas?.machine_name },
                 defaultValue: { value: datas.brand_name, label: datas.brand_name },
                 brand_name: datas.brand_name,
-                inspectorId: datas.id_ispector,
+                inspectorId: {inspectorId : datas.id_ispector},
                 machineId: datas?.id_machinery_type,
                 atex: datas?.atex,
                 ce: datas?.ce,
+                inspector_name : datas?.ispector_name,
                 norm_specification: machinaryInfo?.norm_specification,
                 year: datas?.year,
                 typology: datas?.typology,
                 areaId: datas?.id_working_area,
+                // normId : [{ name: datas?.norms?.map((item) => item?.name) }],
                 inspectionId: datas?.id_inspection,
-                normeId: [{ name: datas?.norms?.map((item) => item?.name) }],
+                norm:[{ name: datas?.norms?.map((item) => item?.name) }],
+                
                 arealavoe_defaultvalue: { value: datas?.wa_name, label: datas?.wa_name },
                 notes: datas?.notes
             };
@@ -499,6 +535,82 @@ const MainLayout6 = ({ areas }) => {
             setFormData(newdata);
         }
     }, [data])
+
+    // function for Submit Form 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!validateForm()) {
+            return;
+        }
+    
+        try {
+            let body = {
+                // machineId: formData.machineId,
+                description: clientformData?.description,
+                created_by: clientformData?.Machinery_created_id,
+                id_order: clientformData?.orderId,
+                date: moment(clientformData?.date).format("YYYY-MM-DD"),
+                id_state: status?.id_state,
+                inspections: [{
+                    machineId: formData.machineId,
+                    inspectorId: formData?.inspectorId.inspectorId,
+                    notes: formData?.notes,
+                    areaId: formData?.areaId,
+                }]
+            }
+            const response = await createInspection({
+                url: filterApi?.createInspectionUrl,
+                method: filterApi.CreateInspectionMethod,
+                body: body,
+            })
+            if (response?.data?.status == "SUCCESS") {
+                toast.success(response?.data?.message)
+                setFormData({
+                    topologyDefaultValues: "",
+                    normedefaultValue: "",
+                    defaultValue: "",
+                    brand_name: "",
+                    typology:"",
+                    inspectorId: "",
+                    machineId: "",
+                    atex: "",
+                    ce: "",
+                    inspectorId: "",
+                    // inspector_name: "",
+                    // inspector_name: "",
+                    norm_specification: "",
+                    year: "",
+                    areaId: "",
+                    inspectionId: "",
+                    norm: "",
+                    arealavoe_defaultvalue: "",
+                    notes: "",
+                    normeDellData:[],
+                    MachineryData:[]
+                  });
+                  
+                // window.location.reload();
+                // refetchDropDown();
+                 refetch();
+                // setShowNextForm(false);
+                setMachineryID(null);
+                setTopologyName(null);
+
+            }
+            else {
+                toast.error(response?.data?.message);
+            }
+
+        }
+
+
+        catch (error) {
+            console.log(error);
+        }
+
+    }
+
+    console.log("formData====",formData,topologyName);
 
 
     // function for Edited Data
@@ -533,7 +645,7 @@ const MainLayout6 = ({ areas }) => {
             if (response?.data?.status == "SUCCESS") {
                 toast.success(response?.data?.message);
                 setShowNextForm(false)
-                window.location.reload();
+                // window.location.reload();
             } else if (response?.data?.status == "ERROR" || response?.data?.status == "FAIL") {
                 toast.error(response?.data?.message);
             }
@@ -543,6 +655,8 @@ const MainLayout6 = ({ areas }) => {
         }
 
     }
+
+   
 
 
     return (
@@ -612,14 +726,14 @@ const MainLayout6 = ({ areas }) => {
                                 {findAreaByKeyPrefix('FormArea8') || <div>- -</div>}
                             </div>
                             <div className="ispezione-detaBox">
-                                {findAreaByKeyPrefix('EditArea1') || <div>- -</div>}
+                                {/* {findAreaByKeyPrefix('EditArea1') || <div>- -</div>} */}
                                 {findAreaByKeyPrefix('EditArea2', { handleSubmit }) || <div>- -</div>}
 
                             </div>
                             {findAreaByKeyPrefix('EditArea3', { stateListing, status, setStatus }) || <div>- -</div>}
 
                         </div>
-                        {findAreaByKeyPrefix('EditArea4') || <div>- -</div>}
+                        {findAreaByKeyPrefix('EditArea4',{handleSubmit,showNextForm}) || <div>- -</div>}
 
                         <div className="form-input-block">
                             <form action="#!">
@@ -633,7 +747,7 @@ const MainLayout6 = ({ areas }) => {
                             <div className="col-md-12">
                                 <div className="form-btn-sets">
                                     <div className="btn-set-left">
-                                        {findAreaByKeyPrefix('EditButtonArea0', { handleClientSubmit }) || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditButtonArea0', { handleClientSubmit,addButttonApi,handleSubmit}) || <div>- -</div>}
                                         {showNextForm && showButton == "add" ? (
                                             findAreaByKeyPrefix('EditButtonArea1', { handleSubmit }) || <div>- -</div>
                                         ) : showButton == "edit" ? (
@@ -653,11 +767,11 @@ const MainLayout6 = ({ areas }) => {
                             {showNextForm && (
                                 <div className="new-added" >
                                     {findAreaByKeyPrefix('EditArea9') || <div>- -</div>}
-                                    {findAreaByKeyPrefix('BodyArea') || <div>- -</div>}
+                                    {findAreaByKeyPrefix('BodyArea',{handleClose}) || <div>- -</div>}
                                     <div className="row row-gap">
-                                        {findAreaByKeyPrefix('EditArea13', { machineTypology, handleSelectMachineryTopology, formData }) || <div>- -</div>}
-                                        {findAreaByKeyPrefix('EditArea14', { MachineryData, formData, handleSelectChange }) || <div>- -</div>}
-                                        {findAreaByKeyPrefix('EditArea10', { normeDellData, handleSelectMachinery, formData }) || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditArea13', { machineTypology, handleSelectMachineryTopology, formData,errors,topologyName}) || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditArea14', { MachineryData: formData?.MachineryData, formData, handleSelectChange,errors,MachineryID }) || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditArea10', { normeDellData : formData?.normeDellData, handleSelectMachinery, formData,errors }) || <div>- -</div>}
                                         {findAreaByKeyPrefix('EditArea15', { formValues: formData.year }) || <div>- -</div>}
                                         {findAreaByKeyPrefix('EditArea17', { formData }) || <div>- -</div>}
                                         <div className="col-md-4">
@@ -667,8 +781,8 @@ const MainLayout6 = ({ areas }) => {
                                             </div>
                                         </div>
 
-                                        {findAreaByKeyPrefix('EditArea12', { handleSelectArea, formData, workingListing }) || <div>- -</div>}
-                                        {findAreaByKeyPrefix('EditArea11', { formData, formValues: clientformData?.created_by, formData, ispectorListing, handleSelectIspector }) || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditArea12', { handleSelectArea, formData, workingListing,errors }) || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditArea11', { formData, formValues: formData?.inspector_name, formData, ispectorListing, handleSelectIspector,errors }) || <div>- -</div>}
                                         {findAreaByKeyPrefix('EditArea16', { formData, formValues: formData.notes, handleNotes, formName: { name: "notes" } }) || <div>- -</div>}
 
                                     </div>

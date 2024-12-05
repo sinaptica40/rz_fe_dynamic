@@ -11,19 +11,51 @@ const EditElement17 = ({areas,formData})=>{
             //     }`}
              className="form-floating"
              >
-             <input
-               className="form-control"
-               id="floatingInput"
-               autoComplete="off"
-              value={formData?.normeId?.length ? formData?.normeId?.map((item)=>item?.name) : ""}
+              {formData?.norm?.length ? (
+                <>
+                <input
+                 className="form-control"
+                 id="floatingInput"
+                 autoComplete="off"
+                 value={formData?.norm?.length ? formData?.norm?.map((item)=>item?.name) : ""}
+                />
+
+                <label htmlFor="floating-select">{element_data.block_name}</label>
+                {/* // {errors.norm_specification && (
+                //   <div className="error-message text-danger">
+                //     {errors.norm_specification}
+                //   </div>
+                //  )} */}
+                </>
+                 ):(
+                  <>
+                  <Select
+                   id="floatingSelect"
+                   name="norm"
+                  //  defaultValue={formData?.defaultValue}
+                  //  value={{label:MachineryID}}
+                  //   onChange={handleSelectChange}
+                  //  options={MachineryData?.data?.map((item)=>{
+                  //   return{
+                  //   value: item?.brand_name,
+                  //   label: item?.brand_name,
+                  //     }
+                  //    })}
+               
+                   classNamePrefix="react-select"
+                   className="form-select form-control"
              />
-              {/* {errors.norm_specification && (
+              {/* {errors?.brand_name && (
                 <div className="error-message text-danger">
-                  {errors.norm_specification}
+                  {errors?.brand_name}
                 </div>
-              )} */}
-              
+              )}
+               */}
               <label htmlFor="floating-select">{element_data.block_name}</label>
+              
+                  </>
+                 )}
+            
               
             </div>
           

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useRef,useEffect} from "react";
 import { toast } from "react-toastify";
 import Loader from "../../lib/loader/loader";
 import { useDeleInspectionMutation, useGetOdersIspezione0Query, useGetOdersIspezione1Query } from "../../services/apiSlice";
@@ -12,7 +12,7 @@ const MainLayout2 = ({ areas }) => {
     const [showModal,setShowModal] = useState();
     const [deletedInspectionId,setDeletedInspectionId]= useState(null);
    
-    
+    const modalRef = useRef(null);
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
         const area = areas.find(area => area?.key && area?.key.startsWith(prefix));
         if (area) {
@@ -96,6 +96,21 @@ const MainLayout2 = ({ areas }) => {
         setShowModal(true);
     }
 
+    useEffect(() => {
+        if (showModal) {
+          const handleOutsideClick = (e) => {
+             
+            if (modalRef.current && !modalRef.current.contains(e.target)) {
+               
+              setShowModal(false); 
+            }
+          };
+          document.addEventListener("mousedown", handleOutsideClick, { capture: true });
+          return () => {
+            document.removeEventListener('mousedown', handleOutsideClick);
+          };
+        }
+      }, [showModal]);
 
     // function for  delete inspection in add form  
     const deleteInspection = async () => {
@@ -264,7 +279,7 @@ const MainLayout2 = ({ areas }) => {
 
                        </div>
                         <div className="card-block-body">
-                          {findAreaByKeyPrefix('IspezioniArea2',{TableData2,handleModal,deleteInspection,showModal,setShowModal}) || <div>- -</div>}
+                          {findAreaByKeyPrefix('IspezioniArea2',{TableData2,handleModal,modalRef,deleteInspection,showModal,setShowModal}) || <div>- -</div>}
                           {totalDocuments2 > perPageItem2 && (
                         findAreaByKeyPrefix('PaginationArea1',{totalDocuments :totalDocuments2, currentPage:currentPage2, perPageItem:perPageItem2, handlePageClick2}) || <div>- -</div>
                         )} 

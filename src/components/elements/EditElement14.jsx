@@ -1,8 +1,8 @@
 import React from 'react'
 import CreatableSelect from "react-select/creatable";
-const EditElement14 = ({areas,MachineryData,handleSelectChange,formData})=>{
+const EditElement14 = ({areas,MachineryData,handleSelectChange,formData,errors,MachineryID})=>{
     const {element_data} = areas;
-    console.log(formData?.machineId,"MachineryData",formData)
+    console.log(MachineryID,"MachineryData")
     return(
         <>
          
@@ -15,7 +15,7 @@ const EditElement14 = ({areas,MachineryData,handleSelectChange,formData})=>{
                 id="floatingSelect"
                 name="brandName"
                 defaultValue={formData?.defaultValue}
-                // value={formData?.machineId ? { value: formData.machineId.value, label: formData.machineId.label } : null}
+                value={{label:MachineryID}}
                 onChange={handleSelectChange}
                  options={MachineryData?.data?.map((item)=>{
                   return{
@@ -27,12 +27,12 @@ const EditElement14 = ({areas,MachineryData,handleSelectChange,formData})=>{
                 classNamePrefix="react-select"
                 className="form-select form-control"
              />
-              {/* {errors.norm_specification && (
+              {/* {errors?.brand_name && (
                 <div className="error-message text-danger">
-                  {errors.norm_specification}
+                  {errors?.brand_name}
                 </div>
-              )} */}
-              
+              )}
+               */}
               <label htmlFor="floating-select">{element_data.block_name}</label>
               
             </div>

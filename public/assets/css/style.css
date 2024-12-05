@@ -2182,6 +2182,7 @@ svg.css-tj5bde-Svg {
   border-top: 2px solid var(--rz-primary);
   padding: 20px 0 0;
   margin: 30px auto;
+  position: relative;
 }
 
 

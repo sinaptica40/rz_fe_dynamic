@@ -21,10 +21,10 @@ const inputTextElement7 =({areas,clientformData,handleDateChange,isSelectActive,
             <label 
             //   htmlFor="floatingInput"
             >{areas?.element_data.block_name}</label> 
-            </div>
             {errorsForm1?.date && (
-                  <div className="text-danger">{errorsForm1?.date}</div>
+                  <div className="text-danger mt-2">{errorsForm1?.date}</div>
                 )}
+            </div>
         </>
     )
 }

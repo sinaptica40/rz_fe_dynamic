@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const IspezioniElement2 = ({ areas, handleModal,deleteInspection,showModal,setShowModal,TableData2,nestedElements }) => {
+const IspezioniElement2 = ({ areas, handleModal,deleteInspection,showModal,modalRef,setShowModal,TableData2,nestedElements }) => {
     
     const navigate = useNavigate();
   
@@ -82,13 +82,18 @@ const IspezioniElement2 = ({ areas, handleModal,deleteInspection,showModal,setSh
         }
     });
 
-    const handleViewClick = (id) => {
-        localStorage.setItem("ispenzioViewID",id);
+    const handleViewClick = (item) => {
+        localStorage.setItem("ispenzioViewID",item?.id_order);
+        localStorage.setItem("order_Data",JSON.stringify({"order_code":item?.order_code,"client":item?.client}))
+        localStorage.setItem("viewRoute",viewRoute);
         navigate(`/${viewRoute}`); 
     };
 
-    const handleEditClick = (id) => {
-        localStorage.setItem("ispenzioEditID",id)
+    const handleEditClick = (item) => {
+       
+        localStorage.setItem("ispenzioEditID",item?.id_order);
+        localStorage.setItem("editroute",editRoute);
+        localStorage.setItem("order_Data",JSON.stringify({"order_code":item?.order_code,"client":item?.client}))
         navigate(`/${editRoute}`); 
     };
 
@@ -194,12 +199,14 @@ const IspezioniElement2 = ({ areas, handleModal,deleteInspection,showModal,setSh
                                 </td>
                                 <td>{item?.order_code}</td>
                              
-                                <td>{item?.ispectors}</td>
+                                <td> {item?.ispectors?.map((inspector, index) => 
+    index < item.ispectors.length - 1 ? `${inspector}, ` : inspector
+  )}</td>
                                 <td>{item?.inspections?.[0]?.calendar_info?.date}</td>
                                 <td>
                                     <div className="table_action_list">
                                         <a
-                                          onClick={()=>handleViewClick(item?.id_order)}
+                                          onClick={()=>handleViewClick(item)}
                                           className="table_actionBtn">
                                             
                                             <img src={viewIcon?.table_fields?.label}  />
@@ -217,7 +224,7 @@ const IspezioniElement2 = ({ areas, handleModal,deleteInspection,showModal,setSh
                                             </svg> */}
                                         </a>
                                         <a 
-                                         onClick={()=>handleEditClick(item?.id_order)}
+                                         onClick={()=>handleEditClick(item)}
                                          className="table_actionBtn">
                                              <img src={editIcon?.table_fields?.label}  />
                                             {/* <svg
@@ -720,7 +727,7 @@ const IspezioniElement2 = ({ areas, handleModal,deleteInspection,showModal,setSh
 
 {showModal && (
             <div className="modal-main-box">
-                <div className="modal-inner-box">
+                <div className="modal-inner-box" ref={modalRef}>
                     {/* <span className="info-iocn">
                         !
                     </span> */}

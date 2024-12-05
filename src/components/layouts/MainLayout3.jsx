@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useDeleteNormMutation, useGetMachineryQuery } from "../../services/apiSlice";
 import { useLocation, useParams } from "react-router-dom";
 import Loader from "../../lib/loader/loader";
@@ -19,6 +19,7 @@ const MainLayout3 = ({ areas }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [deletedId, setDeletedId] = useState(null);
 
+    const modalRef = useRef(null);
 
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
         const area = areas.find(area => area.key && area.key.startsWith(prefix));
@@ -79,15 +80,15 @@ const MainLayout3 = ({ areas }) => {
             acc.deleteApiURL = function_name;
             acc.deleteApiMethod = methodType;
         }
-        if(function_name?.includes("delete-machinery")){
+        if (function_name?.includes("delete-machinery")) {
             acc.deleteApiURL = function_name;
             acc.deleteApiMethod = methodType;
         }
 
         return acc;
     }, {});
-    
-    console.log("isLoading",getDeleteApi);
+
+    console.log("isLoading", getDeleteApi);
 
     let getapi;
     getapi = allApis?.reduce((acc, user) => {
@@ -121,9 +122,9 @@ const MainLayout3 = ({ areas }) => {
 
     );
 
-    const [deleteNorm,{isLoading}] = useDeleteNormMutation();
+    const [deleteNorm, { isLoading }] = useDeleteNormMutation();
 
-   
+
 
 
 
@@ -168,9 +169,22 @@ const MainLayout3 = ({ areas }) => {
         setDeletedId(id)
         setShowModal(true);
     }
+    useEffect(() => {
+        if (showModal) {
+          const handleOutsideClick = (e) => {
+             
+            if (modalRef.current && !modalRef.current.contains(e.target)) {
+               
+              setShowModal(false); 
+            }
+          };
+          document.addEventListener("mousedown", handleOutsideClick, { capture: true });
+          return () => {
+            document.removeEventListener('mousedown', handleOutsideClick);
+          };
+        }
+      }, [showModal]);
 
-
-  
     // function for delete Norme
     const handleDeleteNorme = async () => {
         try {
@@ -179,17 +193,17 @@ const MainLayout3 = ({ areas }) => {
                 method: getDeleteApi.deleteApiMethod,
                 params: deletedId
             })
-            
-          if( res?.data?.status =="SUCCESS"){
-            toast.success(res?.data?.message);
-            refetch();
-            setDeletedId(null);
-            setShowModal(false);
-          }else if (res?.error){
-            toast.error(res?.error?.data?.message);
-          }
+
+            if (res?.data?.status == "SUCCESS") {
+                toast.success(res?.data?.message);
+                refetch();
+                setDeletedId(null);
+                setShowModal(false);
+            } else if (res?.error) {
+                toast.error(res?.error?.data?.message);
+            }
         } catch (error) {
-           toast.error(error)
+            toast.error(error)
         }
     }
 
@@ -268,7 +282,7 @@ const MainLayout3 = ({ areas }) => {
 
                                 </div>
                                 <div className="card-block-body">
-                                    {findAreaByKeyPrefix('MachineryArea2', { data, handleModal, showModal, setShowModal, handleDeleteNorme }) || <div>- -</div>}
+                                    {findAreaByKeyPrefix('MachineryArea2', { data, handleModal, modalRef, showModal, setShowModal, handleDeleteNorme }) || <div>- -</div>}
                                     {totalDocuments > perPageItem ? (
                                         findAreaByKeyPrefix('PaginationArea', { totalDocuments, currentPage, perPageItem, handlePageClick }) || <div>- -</div>
                                     ) : (
@@ -283,7 +297,7 @@ const MainLayout3 = ({ areas }) => {
                     </div>
                 </div>
             </div>
-            
+
         </>
     );
 };

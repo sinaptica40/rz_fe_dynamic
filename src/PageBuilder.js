@@ -36,7 +36,6 @@ const importCss = (path) => {
 };
 
 const renderNestedAreas = (nestedAreas) => {
-  console.log('==nestedAreas==55', nestedAreas)
   const LayoutComponent = importComponent('layout', nestedAreas.layout_name);
 
   const resultAreas = nestedAreas.result.map((nestedArea, nestedIndex) => {
@@ -48,9 +47,6 @@ const renderNestedAreas = (nestedAreas) => {
       importCss(css_name); // Import CSS if present
     }
 
-    console.log('==gourav==', areas?.element_type)
-
-    // console.log('==nestedArea==', areas?.element_type, areas.element_data?.[0].element_type);
     if (areas?.element_type === 'container' && areas.element_data[0].element_type?.id_page) {
       const nestedAreaElements = element_data.map((elementObj, elIndex) => {
         const { area_name, element_name, css_name, element_type, areas: deeperNestedAreas = [] } = elementObj;
@@ -82,8 +78,6 @@ const renderNestedAreas = (nestedAreas) => {
     } else {
       const ElementComponentToSend = importComponent('element', element_name);
 
-      console.log('==gourav== 1', ElementComponentToSend, element_name, area_name)
-
       return (
         <Suspense key={`${area_name}`} fallback={<div>Loading element...</div>}>
           <NestedAreaComponent>
@@ -93,8 +87,6 @@ const renderNestedAreas = (nestedAreas) => {
       );
     }
   });
-
-  console.log('==gourav== 3', resultAreas)
 
   return (
     <Suspense fallback={<div>Loading layout...</div>}>
@@ -132,8 +124,6 @@ const PageBuilder = ({ jsonData }) => {
 
           const ElementComponentToSend = importComponent('element', element_name);
 
-          console.log('==el==type==', areas?.element_type, areas?.table_columns?.[3]?.table_fields.page_type)
-
           if (areas?.element_type === 'container' && areas?.element_data[0]?.element_type?.id_page) {
             const nestedElements = NestedElementData?.length > 0 && areas?.element_data[0]?.element_type?.id_page
               ? renderNestedAreas(areas?.element_data[0]?.element_type.data)
@@ -154,13 +144,15 @@ const PageBuilder = ({ jsonData }) => {
 
             if (subpageColumns?.length > 0) {
               // Render nested elements for all matching subpage columns
-              const nestedElements = subpageColumns.map((subpageColumn, index) =>
-                NestedElementData.length > 0 && subpageColumn?.table_fields?.page_type
-                  ? renderNestedAreas(subpageColumn?.table_fields?.page)
-                  : null
-              );
+              const nestedElements = subpageColumns.map((subpageColumn, index) => {
+                return (
+                  NestedElementData.length > 0 && subpageColumn?.table_fields?.page_type
+                    ? renderNestedAreas(subpageColumn?.table_fields?.page)
+                    : null
+                )
+              }
 
-              console.log("==element==send==", element_name);
+              );
 
               return (
                 <Suspense key={`${ComponentName}-${itemIndex}`} fallback={<div>Loading element...</div>}>

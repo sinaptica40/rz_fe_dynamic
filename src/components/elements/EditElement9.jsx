@@ -1,6 +1,8 @@
 import React from 'react'
-import Select from "react-select";
-const EditElement9 = ({areas,formValues,formData,ispectorListing,handleSelectIspector})=>{
+import CreatableSelect from "react-select/creatable";
+
+
+const EditElement9 = ({areas,formValues,formData,ispectorListing,handleSelectIspector,errors})=>{
     const {element_data} = areas;
     const defaultOption = ispectorListing?.find(machine => machine?.name === formValues);
     console.log("defaultOption",defaultOption);
@@ -12,7 +14,7 @@ const EditElement9 = ({areas,formValues,formData,ispectorListing,handleSelectIsp
             //     }`}
              className="form-floating"
              >
-              <Select
+              <CreatableSelect
                 id="floatingSelect"
                 name="inspectorId"
                 defaultValue={{label:defaultOption?.name,value: defaultOption?.name}}
@@ -31,9 +33,9 @@ const EditElement9 = ({areas,formValues,formData,ispectorListing,handleSelectIsp
                 classNamePrefix="react-select"
                 className="form-select form-control"
              />
-              {/* {errors.norm_specification && (
+              {/* {errors.inspectorId && (
                 <div className="error-message text-danger">
-                  {errors.norm_specification}
+                  {errors.inspectorId}
                 </div>
               )} */}
               

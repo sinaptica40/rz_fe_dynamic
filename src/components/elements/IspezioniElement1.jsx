@@ -11,9 +11,10 @@ const IspezioniElement1 = ({ areas,TableData1 }) => {
 
     const addRoute = areas?.table_columns.find(item=> item.table_fields.data_type=="api");
 
-    console.log("addRoute",addRoute?.table_fields?.label)
-    const handleAddRoute =(id)=>{
-        localStorage.setItem("id_order",id)
+    const handleAddRoute =(item)=>{
+        localStorage.setItem("id_order",item?.id_order);
+        localStorage.setItem("order_Data",JSON.stringify({"order_code":item?.order_code,"client":item?.client}))
+        localStorage.setItem("addRoute",addRoute?.table_fields?.page)
         navigate(`/${addRoute?.table_fields?.page}`);
     }
     
@@ -45,7 +46,7 @@ const IspezioniElement1 = ({ areas,TableData1 }) => {
                                     </td>
                                     <td className="text-end">
                                     <div className="btnRight">
-                                        <a onClick={()=>handleAddRoute(item?.id_order)} className="planRightDete">
+                                        <a onClick={()=>handleAddRoute(item)} className="planRightDete">
                                             <img src={addRoute?.table_fields?.label}/>
                                             {/* <svg
                                                 width={20}

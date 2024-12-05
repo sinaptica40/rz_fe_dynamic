@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
-const NormaElement2 = ({areas,data,nestedElements,handleDeleteNorme,handleModal,showModal,setShowModal}) => {
+const NormaElement2 = ({areas,data,nestedElements,handleDeleteNorme,handleModal,modalRef ,showModal,setShowModal}) => {
 
    
 
@@ -471,7 +471,7 @@ const NormaElement2 = ({areas,data,nestedElements,handleDeleteNorme,handleModal,
             </div>
             {showModal && (
             <div className="modal-main-box">
-                <div className="modal-inner-box">
+                 <div className="modal-inner-box" ref={modalRef}>
                     {/* <span className="info-iocn">
                         !
                     </span> */}
