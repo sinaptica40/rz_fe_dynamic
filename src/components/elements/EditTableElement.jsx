@@ -2,18 +2,20 @@ import React from "react";
 
 const EditTableElement = ({
                 areas,rzOrderdetails,
+                showFormData,
                 deleteInspection,setShowModal,
                 showModal,handleModal,
                 handleFormPage,
-                nestedElements
+                nestedElements,
+                modalRef
               }) => {
   const filterHeading = areas?.table_columns.filter((item)=>item?.table_fields?.data_type != "api")
  
 
-  const editIcon = areas?.table_columns.find(item=> item.table_fields.field_name=="edit icon");
+  const editIcon = areas?.table_columns.find(item=> item.table_fields.field_name.includes("edit"));
   
  
-    const deleteIcon = areas?.table_columns.find(item=> item.table_fields.field_name=="Delete-ispection");
+    const deleteIcon = areas?.table_columns.find(item=> item.table_fields.field_name.includes("Delete"));
 
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
       const area = nestedElements.find(area => area.key && area.key.startsWith(prefix));
@@ -50,6 +52,8 @@ const EditTableElement = ({
 
       return null;
   };
+
+  // console.log("showFormData",showFormData)
    
    
   return (
@@ -77,13 +81,13 @@ const EditTableElement = ({
           <tbody>
            
 
-              {rzOrderdetails?.data?.inspections?.map((item,index)=>{
+              {showFormData?.data?.inspections?.map((item,index)=>{
                 return(
                   <tr key={index}>
-                  <td>{item?.calendar_info?.date}</td>
-                 <td>{item?.ispector_info?.name}</td>
-                  <td>{item?.working_area_info?.wa_name}</td>
-                  <td>{item?.machinery_info?.brand_name}</td>
+                  <td>{item?.calendar_info?.date ? item?.calendar_info?.date :"00/00/0000"}</td>
+                  <td>{item?.ispector_info?.name ? item?.ispector_info?.name : "-"}</td>
+                  <td>{item?.working_area_info?.wa_name ? item?.working_area_info?.wa_name : "-"}</td>
+                  <td>{item?.machinery_info?.name ? item?.machinery_info?.name : "-"}</td>
                   <td>
                   <div className="table_action_list">
                   <a onClick={()=>handleFormPage(item,index)} className="table_actionBtn">
@@ -143,15 +147,15 @@ const EditTableElement = ({
                 </div>
       )} */}
 
-{showModal && (
+          {showModal && (
             <div className="modal-main-box">
-                <div className="modal-inner-box">
+                <div className="modal-inner-box " ref={modalRef}>
                     {/* <span className="info-iocn">
                         !
                     </span> */}
                     {findAreaByKeyPrefix("FormArea8")}
-                   {findAreaByKeyPrefix("FormArea9")}
-                   {findAreaByKeyPrefix("FormArea10")}
+                   {findAreaByKeyPrefix("FormArea9",{showModal})}
+                   {findAreaByKeyPrefix("FormArea10",{showModal})}
                     <div className="modal-btn-group">
                         {findAreaByKeyPrefix("FormArea11",{deleteInspection})}
                         {findAreaByKeyPrefix("FormArea12",{setShowModal})}

@@ -49,8 +49,8 @@ const NormaElement2 = ({areas,data,nestedElements,handleDeleteNorme,handleModal,
 
   
 
-    const editRoute = areas?.table_columns.find(item=> item.table_fields.field_name=="/edito-norma");
-    const deleteRoute = areas?.table_columns.find(item=> item.table_fields.field_name=="Delete-norma");
+    const editRoute = areas?.table_columns.find(item=> item.table_fields.field_name.includes("edito-norma"));
+    const deleteRoute = areas?.table_columns.find(item=> item.table_fields.field_name.includes("Delete"));
     
 
 

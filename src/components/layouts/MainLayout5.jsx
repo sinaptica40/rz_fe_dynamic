@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import Loader from "../../lib/loader/loader";
 import { useAddNormeMutation, useEditNormeMutation, useGetEditNormDataQuery, useGetNormeLanguageQuery, useGetNormeStandardTypeQuery } from "../../services/apiSlice";
 
@@ -69,29 +70,56 @@ const MainLayout5 = ({ areas }) => {
 
     let getapi;
     getapi = allApis.reduce((acc, user) => {
+        const key = user?.key;
         const functionName = user.props.children.props.children.props.api.function_name;
         const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
 
-        if (functionName.includes("add-norme")) {
+       
+        if (key.includes("FormArea14")) {
             acc.addNorme = functionName;
             acc.addNormeApiMethod = api_Method;
         }
-        if (functionName.includes("standard-types")) {
+        if (key.includes("FormArea11")) {
+           
             acc.standardApi = functionName;
             acc.standardTypeApiMethod = api_Method;
         }
-        if (functionName.includes("language")) {
+        if (key.includes("FormArea10")) {
+          
             acc.languageApi = functionName;
             acc.languageApiMethod = api_Method;
         }
-        if (functionName.includes("edit-norme")) {
+        if (key.includes("FormArea14")) {
+            console.log("functionName",functionName);
             acc.editApi = functionName;
             acc.editApiMethod = api_Method;
         }
-        if (functionName.includes("get-norme?id=".toLowerCase())) {
+        if (key.includes("FormArea8")) {
             acc.getEditNorme = functionName;
             acc.getApiMethod = api_Method;
         }
+
+        // if (functionName.includes("add-norme")) {
+        //     acc.addNorme = functionName;
+        //     acc.addNormeApiMethod = api_Method;
+        // }
+        // if (functionName.includes("standard-types")) {
+        //     acc.standardApi = functionName;
+        //     acc.standardTypeApiMethod = api_Method;
+        // }
+        // if (functionName.includes("language")) {
+        //     acc.languageApi = functionName;
+        //     acc.languageApiMethod = api_Method;
+        // }
+        // if (functionName.includes("edit-norme")) {
+        //     acc.editApi = functionName;
+        //     acc.editApiMethod = api_Method;
+        // }
+        // if (functionName.includes("get-norme?id=".toLowerCase())) {
+        //     acc.getEditNorme = functionName;
+        //     acc.getApiMethod = api_Method;
+        // }
+
 
         return acc;
     }, {});
@@ -131,14 +159,15 @@ const MainLayout5 = ({ areas }) => {
     const edit_id = localStorage.getItem("id_standard")
 
     // console.warn("qwert",edit_id)
-    const { data: editNormedata, isFetching, refetch } = useGetEditNormDataQuery({
-        url: getapi.getEditNorme,
+    const { data: editNormedata, isFetching, refetch } = useGetEditNormDataQuery(
+        edit_id ? { url: getapi.getEditNorme,
         method: getapi.getApiMethod,
         params: {
             id: `${edit_id}`,
         },
         refetchOnMountOrArgChange: true,
-    })
+    } : null
+    )
 
 
 
@@ -161,13 +190,15 @@ const MainLayout5 = ({ areas }) => {
             const editValue = editNormedata?.data;
             console.warn("Fetched data for editing:", editValue);
             setFormValues({
-                file: editValue?.pdf_name || null,
-                file_name: editValue?.name || null,
-                id_standard_type: editValue.id_standard_type || "",
-                language: editValue.language || "",
-                description: editValue.description || "",
-                standard_code: editValue.standard_code || "",
-                // id_standard: editValue?.id_standard || "",
+                fileName: editValue?.name || null,
+                // file: editValue?.pdf_name || null,
+                // /file_name: editValue?.name || null,
+                id_standard_type: editValue.id_standard_type || null,
+                language: editValue.language || null,
+                full_url : editValue?.full_url,
+                description: editValue.description || null,
+                standard_code: editValue.standard_code || null,
+                // id_standard: editValue?.id_standard || null,
             });
 
 
@@ -196,34 +227,32 @@ const MainLayout5 = ({ areas }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate form values
-        const validationErrors = validate();
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return;
-        }
-
-        // Set default values for missing fields
-        if (!formValues.id_standard_type) {
-            formValues.id_standard_type = "1";
-        }
-
-        if (!formValues.language) {
-            formValues.language = "EN";
-        }
-
         try {
 
-            if (getapi?.addNorme) {
-
-                console.log("formValues", formValues);
+            if (getapi?.addNorme && getapi.addNormeApiMethod=="POST") {
+    
+                 // Validate form values
+                const validationErrors = validate();
+                if (Object.keys(validationErrors).length > 0) {
+                    setErrors(validationErrors);
+                    return;
+                }
+        
+                // Set default values for missing fields
+                if (!formValues.id_standard_type) {
+                    formValues.id_standard_type = "1";
+                }
+        
+                if (!formValues.language) {
+                    formValues.language = "EN";
+                }
 
                 const formData = new FormData();
                 formData.append('file', formValues.file);
-                formData.append('id_standard_type', formValues.id_standard_type);
-                formData.append('language', formValues.language);
-                formData.append('description', formValues.description);
-                formData.append('standard_code', formValues.standard_code);
+                formData.append('id_standard_type', formValues.id_standard_type || null);
+                formData.append('language', formValues.language || null);
+                formData.append('description', formValues.description || null);
+                formData.append('standard_code', formValues.standard_code || "");
 
                 let obj = {
                     url: getapi.addNorme,
@@ -233,13 +262,14 @@ const MainLayout5 = ({ areas }) => {
 
                 const res = await addNorme(obj);
                 if (res?.data?.status == "success" || res?.data?.status == "SUCCESS") {
+                    toast.success(res?.data?.message);
                     navigate(`/${res?.data?.navigate}`);
                 } else {
                     console.error(res?.error?.data?.message || "An error occurred");
 
                 }
             }
-            else if (getapi?.editApi) {
+            else if (getapi?.editApi && getapi?.editApiMethod =="PUT") {
 
 
                 const formData = new FormData();
@@ -247,10 +277,10 @@ const MainLayout5 = ({ areas }) => {
                 //     formData.append("file", formValues.file);
                 // }
                 isFormData && formData.append('file', formValues.file);
-                formData.append('id_standard_type', formValues.id_standard_type);
-                formData.append('language', formValues.language);
-                formData.append('description', formValues.description);
-                formData.append('standard_code', formValues.standard_code);
+                formData.append('id_standard_type', formValues.id_standard_type || null);
+                formData.append('language', formValues.language || null);
+                formData.append('description', formValues.description || null);
+                formData.append('standard_code', formValues.standard_code || "");
 
                 const objEdit = {
                     url: getapi.editApi,
@@ -262,7 +292,8 @@ const MainLayout5 = ({ areas }) => {
                 const res = await EditNorme(objEdit);
                 console.warn("resss", res)
                 if (res?.data?.status == "success" || res?.data?.status == "SUCCESS") {
-                    // localStorage.removeItem("id_standard");
+                    toast.success(res?.data?.message);
+                    localStorage.removeItem("id_standard");
                     navigate(`/${res?.data?.navigate}`);
                 } else {
                     console.error(res?.error?.data?.message || "An error occurred");
@@ -350,6 +381,7 @@ const MainLayout5 = ({ areas }) => {
                                 <div className="row row-gap">
 
                                     {findAreaByKeyPrefix('FormArea17', { handleChange, errors, formValues }) || <div>- -</div>}
+                                    {findAreaByKeyPrefix("BodyArea",{formValues})}
                                     {findAreaByKeyPrefix('FormArea11', { standardData, handleChange, errors, formValues }) || <div>- -</div>}
                                     {findAreaByKeyPrefix('FormArea10', { languageData, errors, handleChange, formValues }) || <div>- -</div>}
                                     {findAreaByKeyPrefix('FormArea13', { errors, handleChange, formValues }) || <div>- -</div>}

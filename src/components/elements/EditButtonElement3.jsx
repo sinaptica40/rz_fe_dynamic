@@ -1,9 +1,10 @@
 import React from "react";
 
-const EditButtonElement3 = ({areas})=>{
+const EditButtonElement3 = ({areas,exportToExcel})=>{
     const name = areas.element_data.block_name
     return(
         <>
+         <a onClick={exportToExcel} className="btn-primary btn-default btn-grey">
             <span className="downloadIcon">
                   <svg
                     width={28}
@@ -21,7 +22,8 @@ const EditButtonElement3 = ({areas})=>{
                     />
                   </svg>
                 </span>{" "}
-                {name}
+                {name}|
+          </a>
         </>
     )
 }

@@ -1,8 +1,35 @@
 import React from 'react'
+import { useEffect } from 'react';
+import { useState } from 'react';
 import Select from "react-select";
 
-const EditElement17 = ({areas,formData})=>{
+const EditElement17 = ({areas,formData,handleSelectNormeListing,normeListing,normeOptions,customDropDownData})=>{
     const {element_data} = areas;
+    const [opts, setOpts] = useState([])
+
+    useEffect(() => {
+     if (normeListing.length !== 0) {
+      const options=normeListing?.map((item)=>{
+        return{
+        // normspecficationID : item?.id_standard,
+        label: item?.name,
+        value: item?.id_standard,
+      }
+      });
+      
+      setOpts(options)
+     }
+    },[normeListing])
+
+
+
+    console.log("normeOptions",normeOptions);
+
+     
+   
+
+    // const defaultValue = options?.find((option) => option.normspecficationID === formData?.normspecficationID?.map((id)=>id));
+
     return(
         <>
        
@@ -11,7 +38,7 @@ const EditElement17 = ({areas,formData})=>{
             //     }`}
              className="form-floating"
              >
-              {formData?.norm?.length ? (
+              {formData?.norm?.length && !customDropDownData ? (
                 <>
                 <input
                  className="form-control"
@@ -30,18 +57,18 @@ const EditElement17 = ({areas,formData})=>{
                  ):(
                   <>
                   <Select
-                   id="floatingSelect"
-                   name="norm"
-                  //  defaultValue={formData?.defaultValue}
-                  //  value={{label:MachineryID}}
-                  //   onChange={handleSelectChange}
-                  //  options={MachineryData?.data?.map((item)=>{
-                  //   return{
-                  //   value: item?.brand_name,
-                  //   label: item?.brand_name,
-                  //     }
-                  //    })}
-               
+                    id="floatingSelect"
+                   name="norm_specification"
+                  //  value={normeOptions?.map((item) => ({
+                  //   label: item?.label, 
+                  //   value: item?.value, 
+                  //   })) || []}
+                  value={normeOptions}
+                   onChange={(selectedOption) => {
+                    handleSelectNormeListing(selectedOption)
+                  }}
+                   options={opts}
+                   isMulti
                    classNamePrefix="react-select"
                    className="form-select form-control"
              />

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import { useNavigate } from "react-router-dom";
 
 const css = `
 .react-calendar, .react-calendar *, .react-calendar *:before, .react-calendar *:after {
@@ -122,6 +123,7 @@ const css = `
 
 const CalendarElement = ({ areas, calenderData, showModal, setShowModal, handleModal }) => {
     const [selectedDateData, setSelectedDateData] = useState(null);
+    const navigate = useNavigate();
 
 
     const isHighlightedDate = (date) => {
@@ -154,6 +156,11 @@ const CalendarElement = ({ areas, calenderData, showModal, setShowModal, handleM
         }
 
     };
+
+    const ViewCalendarData = (id)=>{
+        localStorage.setItem("order_Data",id)
+        navigate("/99");
+    }
 
     return (
         <>
@@ -260,7 +267,8 @@ const CalendarElement = ({ areas, calenderData, showModal, setShowModal, handleM
                                                 <th>{item.order_code}</th>
                                                 <th>{item.description}</th>
                                                 <th>{item.state?.name}</th>
-                                                <th>
+                                                <th onClick={()=>ViewCalendarData(item?.id_order)}>
+                                                    
                                                     <svg
                                                         width={24}
                                                         height={24}

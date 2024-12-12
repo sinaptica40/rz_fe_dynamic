@@ -48,50 +48,75 @@ const MainLayout2 = ({ areas }) => {
         return null;
     };
 
-    console.log("findAreaByKeyPrefix('IspezioniFormArea1')",findAreaByKeyPrefix('IspezioniArea1'))
+   
     
-    
+    const allApis = areas.filter((item)=>item?.key=="PaginationArea1-10");
 
-    let allApis = areas.filter((item) => {
-        return item?.props?.children?.props?.children?.props?.api != null;
-    });
-
-    let getapi;
-    getapi = allApis.reduce((acc, user) => {
-        const functionName = user.props.children.props.children.props.api.function_name;
-        const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
-
-        if (functionName.includes("getOrders")) {
-            acc.getOdersIspezione = functionName;
-            acc.getOdersIspezioneApiMethod = api_Method;
+    const getapi = allApis?.reduce((acc,user)=>{
+        const function_Name = user?.props?.children?.props?.children?.props?.api?.function_name; 
+        if(function_Name && acc === undefined){
+            return {getOdersIspezione :function_Name}
         }
+       return acc
+    },undefined)
+
+    // let allApis = areas.filter((item) => {
+    //     return item?.props?.children?.props?.children?.props?.api != null;
+    // });
+     
+    // let getapi;
+    // getapi = allApis.reduce((acc, user) => {
+    //     const functionName = user.props.children.props.children.props.api.function_name;
+    //     const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
+
+    //     if (functionName.includes("getOrders")) {
+    //         acc.getOdersIspezione = functionName;
+    //         acc.getOdersIspezioneApiMethod = api_Method;
+    //     }
         
-        return acc;
-    }, {});
+    //     return acc;
+    // }, {});
 
     // for delete Api Inspection
-    const apiData = areas?.find(
+    // const apiData = areas?.find(
+    //     (item) => item?.props?.children?.props?.children?.[0]?.props?.areas?.element_type === "table"
+    // );
+
+    // const getDeleteApi = apiData?.props?.children?.props?.children?.[0]?.props?.nestedElements?.reduce((acc, data) => {
+    //     const function_name = data?.props?.children?.props?.children?.props?.api?.function_name;
+       
+    //     const methodType = data?.props?.children?.props?.children?.props?.api?.method_type;
+
+    //     if (function_name?.includes("delete-inspection")) {
+    //         acc.deleteApiURL = function_name;
+    //         acc.deleteApiMethod = methodType;
+    //     }
+    //     return acc;
+    // }, {});
+
+
+    //api for Delete inspection 
+     const apiData = areas?.find(
         (item) => item?.props?.children?.props?.children?.[0]?.props?.areas?.element_type === "table"
     );
 
     const getDeleteApi = apiData?.props?.children?.props?.children?.[0]?.props?.nestedElements?.reduce((acc, data) => {
         const function_name = data?.props?.children?.props?.children?.props?.api?.function_name;
-       
         const methodType = data?.props?.children?.props?.children?.props?.api?.method_type;
-
-        if (function_name?.includes("delete-inspection")) {
-            acc.deleteApiURL = function_name;
-            acc.deleteApiMethod = methodType;
-        }
+        if(function_name && acc === undefined){
+            return { deleteUrl :function_name,deleteMethod : methodType}
+          }
+      
         return acc;
-    }, {});
+ }, undefined);
+
+ 
 
     // api delete inspection
     const [deleInspection] =useDeleInspectionMutation();
 
      // function for delete Modal 
      const handleModal = (id) => {
-        console.log("deletedId",id);
         setDeletedInspectionId(id)
         setShowModal(true);
     }
@@ -116,8 +141,8 @@ const MainLayout2 = ({ areas }) => {
     const deleteInspection = async () => {
         try { 
            const response = await deleInspection({
-            url: getDeleteApi?.deleteApiURL,      
-            method: getDeleteApi?.deleteApiMethod,
+            url: getDeleteApi?.deleteUrl,      
+            method: getDeleteApi?.deleteMethod,
             id: deletedInspectionId, 
           });
 

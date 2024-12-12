@@ -12,12 +12,16 @@ const IspezioniElement2 = ({ areas, handleModal,deleteInspection,showModal,modal
     const filterApis =  areas?.table_columns
     .filter(item => item.table_fields.data_type =="api");
 
-    console.log("filterApis",filterApis)
-    console.log("filterApis",filterApis?.table_fields?.label)
+    // console.log("filterApis",filterApis)
+    // console.log("filterApis",filterApis?.table_fields?.label)
 
-    const viewIcon = areas?.table_columns.find(item=> item.table_fields.field_name=="/ispezioni-view");
-    const editIcon = areas?.table_columns.find(item=> item.table_fields.field_name=="/ispezioni-edito");
-    const deleteIcon = areas?.table_columns.find(item=> item.table_fields.field_name=="Delete-order");
+    const viewIcon = areas?.table_columns.find(item => item.table_fields.field_name.includes("view"));
+    const editIcon = areas?.table_columns.find(item => item.table_fields.field_name.includes("edit"));
+    const deleteIcon = areas?.table_columns.find(item => item.table_fields.field_name.includes("Delete"));
+
+    // const viewIcon = areas?.table_columns.find(item=> item.table_fields.id_fields==39);
+    // const editIcon = areas?.table_columns.find(item=> item.table_fields.id_fields==37);
+    // const deleteIcon = areas?.table_columns.find(item=> item.table_fields.id_fields==42);
 
 
     // let getapi = filterApis.reduce((acc, user) => {
@@ -73,15 +77,25 @@ const IspezioniElement2 = ({ areas, handleModal,deleteInspection,showModal,modal
     let editRoute;
 
    filterApis.forEach(element => {
-    console.log("element",element)
+        
+       /// get route based on Url 
         if(element?.table_fields?.field_name?.includes("view")){
             viewRoute= element?.table_fields?.page;  
         }
         if(element?.table_fields?.field_name?.includes("edit")){
          editRoute = element?.table_fields?.page;
         }
+        // get route based on id field 
+        //  if(element?.table_fields.id_fields==39){
+        //     viewRoute= element?.table_fields?.page;  
+        // }
+        // if(element?.table_fields?.id_fields==37){
+        //  editRoute = element?.table_fields?.page;
+        // }
+        
     });
 
+ 
     const handleViewClick = (item) => {
         localStorage.setItem("ispenzioViewID",item?.id_order);
         localStorage.setItem("order_Data",JSON.stringify({"order_code":item?.order_code,"client":item?.client}))

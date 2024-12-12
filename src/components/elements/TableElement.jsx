@@ -84,7 +84,7 @@ const TableElement = ({areas}) => {
                         </thead>
                         <tbody>
                             <tr>
-                                <td>00/00/0000</td>
+                                <td>0000/00/00</td>
                                 <td>012345789</td>
                                 <td>012345789</td>
                                 <td>
@@ -110,9 +110,9 @@ const TableElement = ({areas}) => {
                                 </td>
                             </tr>
                             <tr>
+                                <td>0000/00/00</td>
                                 <td>012345789</td>
                                 <td>012345789</td>
-                                <td>00/00/0000</td>
                                 <td>
                                     <div className="download-icon">
                                         <a href="#!">
@@ -136,9 +136,9 @@ const TableElement = ({areas}) => {
                                 </td>
                             </tr>
                             <tr>
+                                <td>0000/00/00</td>
                                 <td>012345789</td>
                                 <td>012345789</td>
-                                <td>00/00/0000</td>
                                 <td>
                                     <div className="download-icon">
                                         <a href="#!">
@@ -162,9 +162,9 @@ const TableElement = ({areas}) => {
                                 </td>
                             </tr>
                             <tr>
+                                <td>0000/00/00</td>
                                 <td>012345789</td>
                                 <td>012345789</td>
-                                <td>00/00/0000</td>
                                 <td>
                                     <div className="download-icon">
                                         <a href="#!">

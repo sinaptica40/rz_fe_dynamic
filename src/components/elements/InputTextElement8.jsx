@@ -8,10 +8,11 @@ const inputTextElement8 = ({ areas, formValues, formName,handleNotes,formData })
           <>
             <input
               name={`${formName?.name}`}
-              type="text"
+              type={`${formName?.type}`}
               className="form-control"
               id="floatingInput"
-              onChange={formData ? handleInputChange : null}
+              // onChange={formData ? handleInputChange : null}
+              onChange ={formData ? handleInputChange : null}
               value={formValues}
               //readOnly
             />

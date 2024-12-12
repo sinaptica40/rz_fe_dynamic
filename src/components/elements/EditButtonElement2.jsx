@@ -1,10 +1,11 @@
 import React from "react";
 
-const EditButtonElement2 = ({areas})=>{
+const EditButtonElement2 = ({areas,handleExcelImportButton})=>{
     const name = areas.element_data.block_name
     console.log("name",name)
     return(
         <>
+        <a onClick ={handleExcelImportButton} className="btn-primary btn-default btn-grey">
              <span className="importIcon">
                   <svg
                     width={27}
@@ -21,6 +22,7 @@ const EditButtonElement2 = ({areas})=>{
                 </span>
                 {" "}
                 {name}
+             </a>
         </>
     )
 }

@@ -3,6 +3,7 @@ import React from "react";
 import { useLocation, useNavigate,useParams } from "react-router-dom";
 import { useState, useEffect,useCallback } from "react";
 import { useAddMachineryMutation, useEditMachineryMutation, useGetEditNormDataQuery,useGetNormeLanguageQuery, useGetNormeStandardTypeQuery } from "../../services/apiSlice";
+import { toast } from "react-toastify";
 
 const MainLayout4 = ({ areas }) => {
     const location = useLocation();
@@ -77,34 +78,59 @@ const MainLayout4 = ({ areas }) => {
     });
 
     
+    
 
     let getapi;
     getapi = allApis.reduce((acc, user) => {
-
-       
+        const key = user?.key
         const functionName = user.props.children.props.children.props.api.function_name;
         const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
 
-        if (functionName.includes("add-machinery")) {
+        console.log("functionName",functionName);
+         
+        if (key.includes("FormArea14")) {
             acc.addMachinery = functionName;
             acc.addMachineryApiMethod = api_Method;
         }
-        if (functionName.includes("standard-types")) {
+        if (key.includes("FormArea16")) {
             acc.standardApi = functionName;
             acc.standardTypeApiMethod = api_Method;
         }
-        if (functionName.includes("get-norme")) {
+        if (key.includes("FormArea12")) {
             acc.getNormeApi = functionName;
             acc.getNormeApiMethod = api_Method;
         }
-        if (functionName.includes("edit-machinery")) {
+        if (key.includes("FormArea14")) {
             acc.editApi = functionName;
             acc.editApiMethod = api_Method;
         }
-        if (functionName.includes("get-machinery?id_machinery_type=".toLowerCase())) {
+        if (key.includes("FormArea8")) {
             acc.getEditNorme = functionName;
             acc.getApiMethod = api_Method;
         }
+        
+
+
+        // if (functionName.includes("add-machinery")) {
+        //     acc.addMachinery = functionName;
+        //     acc.addMachineryApiMethod = api_Method;
+        // }
+        // if (functionName.includes("standard-types")) {
+        //     acc.standardApi = functionName;
+        //     acc.standardTypeApiMethod = api_Method;
+        // }
+        // if (functionName.includes("get-norme")) {
+        //     acc.getNormeApi = functionName;
+        //     acc.getNormeApiMethod = api_Method;
+        // }
+        // if (functionName.includes("edit-machinery")) {
+        //     acc.editApi = functionName;
+        //     acc.editApiMethod = api_Method;
+        // }
+        // if (functionName.includes("get-machinery?id_machinery_type=".toLowerCase())) {
+        //     acc.getEditNorme = functionName;
+        //     acc.getApiMethod = api_Method;
+        // }
         return acc;
     }, {});
 
@@ -125,13 +151,14 @@ const MainLayout4 = ({ areas }) => {
     });
     const edit_id = localStorage.getItem("machinery_id")
 
-    const {data:editNormedata ,isFetching,refetch} =  useGetEditNormDataQuery({
-        url:getapi.getEditNorme,
+    const {data:editNormedata ,isFetching,refetch} =  useGetEditNormDataQuery(
+        edit_id ? { url:getapi.getEditNorme,
         method: getapi.getApiMethod,
         params :{
             id:`${edit_id}`,
         }
-    })
+    }:null
+    )
 
 
 
@@ -157,14 +184,14 @@ const MainLayout4 = ({ areas }) => {
         if (editNormedata?.data && !isFetching) {
             const editValue = editNormedata?.data;           
             setFormValues({
-                name: editValue?.name || "",
-                brand_name: editValue?.brand_name || "",
-                typology: editValue?.typology || "",
+                name: editValue?.name || null,
+                brand_name: editValue?.brand_name || null,
+                typology: editValue?.typology || null,
                 norm_specification: editValue?.norm_specification || [],
                 atex: editValue?.atex || false,
                 ce: editValue?.ce || false,
-                year: editValue?.year || "",
-                id_standard :editValue.id_machinery_type|| "",
+                year: editValue?.year || null,
+                id_standard :editValue.id_machinery_type|| null,
                 id_standard_type:editValue?.norm_specification[0]?.id_standard_type
             });
             console.warn("formmmmmmmeeeeeee",formValues.norm_specification)
@@ -370,25 +397,39 @@ const MainLayout4 = ({ areas }) => {
         // }
     
         
-        const { id_standard_type, ...filteredFormValues } = formValues;
-
+        // const { id_standard_type, ...filteredFormValues } = formValues;
         
-    //    console.warn("formvalue",formValues)
+        const addMachineryValue = {
+            brand_name: formValues?.brand_name || null,
+            typology: formValues?.typology || null,
+            atex: formValues?.atex,
+            ce: formValues?.ce ,
+            // id_standard_type: formValues?.id_standard_type || null,
+            name: formValues?.name || null,
+            year: formValues?.year || null,
+            norm_specification :formValues?.norm_specification || null
+
+        }
+        console.log("addMachineryValue",addMachineryValue)
+
+    
     //    console.warn("filtfhhf",filteredFormValues)
         try {
-            if (getapi?.addMachinery) {
+            if (getapi?.addMachinery && getapi?.addMachineryApiMethod == "POST") {
 
                 let obj = {
                     url: getapi.addMachinery,
                     method: getapi.addMachineryApiMethod,
-                    data: filteredFormValues
+                    data: addMachineryValue
                 }
                 console.warn("obj.data",obj.data)
                 const res = await addMachinery(obj);
                
                 if (res?.data?.status === "success" || res?.data?.status === "SUCCESS") {
                     navigate(`/${res?.data?.navigate}`);
+                    toast.success(res?.data?.message);
                 } else {
+                    toast.error(res?.data?.message);
                     console.error(res?.error?.data?.message || "An error occurred");
 
                 }
@@ -401,24 +442,40 @@ const MainLayout4 = ({ areas }) => {
                 // }
             }
             
-            else if(getapi?.editApi){
+            else if(getapi?.editApi && getapi?.editApiMethod =="PUT"){
+
+                
+        const EditMachineryValue = {
+            brand_name: formValues?.brand_name || null,
+            typology: formValues?.typology || null,
+            atex: formValues?.atex,
+            ce: formValues?.ce ,
+            id_standard_type: formValues?.id_standard_type || null,
+            name: formValues?.name || null,
+            year: formValues?.year || null,
+            norm_specification :formValues?.norm_specification || null
+
+        }
                 const objEdit ={
                     url:getapi.editApi,
                     method:getapi.editApiMethod,
                     params : edit_id,
                     // params: editMachineryData?.id_machinery_type,
-                    data:formValues,
+                    data:EditMachineryValue,
                 }
-                console.warn("aasdsdffssdfd",objEdit.data)
+              
                 const res = await EditMachinery(objEdit);
                
 
                 console.warn("API Response of editMachinery:", res);
                 if (res?.data?.status === "success" || res?.data?.status === "SUCCESS") {
                 //    navigate(res?.data?.navigate);
+                   localStorage.removeItem("machinery_id")
+                   toast.success(res?.data?.message);
                    navigate(`/${res?.data?.navigate}`);
                    
                 } else {
+                    toast.error(res?.data?.message);
                     console.error(res?.error?.data?.message || "An error occurred");
                 
             }

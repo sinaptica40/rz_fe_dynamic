@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 
-const TextElement = ({ areas }) => {
+const TextElement = ({ areas ,showModal}) => {
 
   const location = useLocation();
   const route = location.pathname.substring(1) || '/';
@@ -10,15 +10,14 @@ const TextElement = ({ areas }) => {
   const orderData = JSON.parse(localStorage.getItem("order_Data"));
   const editRoute = localStorage.getItem("editroute");
   const viewRoute = localStorage.getItem("viewRoute");
-
-
-//   console.log("orderData",element_data)
+  console.log("showModal",showModal , route == editRoute)
+ console.log("orderData",showModal,(orderData && (route === addRoute || route === editRoute || route === viewRoute)) && showModal === false)
 
   return (
     <>
       <h3 className="ispezione-no">
         {element_data?.data?.html_name}
-        {(orderData && route === addRoute || route == editRoute || route == viewRoute) && (
+        {((orderData && (route === addRoute || route === editRoute )) && showModal === false || route === viewRoute) && (
           <>
             <span className="order-info">
              {orderData.client} &nbsp;  &nbsp;  &nbsp;

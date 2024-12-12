@@ -49,12 +49,12 @@ const MachineryElement2 = ({ areas, data: machineryData, showModal, handleModal,
     const filteredData = areas?.table_columns
         .filter(item => item.table_fields.data_type !== "api");
 
-    console.warn("table_column_machinery", areas?.table_columns)
+   
 
     const editRoute = areas?.table_columns.filter(item => item.table_fields.data_type == "api");
 
-    const editIcon = areas?.table_columns.find(item => item.table_fields.field_name == "/edito-macchinari");
-    const deleteRoute = areas?.table_columns.find(item => item.table_fields.field_name == "Delete-macchinari");
+    const editIcon = areas?.table_columns.find(item => item.table_fields.field_name.includes("edito"));
+    const deleteRoute = areas?.table_columns.find(item => item.table_fields.field_name.includes("Delete"));
 
 
 
@@ -157,14 +157,17 @@ const MachineryElement2 = ({ areas, data: machineryData, showModal, handleModal,
                                         <td>{item?.norm_specification?.length ? item?.norm_specification[0]?.standard_types?.focus : ""}</td>
                                         <td>
                                             {item?.norm_specification?.length > 0 ?
-                                                item?.norm_specification?.map(({ pdf_name }) => {
+                                                item?.norm_specification?.map(({ name }) => {
                                                     // Extract the file name without the extension
-                                                    const fileNameWithExtension = pdf_name.split('/').pop(); // Get the file name with extension
-                                                    const fileName = fileNameWithExtension.split('.').slice(0, -1).join('.'); // Remove the extension
+                                                    // const fileNameWithExtension = pdf_name.split('/').pop(); // Get the file name with extension
+                                                    // const fileName = fileNameWithExtension.split('.').slice(0, -1).join('.'); // Remove the extension
 
+                                                    // return (
+                                                    //     <span className="norme-specify mx-1">{fileName}</span>
+                                                    // );
                                                     return (
-                                                        <span className="norme-specify mx-1">{fileName}</span>
-                                                    );
+                                                            <span className="norme-specify mx-1">{name}</span>
+                                                        );
                                                 })
                                                 : '-'
                                             }

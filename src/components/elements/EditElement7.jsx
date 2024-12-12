@@ -17,7 +17,10 @@ const EditElement7 = ({ areas, normeDellData, handleSelectMachinery, formData, e
   ? { label: formData?.normedefaultValue?.label, value: formData?.normedefaultValue?.value }
   : null;
 
-
+  console.log("formData?.machineId",formData?.machineName)
+  console.log("formData?.machineId",selectedValue)
+  console.log("formData?.machineId",currentValue)
+ 
  
   return (
     <>
@@ -25,7 +28,7 @@ const EditElement7 = ({ areas, normeDellData, handleSelectMachinery, formData, e
         id="floatingSelect"
         name="machineId"
         onChange={handleSelectMachinery}
-        value={selectedValue ? selectedValue : currentValue ?? {} }
+        value={formData?.machineName ? formData?.machineName : currentValue ? currentValue ?? {} : selectedValue ? selectedValue : "" }
         // value={currentValue ?? {}} 
         // value = {{label: currentValue?.value ?? ""}}
         options={options}

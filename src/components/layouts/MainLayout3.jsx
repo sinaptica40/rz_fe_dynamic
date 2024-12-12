@@ -7,8 +7,6 @@ import { toast } from 'react-toastify';
 
 const MainLayout3 = ({ areas }) => {
 
-
-
     const loaction = useLocation();
 
     const route = loaction.pathname.substring(1) || '/';
@@ -56,7 +54,7 @@ const MainLayout3 = ({ areas }) => {
     };
 
 
-    console.log("function_name", areas)
+    //  console.log("function_name", areas)
 
     // function for get all api in this Page 
     let allApis = areas.filter((item) => {
@@ -73,40 +71,46 @@ const MainLayout3 = ({ areas }) => {
 
     const getDeleteApi = apiData?.props?.children?.props?.children?.[0]?.props?.nestedElements?.reduce((acc, data) => {
         const function_name = data?.props?.children?.props?.children?.props?.api?.function_name;
-        console.log("function_name", function_name)
+        
         const methodType = data?.props?.children?.props?.children?.props?.api?.method_type;
 
-        if (function_name?.includes("delete-norme")) {
-            acc.deleteApiURL = function_name;
-            acc.deleteApiMethod = methodType;
-        }
-        if (function_name?.includes("delete-machinery")) {
-            acc.deleteApiURL = function_name;
-            acc.deleteApiMethod = methodType;
+        // if (function_name?.includes("delete-norme")) {
+        //     acc.deleteApiURL = function_name;
+        //     acc.deleteApiMethod = methodType;
+        // }
+        // if (function_name?.includes("delete-machinery")) {
+        //     acc.deleteApiURL = function_name;
+        //     acc.deleteApiMethod = methodType;
+        // }
+        if(function_name && acc === undefined){
+            return { deleteApiURL : function_name ,deleteApiMethod :methodType}
         }
 
         return acc;
-    }, {});
+    }, undefined);
 
-    console.log("isLoading", getDeleteApi);
+ 
+
+   
 
     let getapi;
     getapi = allApis?.reduce((acc, user) => {
-        const functionName = user.props.children.props.children.props.api.function_name;
+        const key = user?.key;
+        const functionName = user?.props?.children?.props?.children?.props?.api?.function_name;
         const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
 
-
-        if (functionName.includes("get-norme")) {
-            acc.apiURL = functionName;
-            acc.apiMethod = api_Method;
-        }
-        if (functionName.includes("get-machinery")) {
+        // if (functionName.includes("get-norme")) {
+        //     acc.apiURL = functionName;
+        //     acc.apiMethod = api_Method;
+        // }
+        if (key.includes("MachinerySearchArea")) {
             acc.apiURL = functionName;
             acc.apiMethod = api_Method;
         }
 
         return acc;
     }, {});
+  
 
     // call api  
     const { trigger, data, isFetching, error, refetch } = useGetMachineryQuery(
@@ -201,6 +205,7 @@ const MainLayout3 = ({ areas }) => {
                 setShowModal(false);
             } else if (res?.error) {
                 toast.error(res?.error?.data?.message);
+                setShowModal(false);
             }
         } catch (error) {
             toast.error(error)
