@@ -173,7 +173,8 @@ export const loginLayoutApi = createApi({
        getMachineryIDOrder : builder.query({
         query:({url,params})=>{
           return `${url}${params}`;
-        }
+        },
+        keepUnusedDataFor: 0,
        }),
       
        createInspection: builder.mutation({
@@ -188,11 +189,13 @@ export const loginLayoutApi = createApi({
       }),
       
 
-       getEditIDOrder : builder.query({
-        query:({url,params})=>{
+      getEditIDOrder: builder.query({
+        query: ({ url, params }) => {
           return `${url}${params}`;
-        }
-       }),
+        },
+        keepUnusedDataFor: 0,
+      }),
+      
 
        // api for deleteInspection
        deleInspection: builder.mutation({

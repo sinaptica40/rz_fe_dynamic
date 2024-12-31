@@ -18,33 +18,14 @@ const MainLayout6 = ({ areas }) => {
 
     const [totalDataLength, setTotalDataLength] = useState([])
 
-    const [formData, setFormData] = useState(
-        {
-            machineId: "",
-            inspectorId: {},
-            areaId: "",
-            year: "",
-            defaultValue: "",
-            notes: "",
-            normeId: "",
-            ce: false,
-            atex: false,
-        }
-    );
-
-
-
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
         const area = areas.find(area => area.key && area.key.startsWith(prefix));
         if (area) {
-            // Function to recursively clone elements and add extra props
             const deepCloneChildren = (children, extraProps) => {
                 return React.Children.map(children, (child) => {
                     if (React.isValidElement(child)) {
-                        // Clone child and pass down extraProps
                         const clonedChild = React.cloneElement(child, { ...extraProps });
 
-                        // If the child has its own children, recurse through them
                         if (child.props && child.props.children) {
                             const updatedChildren = deepCloneChildren(child.props.children, extraProps);
                             return React.cloneElement(clonedChild, { children: updatedChildren });
@@ -57,7 +38,6 @@ const MainLayout6 = ({ areas }) => {
                 });
             };
 
-            // Clone the area element itself and its nested children
             const clonedArea = React.cloneElement(area, {
                 ...extraProps,
                 children: deepCloneChildren(area.props.children, extraProps),
@@ -71,9 +51,10 @@ const MainLayout6 = ({ areas }) => {
     const filterApi = areas.filter(
         (item) => item?.props?.children?.props?.children?.props?.api != null)
         .reduce((acc, user) => {
+            const key = user?.key;
             const function_name = user?.props?.children?.props?.children?.props?.api?.function_name;
             const apiMethod = user?.props?.children?.props?.children?.props?.api?.method_type;
-            if (function_name.includes("/api/v1/inspections/rz-order")) {
+            if (key?.includes("FormArea7")) {
                 acc.getRzOrderUrl = function_name;
                 acc.getRzOrderMethod = apiMethod
             }
@@ -87,29 +68,17 @@ const MainLayout6 = ({ areas }) => {
         refetchOnMountOrArgChange: true,
     });
 
-    console.log("ispenzioViewID", rzOrderdetails);
-
-
-
-
-
-
-
-
-
     useEffect(() => {
         if (rzOrderdetails) {
 
             let datas = rzOrderdetails?.data;
             setTotalDataLength(datas?.inspections?.length);
-
-            console.log("datas", datas);
             const clientData = {
                 client: datas?.client,
                 description: datas?.description,
                 date: datas?.inspections?.[0]?.calendar_info?.date,
                 created_by: datas?.created_by_name,
-                machinery_info :datas?.inspections
+                machinery_info: datas?.inspections
 
             }
 
@@ -117,8 +86,6 @@ const MainLayout6 = ({ areas }) => {
 
         }
     }, [rzOrderdetails?.data])
-
-    console.log("totalDataLength", totalDataLength)
 
     return (
         <>
@@ -188,9 +155,7 @@ const MainLayout6 = ({ areas }) => {
                             </div>
                             {findAreaByKeyPrefix('ViewIdArea') || <div>- -</div>}
                             <div className="action_dropdownBox">
-                                <div className="dropdown">
-                                    <span className="dropdown-item "></span>
-                                </div>
+
                             </div>
                         </div>
                         {findAreaByKeyPrefix('EditArea4') || <div>- -</div>}
@@ -209,24 +174,26 @@ const MainLayout6 = ({ areas }) => {
                                     {Array.from({ length: totalDataLength }).map((_, index) => (
                                         <div key={index}>
                                             <div className="heading-bg-element mb-4">
-                                                <div className="heading-elm-itle">Inspection Item {index + 1}</div>
+                                                <div className="heading-elm-itle">
+                                                {findAreaByKeyPrefix("ViewPageHeadingArea",{index})}
+                                                </div>
                                             </div>
                                             <div className="row row-gap">
-                                                {findAreaByKeyPrefix('ViewArea2', {  value: clientformData?.machinery_info?.[index]?.machinery_info?.typology, label: "machinery_info" }) || <div>- -</div>}
-                                                {findAreaByKeyPrefix('ViewArea3', {  value: clientformData?.machinery_info?.[index]?.machinery_info?.name, label: "name" } ) || <div>- -</div>}
-                                                {findAreaByKeyPrefix('ViewArea4', {value: clientformData?.machinery_info?.[index]?.machinery_info?.brand_name, label: "brand_name"  }) || <div>- -</div>}
-                                                {findAreaByKeyPrefix('ViewArea5', {value: clientformData?.machinery_info?.[index]?.machinery_info?.year, label: "machinery_info"  }) || <div>- -</div>}
-                                                {findAreaByKeyPrefix('ViewArea6',  {value: clientformData?.machinery_info?.[index]?.machinery_info?.norm_specification?.map((item)=>(item?.name)), label: "machinery_info"  }) || <div>- -</div>}
+                                                {findAreaByKeyPrefix('ViewArea2', { value: clientformData?.machinery_info?.[index]?.machinery_info?.typology, label: "machinery_info" }) || <div>- -</div>}
+                                                {findAreaByKeyPrefix('ViewArea3', { value: clientformData?.machinery_info?.[index]?.machinery_info?.name, label: "name" }) || <div>- -</div>}
+                                                {findAreaByKeyPrefix('ViewArea4', { value: clientformData?.machinery_info?.[index]?.machinery_info?.brand_name, label: "brand_name" }) || <div>- -</div>}
+                                                {findAreaByKeyPrefix('ViewArea5', { value: clientformData?.machinery_info?.[index]?.machinery_info?.year, label: "machinery_info" }) || <div>- -</div>}
+                                                {findAreaByKeyPrefix('ViewArea6', { value: clientformData?.machinery_info?.[index]?.machinery_info?.norm_specification?.map((item) => (item?.name)), label: "machinery_info" }) || <div>- -</div>}
                                                 <div className="col-md-4">
-                                                <div className="form-custom-check inline-check ccmt-50">
-    {findAreaByKeyPrefix('EditCheckArea1', { formValues: { ce: clientformData?.machinery_info?.[index]?.machinery_info?.ce } }) || <div>- -</div>}
-    {findAreaByKeyPrefix('EditCheckArea2', { formValues: { atex: clientformData?.machinery_info?.[index]?.machinery_info?.atex } }) || <div>- -</div>}
-</div>
+                                                    <div className="form-custom-check inline-check ccmt-50">
+                                                        {findAreaByKeyPrefix('EditCheckArea1', { formValues: { ce: clientformData?.machinery_info?.[index]?.machinery_info?.ce } }) || <div>- -</div>}
+                                                        {findAreaByKeyPrefix('EditCheckArea2', { formValues: { atex: clientformData?.machinery_info?.[index]?.machinery_info?.atex } }) || <div>- -</div>}
+                                                    </div>
 
                                                 </div>
                                                 {findAreaByKeyPrefix('ViewArea7', { value: clientformData?.machinery_info?.[index]?.ispector_info?.name, label: "ispector_info" }) || <div>- -</div>}
-                                                {findAreaByKeyPrefix('ViewArea8', { value: clientformData?.machinery_info?.[index]?.working_area_info?.wa_name, label: "wa_name"  }) || <div>- -</div>}
-                                                {findAreaByKeyPrefix('ViewArea9', { value: clientformData?.machinery_info?.[index]?.notes, label: "notes"  }) || <div>- -</div>}
+                                                {findAreaByKeyPrefix('ViewArea8', { value: clientformData?.machinery_info?.[index]?.working_area_info?.wa_name, label: "wa_name" }) || <div>- -</div>}
+                                                {findAreaByKeyPrefix('ViewArea9', { value: clientformData?.machinery_info?.[index]?.notes, label: "notes" }) || <div>- -</div>}
                                             </div>
                                         </div>
                                     ))}

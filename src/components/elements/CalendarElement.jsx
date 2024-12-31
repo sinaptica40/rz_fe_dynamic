@@ -116,15 +116,11 @@ const css = `
     width: 32px;
     height: 32px;
     line-height: 35px;
-}
-}
-
-`
+}}`
 
 const CalendarElement = ({ areas, calenderData, showModal, setShowModal, handleModal }) => {
     const [selectedDateData, setSelectedDateData] = useState(null);
     const navigate = useNavigate();
-
 
     const isHighlightedDate = (date) => {
         if (!calenderData || !calenderData.data) return false;
@@ -149,16 +145,13 @@ const CalendarElement = ({ areas, calenderData, showModal, setShowModal, handleM
                     console.log("selectedDate", selectedDateData)
                     setShowModal(true); // Open the modal
                     handleModal(clickedDateData);
-
                 }
-
             };
         }
-
     };
 
-    const ViewCalendarData = (id)=>{
-        localStorage.setItem("order_Data",id)
+    const ViewCalendarData = (id) => {
+        localStorage.setItem("order_Data", id)
         navigate("/99");
     }
 
@@ -267,8 +260,8 @@ const CalendarElement = ({ areas, calenderData, showModal, setShowModal, handleM
                                                 <th>{item.order_code}</th>
                                                 <th>{item.description}</th>
                                                 <th>{item.state?.name}</th>
-                                                <th onClick={()=>ViewCalendarData(item?.id_order)}>
-                                                    
+                                                <th onClick={() => ViewCalendarData(item?.id_order)}>
+
                                                     <svg
                                                         width={24}
                                                         height={24}
@@ -292,7 +285,6 @@ const CalendarElement = ({ areas, calenderData, showModal, setShowModal, handleM
                 </div>
             )}
         </>
-
     )
 };
 

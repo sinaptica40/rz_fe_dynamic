@@ -4,7 +4,6 @@ const LoginForgetElement = ({areas}) => {
     return (
         <>
             <a href="forgot-password.html" className="forget_pass">
-                {/* Recupera le credenziali */}
                 {name}
             </a>
         </>

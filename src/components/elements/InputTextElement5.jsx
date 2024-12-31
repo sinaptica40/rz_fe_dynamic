@@ -8,10 +8,7 @@ const InputTextElement5 = ({areas,value,label})=>{
                 className="form-control"
                 id="floatingInput"
                 value={value}
-                // placeholder={areas?.element_data.block_name}
-                // onChange={handleChange}
                 name={label}
-                //defaultValue={`Inserire ${element_data.block_name}`}
             />
             <label htmlFor="floatingInput">{areas?.element_data.block_name}</label>
          </>

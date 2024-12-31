@@ -1,8 +1,8 @@
 import React from 'react'
 
-function PaginationArea2({children}) {
+function PaginationArea2({ children }) {
   return (
-   {children}
+    { children }
   )
 }
 

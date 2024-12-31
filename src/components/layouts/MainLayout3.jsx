@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 
 
 const MainLayout3 = ({ areas }) => {
+    console.log('==areas==33', areas)
 
     const loaction = useLocation();
 
@@ -22,14 +23,11 @@ const MainLayout3 = ({ areas }) => {
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
         const area = areas.find(area => area.key && area.key.startsWith(prefix));
         if (area) {
-            // Function to recursively clone elements and add extra props
             const deepCloneChildren = (children, extraProps) => {
                 return React.Children.map(children, (child) => {
                     if (React.isValidElement(child)) {
-                        // Clone child and pass down extraProps
                         const clonedChild = React.cloneElement(child, { ...extraProps });
 
-                        // If the child has its own children, recurse through them
                         if (child.props && child.props.children) {
                             const updatedChildren = deepCloneChildren(child.props.children, extraProps);
                             return React.cloneElement(clonedChild, { children: updatedChildren });
@@ -38,11 +36,10 @@ const MainLayout3 = ({ areas }) => {
                         return clonedChild;
                     }
 
-                    return child; // Return non-element children as is (e.g., strings, numbers)
+                    return child;
                 });
             };
 
-            // Clone the area element itself and its nested children
             const clonedArea = React.cloneElement(area, {
                 ...extraProps,
                 children: deepCloneChildren(area.props.children, extraProps),
@@ -53,45 +50,22 @@ const MainLayout3 = ({ areas }) => {
         return null;
     };
 
-
-    //  console.log("function_name", areas)
-
-    // function for get all api in this Page 
     let allApis = areas.filter((item) => {
         return item?.props?.children?.props?.children?.props?.api != null;
     });
 
-
-
-    // function for getDeleteApi
     const apiData = areas.find(
         (item) => item?.props?.children?.props?.children?.[0]?.props?.areas?.element_type === "table"
     );
 
-
     const getDeleteApi = apiData?.props?.children?.props?.children?.[0]?.props?.nestedElements?.reduce((acc, data) => {
         const function_name = data?.props?.children?.props?.children?.props?.api?.function_name;
-        
         const methodType = data?.props?.children?.props?.children?.props?.api?.method_type;
-
-        // if (function_name?.includes("delete-norme")) {
-        //     acc.deleteApiURL = function_name;
-        //     acc.deleteApiMethod = methodType;
-        // }
-        // if (function_name?.includes("delete-machinery")) {
-        //     acc.deleteApiURL = function_name;
-        //     acc.deleteApiMethod = methodType;
-        // }
-        if(function_name && acc === undefined){
-            return { deleteApiURL : function_name ,deleteApiMethod :methodType}
+        if (function_name && acc === undefined) {
+            return { deleteApiURL: function_name, deleteApiMethod: methodType }
         }
-
         return acc;
     }, undefined);
-
- 
-
-   
 
     let getapi;
     getapi = allApis?.reduce((acc, user) => {
@@ -99,20 +73,13 @@ const MainLayout3 = ({ areas }) => {
         const functionName = user?.props?.children?.props?.children?.props?.api?.function_name;
         const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
 
-        // if (functionName.includes("get-norme")) {
-        //     acc.apiURL = functionName;
-        //     acc.apiMethod = api_Method;
-        // }
         if (key.includes("MachinerySearchArea")) {
             acc.apiURL = functionName;
             acc.apiMethod = api_Method;
         }
-
         return acc;
     }, {});
-  
 
-    // call api  
     const { trigger, data, isFetching, error, refetch } = useGetMachineryQuery(
         {
             endpointName: getapi.apiURL,
@@ -128,11 +95,6 @@ const MainLayout3 = ({ areas }) => {
 
     const [deleteNorm, { isLoading }] = useDeleteNormMutation();
 
-
-
-
-
-
     useCallback(() => {
         if (params["*"]) {
             getapi = {}
@@ -143,53 +105,41 @@ const MainLayout3 = ({ areas }) => {
     useEffect(() => {
         if (params["*"] === `${route}` && currentPage !== 1) {
             setCurrentPage(1);
-
         }
         if (params["*"] === `${route}`) {
             setSearchText("")
         }
-
-
     }, [params["*"], route]);
-
 
     const handlePageClick = ({ selected }) => {
         setCurrentPage(selected + 1)
-        // setSearchText("")
     };
-
-
-
-
 
     let perPageItem = data?.pagination?.per_page;
 
-
-
     const totalDocuments = data?.pagination?.total_items;
 
-    //function for handle show modal
     const handleModal = (id) => {
         setDeletedId(id)
         setShowModal(true);
     }
+
     useEffect(() => {
         if (showModal) {
-          const handleOutsideClick = (e) => {
-             
-            if (modalRef.current && !modalRef.current.contains(e.target)) {
-               
-              setShowModal(false); 
-            }
-          };
-          document.addEventListener("mousedown", handleOutsideClick, { capture: true });
-          return () => {
-            document.removeEventListener('mousedown', handleOutsideClick);
-          };
-        }
-      }, [showModal]);
+            const handleOutsideClick = (e) => {
 
-    // function for delete Norme
+                if (modalRef.current && !modalRef.current.contains(e.target)) {
+
+                    setShowModal(false);
+                }
+            };
+            document.addEventListener("mousedown", handleOutsideClick, { capture: true });
+            return () => {
+                document.removeEventListener('mousedown', handleOutsideClick);
+            };
+        }
+    }, [showModal]);
+
     const handleDeleteNorme = async () => {
         try {
             const res = await deleteNorm({
@@ -212,8 +162,6 @@ const MainLayout3 = ({ areas }) => {
         }
     }
 
-
-
     return (
         <>
             {isFetching && (<Loader />)}
@@ -222,7 +170,6 @@ const MainLayout3 = ({ areas }) => {
                     <img src="img/logo.png" alt="" />
                 </div>
             </div>
-            {/* Back to Top */}
             <div className="progress-wrap cursor-pointer">
                 <svg
                     className="arrowTop"
@@ -253,7 +200,6 @@ const MainLayout3 = ({ areas }) => {
                     ></path>
                 </svg>
             </div>
-            {/* Header */}
             <header id="header">
                 <div className="container-fluid px-0">
                     <div className="row">
@@ -284,7 +230,6 @@ const MainLayout3 = ({ areas }) => {
                                         {findAreaByKeyPrefix('MachineryTableNameArea') || <div>- -</div>}
                                     </div>
                                     {findAreaByKeyPrefix('MachinerySearchArea', { setSearchText, searchText }) || <div>- -</div>}
-
                                 </div>
                                 <div className="card-block-body">
                                     {findAreaByKeyPrefix('MachineryArea2', { data, handleModal, modalRef, showModal, setShowModal, handleDeleteNorme }) || <div>- -</div>}
@@ -293,16 +238,12 @@ const MainLayout3 = ({ areas }) => {
                                     ) : (
                                         ""
                                     )}
-
                                 </div>
                             </div>
-
                         </div>
-
                     </div>
                 </div>
             </div>
-
         </>
     );
 };

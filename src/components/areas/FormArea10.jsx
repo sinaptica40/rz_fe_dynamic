@@ -3,9 +3,7 @@ import React from "react";
 const NewMachineryArea3 = ({ children }) => {
     return (
         <>
-           
-                    {children}
-               
+            {children}
         </>
     )
 }

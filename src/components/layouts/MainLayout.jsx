@@ -3,86 +3,71 @@ import { useState } from "react";
 import { useGetCalenderQuery, useGetInspectionsOrderQuery } from "../../services/apiSlice";
 
 const MainLayout = ({ areas }) => {
-    console.log('mainAdmin', areas);
-
     const [showModal, setShowModal] = useState(false);
 
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
         const area = areas.find(area => area?.key && area?.key.startsWith(prefix));
         if (area) {
-
-            // Function to recursively clone elements and add extra props
             const deepCloneChildren = (children, extraProps) => {
                 return React.Children.map(children, (child) => {
                     if (React.isValidElement(child)) {
-                        // Clone child and pass down extraProps
                         const clonedChild = React.cloneElement(child, { ...extraProps });
-
-                        // If the child has its own children, recurse through them
                         if (child.props && child.props.children) {
                             const updatedChildren = deepCloneChildren(child.props.children, extraProps);
                             return React.cloneElement(clonedChild, { children: updatedChildren });
                         }
-
                         return clonedChild;
                     }
-
-                    return child; // Return non-element children as is (e.g., strings, numbers)
+                    return child;
                 });
             };
 
-            // Clone the area element itself and its nested children
             const clonedArea = React.cloneElement(area, {
                 ...extraProps,
                 children: deepCloneChildren(area.props.children, extraProps),
             });
             return clonedArea;
         }
-
         return null;
     };
 
     const handleModal = (clickedDateData) => {
-        console.log("Handling modal for clicked date:", clickedDateData);
         setShowModal(true);
     }
 
     // function for get All apis
     let getApi = areas.filter((item) => item?.props?.children?.props?.children?.props?.api != null
-    ).reduce((acc,user)=>{
+    ).reduce((acc, user) => {
+        const key = user?.key;
+        console.log("MainBodyArea4", key)
         const functionName = user.props.children.props.children.props.api.function_name;
         const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
 
-        if (functionName.includes("getOrders")) {
+        if (key?.includes("MainBodyArea4")) {
             acc.getInspectionOrder = functionName;
             acc.getOderApiMethod = api_Method;
         }
-        if (functionName.includes("rz-calendar")) {
+        if (key?.includes("MainBodyArea5")) {
             acc.calenderApi = functionName;
             acc.calenderApiApiMethod = api_Method;
         }
         return acc;
-    },{})
+    }, {})
 
-     const {data:inspectionData,isFetching:isFetchingOrder} =useGetInspectionsOrderQuery({
-       url: getApi.getInspectionOrder,
-       params:{
-         id_state:0,
-       },
-       refetchOnMountOrArgChange: true,
-     },
-     );
+    const { data: inspectionData, isFetching: isFetchingOrder } = useGetInspectionsOrderQuery({
+        url: getApi.getInspectionOrder,
+        params: {
+            id_state: 0,
+        },
+        refetchOnMountOrArgChange: true,
+    },
+    );
 
-     console.log("inspectionData",inspectionData)
-
-     const {data:calenderData,isFetching} =useGetCalenderQuery({
+    const { data: calenderData, isFetching } = useGetCalenderQuery({
         url: getApi.calenderApi,
         refetchOnMountOrArgChange: true,
-      },
-      );
-
-   
-     
+    },
+    );
 
     return (
         <>
@@ -91,7 +76,6 @@ const MainLayout = ({ areas }) => {
                     <img src="img/logo.png" alt="" />
                 </div>
             </div>
-            {/* Back to Top */}
             <div className="progress-wrap cursor-pointer">
                 <svg
                     className="arrowTop"
@@ -122,7 +106,6 @@ const MainLayout = ({ areas }) => {
                     ></path>
                 </svg>
             </div>
-            {/* Header */}
             <header id="header">
                 <div className="container-fluid px-0">
                     <div className="row">
@@ -148,8 +131,8 @@ const MainLayout = ({ areas }) => {
                     {findAreaByKeyPrefix('MainBodyArea3')}
                 </div>
                 <div className="row g-xxl-5">
-                    {findAreaByKeyPrefix('MainBodyArea4',{inspectionData})}
-                    {findAreaByKeyPrefix('MainBodyArea5',{calenderData,showModal,setShowModal,handleModal})}
+                    {findAreaByKeyPrefix('MainBodyArea4', { inspectionData })}
+                    {findAreaByKeyPrefix('MainBodyArea5', { calenderData, showModal, setShowModal, handleModal })}
                 </div>
             </div>
         </>

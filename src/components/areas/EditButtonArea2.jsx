@@ -1,9 +1,9 @@
 import React from "react";
 
-const EditButtonArea2 =({children})=>{
-    return(
-        <>     
-                {children}
+const EditButtonArea2 = ({ children }) => {
+    return (
+        <>
+            {children}
         </>
     )
 }

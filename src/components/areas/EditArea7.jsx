@@ -6,7 +6,6 @@ const EditArea7 = ({ children }) => {
              <div className="col-md-4">
                     {children}  
             </div>
-         
         </>
     )
 }

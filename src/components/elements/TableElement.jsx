@@ -1,8 +1,6 @@
 import React from "react";
 
-const TableElement = ({areas}) => {
-    console.log('===TableElement===', areas)
-    // console.log("tableIcon", areas?.table_columns?.table_fields)
+const TableElement = ({ areas }) => {
     const tableHeading = areas?.table_columns;
     return (
         <>
@@ -70,16 +68,12 @@ const TableElement = ({areas}) => {
                     <table className="table">
                         <thead>
                             <tr>
-                                {tableHeading?.map((item)=>(
-                                   <th scope="col">
-                                    
-                                    {item?.table_fields?.field_name}
+                                {tableHeading?.map((item) => (
+                                    <th scope="col">
+
+                                        {item?.table_fields?.field_name}
                                     </th>
                                 ))}
-                                {/* <th scope="col">ID commessa</th>
-                                <th scope="col">ID cliente</th>
-                                <th scope="col">Data creazione</th>
-                                <th scope="col" /> */}
                             </tr>
                         </thead>
                         <tbody>

@@ -113,11 +113,11 @@ const PageBuilder = ({ jsonData }) => {
       const processElements = (items) => {
         return items?.map((itemObj, itemIndex) => {
           const { area_name, areas, css_name, layout_name, is_subpage, element_name } = itemObj;
-          const ComponentName = area_name || layout_name; // Use layout or area name to load component
+          const ComponentName = area_name || layout_name;
           const ElementComponent = importComponent(area_name ? 'area' : 'layout', ComponentName);
 
           if (css_name) {
-            importCss(css_name); // Load associated CSS if present
+            importCss(css_name);
           }
 
           const NestedElementData = areas?.element_data || areas?.table_columns || [];
@@ -135,24 +135,20 @@ const PageBuilder = ({ jsonData }) => {
               </Suspense>
             );
           }
-          // Commented by Naveen
+
           else if (areas?.element_type === 'table') {
-            // Find all columns where `table_fields.page_type` is 'subpage'
             const subpageColumns = areas?.table_columns?.filter(
               column => column?.table_fields?.page_type === 'subpage'
             );
 
             if (subpageColumns?.length > 0) {
-              // Render nested elements for all matching subpage columns
               const nestedElements = subpageColumns.map((subpageColumn, index) => {
                 return (
                   NestedElementData.length > 0 && subpageColumn?.table_fields?.page_type
                     ? renderNestedAreas(subpageColumn?.table_fields?.page)
                     : null
                 )
-              }
-
-              );
+              });
 
               return (
                 <Suspense key={`${ComponentName}-${itemIndex}`} fallback={<div>Loading element...</div>}>
@@ -173,7 +169,6 @@ const PageBuilder = ({ jsonData }) => {
               return (
                 <Suspense key={`${ComponentName}-${itemIndex}`} fallback={<div>Loading element...</div>}>
                   <ElementComponent>
-                    {/* {nestedElements || ( */}
                     <ElementComponentToSend
                       data={areas?.element_data?.[0]?.element_type}
                       areas={areas}
@@ -187,11 +182,9 @@ const PageBuilder = ({ jsonData }) => {
             }
           }
 
-          // Commented by Naveen
           else {
             return (
               <Suspense key={`${ComponentName}-${itemIndex}`} fallback={<div>
-                {/* Loading element... */}
                 <Loader />
               </div>}>
                 <ElementComponent >

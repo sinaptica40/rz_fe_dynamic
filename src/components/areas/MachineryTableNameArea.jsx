@@ -1,9 +1,9 @@
 import React from 'react'
 
-const MachineryTableNameArea =({children})=> {
+const MachineryTableNameArea = ({ children }) => {
   return (
     <div>
-    {children}
+      {children}
     </div>
   )
 }

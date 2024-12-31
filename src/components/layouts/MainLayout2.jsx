@@ -1,4 +1,4 @@
-import React, { useState,useRef,useEffect} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 import Loader from "../../lib/loader/loader";
 import { useDeleInspectionMutation, useGetOdersIspezione0Query, useGetOdersIspezione1Query } from "../../services/apiSlice";
@@ -7,24 +7,20 @@ const MainLayout2 = ({ areas }) => {
 
     const [searchText1, setSearchText1] = useState("");
     const [searchText2, setSearchText2] = useState("");
-    const [currentPage1,setCurrentPage1] = useState(1);
-    const [currentPage2,setCurrentPage2] = useState(1);
-    const [showModal,setShowModal] = useState();
-    const [deletedInspectionId,setDeletedInspectionId]= useState(null);
-   
+    const [currentPage1, setCurrentPage1] = useState(1);
+    const [currentPage2, setCurrentPage2] = useState(1);
+    const [showModal, setShowModal] = useState();
+    const [deletedInspectionId, setDeletedInspectionId] = useState(null);
+
     const modalRef = useRef(null);
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
         const area = areas.find(area => area?.key && area?.key.startsWith(prefix));
         if (area) {
-
-            // Function to recursively clone elements and add extra props
             const deepCloneChildren = (children, extraProps) => {
                 return React.Children.map(children, (child) => {
                     if (React.isValidElement(child)) {
-                        // Clone child and pass down extraProps
                         const clonedChild = React.cloneElement(child, { ...extraProps });
 
-                        // If the child has its own children, recurse through them
                         if (child.props && child.props.children) {
                             const updatedChildren = deepCloneChildren(child.props.children, extraProps);
                             return React.cloneElement(clonedChild, { children: updatedChildren });
@@ -32,12 +28,10 @@ const MainLayout2 = ({ areas }) => {
 
                         return clonedChild;
                     }
-
-                    return child; // Return non-element children as is (e.g., strings, numbers)
+                    return child;
                 });
             };
 
-            // Clone the area element itself and its nested children
             const clonedArea = React.cloneElement(area, {
                 ...extraProps,
                 children: deepCloneChildren(area.props.children, extraProps),
@@ -48,173 +42,117 @@ const MainLayout2 = ({ areas }) => {
         return null;
     };
 
-   
-    
-    const allApis = areas.filter((item)=>item?.key=="PaginationArea1-10");
+    const allApis = areas.filter((item) => item?.key == "PaginationArea1-10");
 
-    const getapi = allApis?.reduce((acc,user)=>{
-        const function_Name = user?.props?.children?.props?.children?.props?.api?.function_name; 
-        if(function_Name && acc === undefined){
-            return {getOdersIspezione :function_Name}
+    const getapi = allApis?.reduce((acc, user) => {
+        const function_Name = user?.props?.children?.props?.children?.props?.api?.function_name;
+        if (function_Name && acc === undefined) {
+            return { getOdersIspezione: function_Name }
         }
-       return acc
-    },undefined)
-
-    // let allApis = areas.filter((item) => {
-    //     return item?.props?.children?.props?.children?.props?.api != null;
-    // });
-     
-    // let getapi;
-    // getapi = allApis.reduce((acc, user) => {
-    //     const functionName = user.props.children.props.children.props.api.function_name;
-    //     const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
-
-    //     if (functionName.includes("getOrders")) {
-    //         acc.getOdersIspezione = functionName;
-    //         acc.getOdersIspezioneApiMethod = api_Method;
-    //     }
-        
-    //     return acc;
-    // }, {});
-
-    // for delete Api Inspection
-    // const apiData = areas?.find(
-    //     (item) => item?.props?.children?.props?.children?.[0]?.props?.areas?.element_type === "table"
-    // );
-
-    // const getDeleteApi = apiData?.props?.children?.props?.children?.[0]?.props?.nestedElements?.reduce((acc, data) => {
-    //     const function_name = data?.props?.children?.props?.children?.props?.api?.function_name;
-       
-    //     const methodType = data?.props?.children?.props?.children?.props?.api?.method_type;
-
-    //     if (function_name?.includes("delete-inspection")) {
-    //         acc.deleteApiURL = function_name;
-    //         acc.deleteApiMethod = methodType;
-    //     }
-    //     return acc;
-    // }, {});
+        return acc
+    }, undefined)
 
 
-    //api for Delete inspection 
-     const apiData = areas?.find(
+    const apiData = areas?.find(
         (item) => item?.props?.children?.props?.children?.[0]?.props?.areas?.element_type === "table"
     );
 
     const getDeleteApi = apiData?.props?.children?.props?.children?.[0]?.props?.nestedElements?.reduce((acc, data) => {
         const function_name = data?.props?.children?.props?.children?.props?.api?.function_name;
         const methodType = data?.props?.children?.props?.children?.props?.api?.method_type;
-        if(function_name && acc === undefined){
-            return { deleteUrl :function_name,deleteMethod : methodType}
-          }
-      
+        if (function_name && acc === undefined) {
+            return { deleteUrl: function_name, deleteMethod: methodType }
+        }
+
         return acc;
- }, undefined);
+    }, undefined);
 
- 
+    const [deleInspection] = useDeleInspectionMutation();
 
-    // api delete inspection
-    const [deleInspection] =useDeleInspectionMutation();
-
-     // function for delete Modal 
-     const handleModal = (id) => {
+    const handleModal = (id) => {
         setDeletedInspectionId(id)
         setShowModal(true);
     }
 
     useEffect(() => {
         if (showModal) {
-          const handleOutsideClick = (e) => {
-             
-            if (modalRef.current && !modalRef.current.contains(e.target)) {
-               
-              setShowModal(false); 
-            }
-          };
-          document.addEventListener("mousedown", handleOutsideClick, { capture: true });
-          return () => {
-            document.removeEventListener('mousedown', handleOutsideClick);
-          };
+            const handleOutsideClick = (e) => {
+                if (modalRef.current && !modalRef.current.contains(e.target)) {
+                    setShowModal(false);
+                }
+            };
+            document.addEventListener("mousedown", handleOutsideClick, { capture: true });
+            return () => {
+                document.removeEventListener('mousedown', handleOutsideClick);
+            };
         }
-      }, [showModal]);
-
-    // function for  delete inspection in add form  
+    }, [showModal]);
+ 
     const deleteInspection = async () => {
-        try { 
-           const response = await deleInspection({
-            url: getDeleteApi?.deleteUrl,      
-            method: getDeleteApi?.deleteMethod,
-            id: deletedInspectionId, 
-          });
+        try {
+            const response = await deleInspection({
+                url: getDeleteApi?.deleteUrl,
+                method: getDeleteApi?.deleteMethod,
+                id: deletedInspectionId,
+            });
 
-          if(response?.data?.status =="SUCCESS"){
-            toast.success(response?.data?.message);
-            setShowModal(false);
-            window.location.reload();
-          }else{
-            toast.error(response?.data?.message);
-          }
+            if (response?.data?.status == "SUCCESS") {
+                toast.success(response?.data?.message);
+                setShowModal(false);
+                tableTwoRefetch()
+                refetch()
+            } else {
+                toast.error(response?.data?.message);
+            }
         } catch (error) {
-          console.error("Error deleting inspection:", error);
+            console.error("Error deleting inspection:", error);
         }
-      };
-     
+    };
 
-    
-    //function for call api table second
-    const {data:TableData2,isFetching}=useGetOdersIspezione0Query({
-        endpointName:getapi.getOdersIspezione,
-        method:getapi.getOdersIspezioneApiMethod,
-        params :{
-            id_state:0,
-            page:currentPage2,
+    const { data: TableData2, isFetching, refetch: tableTwoRefetch } = useGetOdersIspezione0Query({
+        endpointName: getapi.getOdersIspezione,
+        method: getapi.getOdersIspezioneApiMethod,
+        params: {
+            id_state: 0,
+            page: currentPage2,
             ...(searchText2 ? { search: searchText2 } : {}),
         },
         refetchOnMountOrArgChange: true,
-
     })
-    
-    //function for call api table first
-    const {data:TableData1,isFetching:isFetching1,refetch}=useGetOdersIspezione1Query({
-        endpointName:getapi.getOdersIspezione,
-        method:getapi.getOdersIspezioneApiMethod,
-        params :{
-            id_state:1,
-            page:currentPage1,
+
+    const { data: TableData1, isFetching: isFetching1, refetch } = useGetOdersIspezione1Query({
+        endpointName: getapi.getOdersIspezione,
+        method: getapi.getOdersIspezioneApiMethod,
+        params: {
+            id_state: 1,
+            page: currentPage1,
             ...(searchText1 ? { search: searchText1 } : {}),
         },
         refetchOnMountOrArgChange: true,
-
     })
 
-    ///pagination for perpage and totaldocumemnt table one
-    let perPageItem1=TableData1?.pagination?.per_page;
+    let perPageItem1 = TableData1?.pagination?.per_page;
     const totalDocuments1 = TableData1?.pagination?.total_items;
 
-
-    //pagination perpage and totaldocument for table 2
-    let perPageItem2=TableData2?.pagination?.per_page;
+    let perPageItem2 = TableData2?.pagination?.per_page;
     const totalDocuments2 = TableData2?.pagination?.total_items;
 
+    const handlePageClick = ({ selected }) => {
+        setCurrentPage1(selected + 1)
+    };
 
-    const handlePageClick = ({selected}) => {
-        setCurrentPage1(selected+1)
-      };
-
-      const handlePageClick2 = ({selected}) => {
-        setCurrentPage2(selected+1)
-      };
-
-    
+    const handlePageClick2 = ({ selected }) => {
+        setCurrentPage2(selected + 1)
+    };
 
     return (
         <>
-         {(isFetching || isFetching1) && <Loader />}
+            {(isFetching || isFetching1) && <Loader />}
             <div className="loader-wrapper" style={{ display: "none" }}>
                 <div className="loader">
                     <img src="img/logo.png" alt="" />
                 </div>
             </div>
-            {/* Back to Top */}
             <div className="progress-wrap cursor-pointer">
                 <svg
                     className="arrowTop"
@@ -245,7 +183,6 @@ const MainLayout2 = ({ areas }) => {
                     ></path>
                 </svg>
             </div>
-            {/* Header */}
             <header id="header">
                 <div className="container-fluid px-0">
                     <div className="row">
@@ -265,56 +202,49 @@ const MainLayout2 = ({ areas }) => {
                 </div>
             </header>
             <div className="webcontent-wrapper">
-            <div className="container-fluid p-0">
+                <div className="container-fluid p-0">
                     <div className="row">
-                    <div className="col-lg-12">
-                    <div className="cards-block Ispezioni-block">
-                    <div className="card-header border-0 add-form-header pb-0">
-                    <div className="card-title">
-                        {findAreaByKeyPrefix('IspezioniFormArea1') || <div>- -</div>}
-                        {findAreaByKeyPrefix('IspezioniTableNameArea1') || <div>- -</div>}
-                    </div>
-                        {findAreaByKeyPrefix('IspezioniSearchArea1',{searchText:searchText1,setSearchText:setSearchText1}) || <div>- -</div>}
-
+                        <div className="col-lg-12">
+                            <div className="cards-block Ispezioni-block">
+                                <div className="card-header border-0 add-form-header pb-0">
+                                    <div className="card-title">
+                                        {findAreaByKeyPrefix('IspezioniFormArea1') || <div>- -</div>}
+                                        {findAreaByKeyPrefix('IspezioniTableNameArea1') || <div>- -</div>}
+                                    </div>
+                                    {findAreaByKeyPrefix('IspezioniSearchArea1', { searchText: searchText1, setSearchText: setSearchText1 }) || <div>- -</div>}
+                                </div>
+                                <div className="card-block-body">
+                                    {findAreaByKeyPrefix('IspezioniArea1', { TableData1 }) || <div>- -</div>}
+                                    {totalDocuments1 > perPageItem1 && (
+                                        findAreaByKeyPrefix('PaginationArea1', { totalDocuments: totalDocuments1, currentPage: currentPage1, perPageItem: perPageItem1, handlePageClick }) || <div>- -</div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
-                        <div className="card-block-body">
-                        {findAreaByKeyPrefix('IspezioniArea1',{TableData1}) || <div>- -</div>}
-                        {totalDocuments1 > perPageItem1 && (
-                        findAreaByKeyPrefix('PaginationArea1',{totalDocuments :totalDocuments1, currentPage:currentPage1, perPageItem:perPageItem1, handlePageClick}) || <div>- -</div>
-                        )} 
-                        </div>
-                    </div>
-                   
-                    </div>
-                       
                     </div>
                 </div>
                 <div className="container-fluid p-0">
                     <div className="row">
-                       
-                       <div className="col-lg-12">
-                       <div className="cards-block Ispezioni-block">
-                       <div className="card-header border-0 add-form-header pb-0">
-                       <div className="card-title">
-                        {findAreaByKeyPrefix('IspezioniFormArea2') || <div>- -</div>}
-                         {findAreaByKeyPrefix('IspezioniTableNameArea2') || <div>- -</div>}
-                        
-                       </div>
-                          {findAreaByKeyPrefix('IspezioniSearchArea2',{searchText:searchText2,setSearchText:setSearchText2}) || <div>- -</div>}
-
-                       </div>
-                        <div className="card-block-body">
-                          {findAreaByKeyPrefix('IspezioniArea2',{TableData2,handleModal,modalRef,deleteInspection,showModal,setShowModal}) || <div>- -</div>}
-                          {totalDocuments2 > perPageItem2 && (
-                        findAreaByKeyPrefix('PaginationArea1',{totalDocuments :totalDocuments2, currentPage:currentPage2, perPageItem:perPageItem2, handlePageClick2}) || <div>- -</div>
-                        )} 
-                        </div>
-                    </div>
-                    </div>
+                        <div className="col-lg-12">
+                            <div className="cards-block Ispezioni-block">
+                                <div className="card-header border-0 add-form-header pb-0">
+                                    <div className="card-title">
+                                        {findAreaByKeyPrefix('IspezioniFormArea2') || <div>- -</div>}
+                                        {findAreaByKeyPrefix('IspezioniTableNameArea2') || <div>- -</div>}
+                                    </div>
+                                    {findAreaByKeyPrefix('IspezioniSearchArea2', { searchText: searchText2, setSearchText: setSearchText2 }) || <div>- -</div>}
+                                </div>
+                                <div className="card-block-body">
+                                    {findAreaByKeyPrefix('IspezioniArea2', { TableData2, handleModal, modalRef, deleteInspection, showModal, setShowModal }) || <div>- -</div>}
+                                    {totalDocuments2 > perPageItem2 && (
+                                        findAreaByKeyPrefix('PaginationArea1', { totalDocuments: totalDocuments2, currentPage: currentPage2, perPageItem: perPageItem2, handlePageClick2 }) || <div>- -</div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            
+            </div>
         </>
     );
 };

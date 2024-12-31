@@ -1,9 +1,7 @@
 import React from "react";
 
 const MainLayout5 = ({ areas }) => {
-    console.warn('==MainLayout666=areas==', areas);
 
-    // Helper function to find area by key prefix (e.g., 'HeaderArea1')
     const findAreaByKeyPrefix = (prefix) => areas.find(area => area.key && area.key.startsWith(prefix));
 
     return (
@@ -13,7 +11,6 @@ const MainLayout5 = ({ areas }) => {
                     <img src="img/logo.png" alt="" />
                 </div>
             </div>
-            {/* Back to Top */}
             <div className="progress-wrap cursor-pointer">
                 <svg
                     className="arrowTop"
@@ -44,7 +41,6 @@ const MainLayout5 = ({ areas }) => {
                     ></path>
                 </svg>
             </div>
-            {/* Header */}
             <header id="header">
                 <div className="container-fluid px-0">
                     <div className="row">

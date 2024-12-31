@@ -1,7 +1,6 @@
 import React from "react";
 
 const TableAreaWider = ({ children }) => {
-    console.log("==TableAreaWider==", children)
     return (
         <>
             <div className="col-xl-8 col-lg-12">

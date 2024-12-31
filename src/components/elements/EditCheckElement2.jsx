@@ -1,6 +1,6 @@
 import React from "react";
 
-const EditCheckElement2 = ({areas,handleChange,formValues}) => {
+const EditCheckElement2 = ({ areas, handleChange, formValues }) => {
     const name = areas.element_data.block_name
     return (
         <>
@@ -10,9 +10,9 @@ const EditCheckElement2 = ({areas,handleChange,formValues}) => {
             >
                 {name}
             </label>
-            <input type="checkbox" 
-              checked={formValues?.atex}
-            name="atex" onChange={handleChange} className="form-check-input" id={name} />
+            <input type="checkbox"
+                checked={formValues?.atex}
+                name="atex" onChange={handleChange} className="form-check-input" id={name} />
         </>
     )
 }

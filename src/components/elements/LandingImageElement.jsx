@@ -1,11 +1,13 @@
 import React from "react";
 
-const LandingImageElement = () => {
+const LandingImageElement = ({areas}) => {
+
+    console.log("areas",areas);
     return (
         <>
             <div className="login_logoBox">
                 <a href="index.html">
-                    <img src="img/login-logo.png" alt="" />
+                    <img src={areas?.element_data?.data?.html_name} alt="" />
                 </a>
             </div>
             <div className="login_image">

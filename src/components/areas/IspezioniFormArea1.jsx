@@ -1,10 +1,10 @@
 import React from 'react'
 
-function IspezioniFormArea1({children}) {
+function IspezioniFormArea1({ children }) {
   return (
     <span className="title-icon">
-    {children}
-</span>
+      {children}
+    </span>
   )
 }
 

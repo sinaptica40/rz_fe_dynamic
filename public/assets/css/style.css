@@ -2794,3 +2794,33 @@ table .thbold tr th {
 .dash_nav_item a:hover .icon_holder img {
   filter: brightness(0) invert(1);
 }
+
+
+.header_menuIcon img {
+  filter: brightness(0) invert(1);
+}
+#header .nav-item.active .header_menuIcon img, #header .nav-item:hover .header_menuIcon img {
+  filter: unset;
+}
+ .user_dropdown .header_menuIcon img {
+  height: unset;
+  width: unset;
+  min-height: unset;
+  min-width: unset;
+  filter: brightness(0) invert(1);
+  border-radius: 0;
+}
+
+.right_notfiMenu .nav-link{
+  padding: 8px 22px !important;
+}
+.right_notfiMenu .nav-link:hover{
+  color: var(--rz-primary) !important;
+  background: #fff !important;
+}
+.right_notfiMenu .nav-link:hover .header_menuIcon img{
+  filter: unset;
+}
+.right_notfiMenu {
+  margin-left: -20px;
+}

@@ -1,26 +1,21 @@
-const inputTextElement8 = ({ areas, formValues, formName,handleNotes,formData }) => {
-    const handleInputChange = (e) => {
-        handleNotes(e);  // You can also handle additional logic if needed.
-      };
-
-    return (
-         
-          <>
-            <input
-              name={`${formName?.name}`}
-              type={`${formName?.type}`}
-              className="form-control"
-              id="floatingInput"
-              // onChange={formData ? handleInputChange : null}
-              onChange ={formData ? handleInputChange : null}
-              value={formValues}
-              //readOnly
-            />
-            <label htmlFor="floatingInput">{areas?.element_data.block_name}</label>
-          </>
-    
-    );
+const inputTextElement8 = ({ areas, formValues, formName, handleNotes, formData }) => {
+  const handleInputChange = (e) => {
+    handleNotes(e);
   };
-  
-  export default inputTextElement8;
-  
+
+  return (
+    <>
+      <input
+        name={`${formName?.name}`}
+        type={`${formName?.type}`}
+        className="form-control"
+        id="floatingInput"
+        onChange={formData ? handleInputChange : null}
+        value={formValues}
+      />
+      <label htmlFor="floatingInput">{areas?.element_data.block_name}</label>
+    </>
+  );
+};
+
+export default inputTextElement8;

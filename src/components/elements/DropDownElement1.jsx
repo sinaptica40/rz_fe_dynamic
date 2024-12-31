@@ -2,14 +2,13 @@ import React from 'react';
 
 function DropDownElement1({ areas, formValues,standardData,errors, handleChange }) {
     let { element_data } = areas;
-    console.log("formValues",formValues)
     return (
         <>
             <select
                 className="form-select form-control"
                 id="floatingSelect"
                 aria-label="Floating label select example"
-                value={ formValues.id_standard_type} // Make sure the value matches one of the options
+                value={ formValues.id_standard_type} 
                 onChange={handleChange}
                 name="id_standard_type"
             >

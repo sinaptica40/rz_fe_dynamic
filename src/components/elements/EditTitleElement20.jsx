@@ -1,12 +1,12 @@
 import React from "react";
 
-const EditTitleElement20 =({areas,handleSubmit})=>{
+const EditTitleElement20 = ({ areas, handleSubmit }) => {
     const name = areas.element_data.block_name
-    return(
+    return (
         <>
-        <button onClick={handleSubmit} className="btn-primary btn-default">
-            {name}
-        </button>
+            <button onClick={handleSubmit} className="btn-primary btn-default">
+                {name}
+            </button>
         </>
     )
 }

@@ -1,7 +1,6 @@
 import React from 'react';
 
 const SubmitButtonArea = ({ children }) => {
-    console.log('==SubmitButtonArea==', children)
     return (
         <>
             <button

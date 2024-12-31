@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 const ProfileElement = ({ areas }) => {
-    // console.log("profilebutton",areas)
+  
     const navigate = useNavigate();
     const handleLogout = () => {
         localStorage.removeItem("access_token");
@@ -18,6 +18,7 @@ const ProfileElement = ({ areas }) => {
     };
     return (
         <>
+            <div className={`user_dropdown ${isDropdownOpen ? 'show' : ''}`}>
             <a
                 className="nav-link profileDropHeader dropdown-toggle"
                 href="javascript:void(0);"
@@ -25,7 +26,6 @@ const ProfileElement = ({ areas }) => {
                 role="button"
                 data-bs-toggle="dropdown"
                 aria-haspopup="true"
-                // aria-expanded="false"
                 aria-expanded={isDropdownOpen ? 'true' : 'false'}
                 onClick={toggleDropdown}
             >
@@ -34,7 +34,6 @@ const ProfileElement = ({ areas }) => {
                     {userName}
                 </div>
             </a>
-            <div className={`user_dropdown ${isDropdownOpen ? 'show' : ''}`}>
                 <div className={`dropdown-menu ${isDropdownOpen ? 'show' : ''}`} aria-labelledby="user-drop">
                     <div className="user_info">
                         <div className="user_name d-block d-lg-none">

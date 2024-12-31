@@ -1,10 +1,10 @@
 import React from 'react'
 
-function IspezioniTableNameArea1({children}) {
+function IspezioniTableNameArea1({ children }) {
   return (
-   <>
-   {children}
-   </>
+    <>
+      {children}
+    </>
   )
 }
 

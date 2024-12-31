@@ -1,9 +1,9 @@
 import React from 'react'
 
-function IspezioniSearchArea1({children}) {
+function IspezioniSearchArea1({ children }) {
   return (
     <div className="cardSearchBox">
-    {children}
+      {children}
     </div>
   )
 }

@@ -25,22 +25,14 @@ const MainLayout5 = ({ areas }) => {
 
     const [errors, setErrors] = useState({});
 
-
-
-
-    // const findAreaByKeyPrefix = (prefix) => areas.find(area => area.key && area.key.startsWith(prefix));
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
         const area = areas.find(area => area.key && area.key.startsWith(prefix));
         if (area) {
-
-            // Function to recursively clone elements and add extra props
             const deepCloneChildren = (children, extraProps) => {
                 return React.Children.map(children, (child) => {
                     if (React.isValidElement(child)) {
-                        // Clone child and pass down extraProps
                         const clonedChild = React.cloneElement(child, { ...extraProps });
 
-                        // If the child has its own children, recurse through them
                         if (child.props && child.props.children) {
                             const updatedChildren = deepCloneChildren(child.props.children, extraProps);
                             return React.cloneElement(clonedChild, { children: updatedChildren });
@@ -49,11 +41,10 @@ const MainLayout5 = ({ areas }) => {
                         return clonedChild;
                     }
 
-                    return child; // Return non-element children as is (e.g., strings, numbers)
+                    return child; 
                 });
             };
 
-            // Clone the area element itself and its nested children
             const clonedArea = React.cloneElement(area, {
                 ...extraProps,
                 children: deepCloneChildren(area.props.children, extraProps),
@@ -74,7 +65,6 @@ const MainLayout5 = ({ areas }) => {
         const functionName = user.props.children.props.children.props.api.function_name;
         const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
 
-       
         if (key.includes("FormArea14")) {
             acc.addNorme = functionName;
             acc.addNormeApiMethod = api_Method;
@@ -85,7 +75,6 @@ const MainLayout5 = ({ areas }) => {
             acc.standardTypeApiMethod = api_Method;
         }
         if (key.includes("FormArea10")) {
-          
             acc.languageApi = functionName;
             acc.languageApiMethod = api_Method;
         }
@@ -98,29 +87,6 @@ const MainLayout5 = ({ areas }) => {
             acc.getEditNorme = functionName;
             acc.getApiMethod = api_Method;
         }
-
-        // if (functionName.includes("add-norme")) {
-        //     acc.addNorme = functionName;
-        //     acc.addNormeApiMethod = api_Method;
-        // }
-        // if (functionName.includes("standard-types")) {
-        //     acc.standardApi = functionName;
-        //     acc.standardTypeApiMethod = api_Method;
-        // }
-        // if (functionName.includes("language")) {
-        //     acc.languageApi = functionName;
-        //     acc.languageApiMethod = api_Method;
-        // }
-        // if (functionName.includes("edit-norme")) {
-        //     acc.editApi = functionName;
-        //     acc.editApiMethod = api_Method;
-        // }
-        // if (functionName.includes("get-norme?id=".toLowerCase())) {
-        //     acc.getEditNorme = functionName;
-        //     acc.getApiMethod = api_Method;
-        // }
-
-
         return acc;
     }, {});
 
@@ -136,7 +102,6 @@ const MainLayout5 = ({ areas }) => {
         if (!formValues.description) {
             newErrors.description = "Please enter a Description.";
         }
-
 
         return newErrors;
     };
@@ -226,9 +191,7 @@ const MainLayout5 = ({ areas }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
-
             if (getapi?.addNorme && getapi.addNormeApiMethod=="POST") {
     
                  // Validate form values
@@ -379,7 +342,6 @@ const MainLayout5 = ({ areas }) => {
                         <div className="form-input-block">
                             <form onSubmit={handleSubmit}>
                                 <div className="row row-gap">
-
                                     {findAreaByKeyPrefix('FormArea17', { handleChange, errors, formValues }) || <div>- -</div>}
                                     {findAreaByKeyPrefix("BodyArea",{formValues})}
                                     {findAreaByKeyPrefix('FormArea11', { standardData, handleChange, errors, formValues }) || <div>- -</div>}

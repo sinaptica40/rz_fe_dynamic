@@ -9,7 +9,6 @@ function DropDownElement2({ areas, formValues, handleSelectChange, errors, norme
         className={`form-floating ${isSelectActive ? "active-floating-select" : ""
           }`}
         style={{ borderBottom: 'none' }}
-      //className="form-floating"
       >
         <Select
           id="floatingSelect"
@@ -30,7 +29,7 @@ function DropDownElement2({ areas, formValues, handleSelectChange, errors, norme
         <label htmlFor="floating-select">{element_data.block_name}</label>
 
       </div>
-     </div>
+    </div>
   )
 }
 

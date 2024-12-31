@@ -7,7 +7,20 @@
   right: calc(calc(100vw - 1930px)/2);
 }
 }
+@media (min-width: 1600px) and (max-width: 1735px) {
+  .right_notfiMenu {
+    margin-left: -100px;
+}
+}
+@media (min-width: 1200px) and (max-width: 1600px) {
+  .right_notfiMenu {
+    margin-left: -10px;
+}
+}
 @media (min-width: 1400px) and (max-width: 1660px) {
+  .right_notfiMenu {
+    margin-left: 30px;
+}
 .card-block-body{
   min-height: 260px;
 }
@@ -146,6 +159,7 @@
 }
 
 @media (max-width: 1199.98px) {
+ 
   .dash_sidebar_box .dash_nav_item a {
     padding: 28px 25px;
 }
@@ -159,6 +173,9 @@ top: 110px;
 
 
 @media (min-width: 992px) and (max-width: 1199.98px) {
+  .right_notfiMenu {
+    margin-left: 30px;
+}
   .cards-block.Ispezioni-block.calender-block {
     margin-top: 18px;
 }
@@ -661,6 +678,17 @@ top: 110px;
 }
 
 @media (max-width: 767.98px) {
+  #header .nav-link {
+    font-size: 18px;
+    padding-inline: 5px;
+}
+.right_notfiMenu .nav-link{
+  padding-inline: 13px !important;
+}
+.user_dropdown .header_menuIcon img {
+  max-width: 24px;
+}
+
   #header::before {
     top: 90px;
 }
@@ -834,7 +862,12 @@ top: 110px;
 }
 
 @media (max-width: 575.98px) {
-
+  .user_dropdown img {
+    height: 40px;
+    width: 40px;
+    min-height: 40px;
+    min-width: 40px;
+  }
   table .thbold tr th {
     font-size: 15px;
 }
@@ -1029,6 +1062,9 @@ top: 110px;
 @media (max-width: 399.98px) {
 .webcontent-wrapper::before {
   height: 22px;
+}
+.navbar-toggler {
+  margin: 4px 0 0 10px;
 }
 .webcontent-wrapper::after {
   height: 22px;

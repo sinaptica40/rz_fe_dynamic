@@ -1,7 +1,6 @@
 import React from 'react';
 
 const RedirectionLinkArea = ({ children }) => {
-    console.log('==RedirectionLinkArea==', children)
     return (
         <>
             <div className="forget_passwordBox">

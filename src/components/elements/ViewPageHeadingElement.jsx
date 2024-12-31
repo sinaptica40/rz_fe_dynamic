@@ -1,10 +1,11 @@
 import React from "react";
 
-const ViewPageHeadingElement = ({ areas,item }) => {
-    let { element_data } = areas;
+const ViewPageHeadingElement = ({ areas ,index }) => {
+
+    console.log("areas==",areas)
     return (
         <>
-            <div className="heading-elm-itle">Inspection Item {item}</div>
+           {areas?.element_data?.block_name} {index + 1}
         </>
     )
 }
