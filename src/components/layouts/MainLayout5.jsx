@@ -2,13 +2,9 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loader from "../../lib/loader/loader";
-import { useAddNormeMutation, useEditNormeMutation, useGetEditNormDataQuery, useGetNormeLanguageQuery, useGetNormeStandardTypeQuery } from "../../services/apiSlice";
-
+import { useAddNormeMutation, useEditNormeMutation, useGetEditNormDataQuery, useGetNormeLanguageQuery, useGetNormeStandardTypeQuery, useGetUserDetailsQuery } from "../../services/apiSlice";
 
 const MainLayout5 = ({ areas }) => {
-    const location = useLocation();
-    const route = location.pathname.substring(1) || '/';
-
     const params = useParams();
 
 
@@ -79,7 +75,6 @@ const MainLayout5 = ({ areas }) => {
             acc.languageApiMethod = api_Method;
         }
         if (key.includes("FormArea14")) {
-            console.log("functionName",functionName);
             acc.editApi = functionName;
             acc.editApiMethod = api_Method;
         }
@@ -87,20 +82,24 @@ const MainLayout5 = ({ areas }) => {
             acc.getEditNorme = functionName;
             acc.getApiMethod = api_Method;
         }
+        if (key?.includes("HeaderArea4-3")) {
+            acc.userDetailsApi = functionName;
+            acc.userDetailsApiMethod = api_Method;
+        }
         return acc;
     }, {});
 
 
 
-    const validate = () => {
+    const validate = (validateDescription = false) => {
         const newErrors = {};
 
-        if (!formValues.file) {
-            newErrors.file = "Please upload a PDF file.";
+        if (!formValues.file && !validateDescription) {
+            newErrors.file = "Si prega di caricare un file PDF.";
         }
 
         if (!formValues.description) {
-            newErrors.description = "Please enter a Description.";
+            newErrors.description = "Inserisci una descrizione.";
         }
 
         return newErrors;
@@ -233,8 +232,11 @@ const MainLayout5 = ({ areas }) => {
                 }
             }
             else if (getapi?.editApi && getapi?.editApiMethod =="PUT") {
-
-
+                const validationErrors = validate(true);
+                if (Object.keys(validationErrors).length > 0) {
+                    setErrors({description: validationErrors?.description});
+                    return;
+                }
                 const formData = new FormData();
                 // if (formValues.file) {
                 //     formData.append("file", formValues.file);
@@ -267,6 +269,13 @@ const MainLayout5 = ({ areas }) => {
             console.error("Error submitting form:", error);
         }
     };
+
+    // user details
+   const {data: userDetails, error , isFetchingg} = useGetUserDetailsQuery({
+    url: getapi?.userDetailsApi,
+    method: getapi?.userDetailsApiMethod,
+    refetchOnMountOrArgChange: true,
+    })
 
 
     return (
@@ -317,8 +326,8 @@ const MainLayout5 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea4') || <div>- -</div>}
+                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
+                                {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
                                 </button>

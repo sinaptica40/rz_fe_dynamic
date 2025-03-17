@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import Loader from './lib/loader/loader';
 
 const importComponent = (type, path) => {
+  console.log(type, path, 'inside then importcomponent function')
   try {
     let componentPath = '';
     switch (type) {
@@ -36,6 +37,7 @@ const importCss = (path) => {
 };
 
 const renderNestedAreas = (nestedAreas) => {
+  console.log(nestedAreas,'check nested area here')
   const LayoutComponent = importComponent('layout', nestedAreas.layout_name);
 
   const resultAreas = nestedAreas.result.map((nestedArea, nestedIndex) => {
@@ -100,7 +102,6 @@ const renderNestedAreas = (nestedAreas) => {
 const PageBuilder = ({ jsonData }) => {
   const [Layout, setLayout] = useState(null);
   const [areas, setAreas] = useState([]);
-
   useEffect(() => {
     if (jsonData) {
       if (jsonData.css_name) {
@@ -137,9 +138,15 @@ const PageBuilder = ({ jsonData }) => {
           }
 
           else if (areas?.element_type === 'table') {
+
             const subpageColumns = areas?.table_columns?.filter(
               column => column?.table_fields?.page_type === 'subpage'
             );
+            console.log('==for==pageColumns==', areas)
+            
+            // const pageColumns = areas?.table_columns?.filter(
+            //   column => column?.table_fields?.page_type === 'page'
+            // );
 
             if (subpageColumns?.length > 0) {
               const nestedElements = subpageColumns.map((subpageColumn, index) => {
@@ -160,6 +167,7 @@ const PageBuilder = ({ jsonData }) => {
                         areas={areas}
                         api={itemObj?.api}
                         nestedElements={nestedElement?.props?.children?.props?.children}
+                        // pageColumns={pageColumns}
                       />
                     ))}
                   </ElementComponent>
@@ -174,6 +182,7 @@ const PageBuilder = ({ jsonData }) => {
                       areas={areas}
                       api={itemObj?.api}
                       nestedElements={null}
+                      // pageColumns={pageColumns}
                     />
                     {/* // */}
                   </ElementComponent>

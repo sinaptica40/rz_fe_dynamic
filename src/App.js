@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { useDispatch } from 'react-redux';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -14,8 +14,13 @@ let pagesCache = null;
 const fetchPages = async () => {
   if (!pagesCache) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/pages`);
+      const response = await fetch(`${API_BASE_URL}/api/v1/pages`,{
+        headers: {
+          'Accept-Language': 'en', // Set the desired language
+        },
+      });
       const data = await response.json();
+      localStorage.setItem("navPages",JSON.stringify(data?.data?.pages))
       pagesCache = data.data.pages.reduce((acc, page) => {
         acc[page.page_name_label] = page.id_page;
         return acc;
@@ -29,7 +34,9 @@ const fetchPages = async () => {
 };
 
 const fetchData = async (route, token) => {
+  
   const pages = await fetchPages();
+  console.log(pages,'check pages array')
   let pageId;
 
   if (!token) {
@@ -66,8 +73,13 @@ const fetchData = async (route, token) => {
   }
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url,{
+      headers: {
+        'Accept-Language': 'en', // Set the desired language
+      },
+    });
     const data = await response.json();
+    console.log(data,'check data here get from url')
     return data.data;
   } catch (error) {
     return {
@@ -91,20 +103,34 @@ const fetchData = async (route, token) => {
   }
 };
 
+
+
+
 const AppContent = () => {
   const [jsonData, setJsonData] = React.useState(null);
   const location = useLocation();
+  const dispatch = useDispatch()
+  const navigate = useNavigate();
   const route = location.pathname.substring(1) || '/';
-
+  console.log(route,'check the route name here')
   React.useEffect(() => {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+    if(!token){
+      navigate('/login')
+    }
     
     const getData = async () => {
       const data = await fetchData(route, token);
+      console.log(data,'check getData Function')
       setJsonData(data);
       console.warn("dataaaa",jsonData)
+     
     };
-    getData();
+   
+      getData();
+      // const userdata = await getUserDetails({
+
+      // });
   }, [route]);
 
   if (!jsonData) {

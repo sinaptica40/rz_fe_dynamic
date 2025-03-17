@@ -7,10 +7,10 @@ const PdfDownloadElement = ({ areas, formValues }) => {
         <div className="form-group">
             <a href={formValues?.full_url}>
                 <img src={element_data?.data?.html_name} />
-            </a>
             <span style={{ paddingLeft: "10px" }}>
                 {formValues?.file ? formValues?.file?.name : formValues?.fileName ? formValues?.fileName : "No file chosen"}
             </span>
+            </a>
         </div>
     )
 }

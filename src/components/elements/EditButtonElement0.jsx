@@ -3,11 +3,12 @@ import React from "react";
 const EditButtonArea0 = ({ areas, handleClientSubmit, handleSubmit, addButttonApi }) => {
 
     const name = areas.element_data.block_name;
+    console.log(addButttonApi ,'check add api button')
     
     return (
         <>
             {addButttonApi ? (
-                <button onClick={handleSubmit} className="btn-primary btn-default">
+                <button  className="btn-primary btn-default">
                     <span className="plusIcon">
                         <svg
                             width={24}

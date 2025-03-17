@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const MachineryElement1 = ({ api, areas, data }) => {
     const navigate = useNavigate();
-    
+    console.log(api,'check machine are one');
     const handleClick = (id_page) => {
         navigate(`${id_page}`); 
     };

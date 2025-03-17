@@ -2,13 +2,13 @@ import React from "react";
 
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
-import { useAddMachineryMutation, useEditMachineryMutation, useGetEditNormDataQuery, useGetNormeLanguageQuery, useGetNormeStandardTypeQuery } from "../../services/apiSlice";
+import { useAddMachineryMutation, useEditMachineryMutation, useGetEditNormDataQuery, useGetNormeLanguageQuery, useGetNormeStandardTypeQuery, useGetUserDetailsQuery } from "../../services/apiSlice";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const MainLayout4 = ({ areas }) => {
     const location = useLocation();
     const route = location.pathname.substring('/');
-
     const navigate = useNavigate();
     const params = useParams();
 
@@ -89,6 +89,10 @@ const MainLayout4 = ({ areas }) => {
         if (key.includes("FormArea8")) {
             acc.getEditNorme = functionName;
             acc.getApiMethod = api_Method;
+        }
+        if (key?.includes("HeaderArea4-3")) {
+            acc.userDetailsApi = functionName;
+            acc.userDetailsApiMethod = api_Method;
         }
         return acc;
     }, {});
@@ -252,25 +256,28 @@ const MainLayout4 = ({ areas }) => {
         const newErrors = {};
 
         if (!formValues.name) {
-            newErrors.name = "Nome Macchinario is required.";
+            newErrors.name = "Nome Macchinario è obbligatorio.";
+        }
+        if (!formValues.typology) {
+            newErrors.typology = "è richiesta la tipologia";
         }
 
-        if (!formValues.id_standard_type) {
-            newErrors.id_standard_type = "Blocco Norme Base is required.";
-        }
+        // if (!formValues.id_standard_type) {
+        //     newErrors.id_standard_type = "Blocco Norme Base is required.";
+        // }
 
-        if (!formValues.year) {
-            newErrors.year = "Costrizione is required.";
-        }
+        // if (!formValues.year) {
+        //     newErrors.year = "Costrizione is required.";
+        // }
 
-        if (formValues.year.toString().length > 5) {
-            newErrors.year = "Costrizione must be 5 digits or less.";
-        }
+        // if (formValues.year.toString().length > 5) {
+        //     newErrors.year = "Costrizione must be 5 digits or less.";
+        // }
 
-        if (formValues.norm_specification.length === 0) {
-            newErrors.norm_specification =
-                "At least one Norma Specifica must be selected.";
-        }
+        // if (formValues.norm_specification.length === 0) {
+        //     newErrors.norm_specification =
+        //         "At least one Norma Specifica must be selected.";
+        // }
         return newErrors;
     };
 
@@ -296,12 +303,12 @@ const MainLayout4 = ({ areas }) => {
         }
 
         const addMachineryValue = {
-            brand_name: formValues?.brand_name || null,
+            brand_name: formValues?.brand_name || "Altro marchio",
             typology: formValues?.typology || null,
-            atex: formValues?.atex,
-            ce: formValues?.ce,
+            atex: formValues?.atex || false,
+            ce: formValues?.ce || false,
             name: formValues?.name || null,
-            year: formValues?.year || null,
+            year: parseInt(formValues?.year) || null,
             norm_specification: formValues?.norm_specification || null
 
         }
@@ -328,11 +335,11 @@ const MainLayout4 = ({ areas }) => {
                 const EditMachineryValue = {
                     brand_name: formValues?.brand_name || null,
                     typology: formValues?.typology || null,
-                    atex: formValues?.atex,
-                    ce: formValues?.ce,
-                    id_standard_type: formValues?.id_standard_type || null,
+                    atex: formValues?.atex || false,
+                    ce: formValues?.ce || false,
+                    // id_standard_type: formValues?.id_standard_type || null,
                     name: formValues?.name || null,
-                    year: formValues?.year || null,
+                    year: parseInt(formValues?.year) || null,
                     norm_specification: formValues?.norm_specification || null
 
                 }
@@ -358,6 +365,13 @@ const MainLayout4 = ({ areas }) => {
             console.error("Error submitting form:", error);
         }
     };
+
+    // user details
+   const {data: userDetails, error , isFetchingg} = useGetUserDetailsQuery({
+    url: getapi?.userDetailsApi,
+    method: getapi?.userDetailsApiMethod,
+    refetchOnMountOrArgChange: true,
+    })
 
     return (
         <>
@@ -405,8 +419,8 @@ const MainLayout4 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea4') || <div>- -</div>}
+                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
+                                {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
                                 </button>

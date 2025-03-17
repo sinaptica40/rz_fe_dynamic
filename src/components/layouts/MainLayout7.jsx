@@ -1,21 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import moment from 'moment';
-import { loginLayoutApi, useCreateInspectionMutation, useDeleInspectionMutation, useGetAddDropDownListQuery, useGetEditIDOrderQuery, useGetMachineryIDOrderQuery, useGetRzOrderQuery, useUpdateInspectionMutation } from "../../services/apiSlice";
+import { useCreateInspectionMutation, useDeleInspectionMutation, useGetAddDropDownListQuery, useGetEditIDOrderQuery, useGetMachineryIDOrderQuery, useGetRzOrderQuery, useGetUserDetailsQuery, useUpdateInspectionMutation, useUploadExcelMutation } from "../../services/apiSlice";
 import { toast } from "react-toastify";
-import { useCallback } from "react";
 import { useMemo } from "react";
 import * as XLSX from "xlsx";
 import { useLocation } from "react-router-dom";
 import Loader from "../../lib/loader/loader";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { Modal, Button } from 'react-bootstrap';
 
 const MainLayout6 = ({ areas }) => {
     const location = useLocation();
     const route = location.pathname.substring(1) || '/';
-    const dispatch = useDispatch()
-    const userId = localStorage.getItem("user_id");
+    const userId = localStorage.getItem("user_id") ?? sessionStorage.getItem("user_id")
     const modalRef = useRef(null);
-    const [file, setFile] = useState(null)
 
     const id_order = localStorage.getItem("id_order");
     const AddRoute = localStorage.getItem("addRoute");
@@ -46,7 +44,6 @@ const MainLayout6 = ({ areas }) => {
     const [upDateOrderId, setupDateOrderId] = useState(null);
     const [deletedInspectionId, setDeletedInspectionId] = useState(null);
     const [showButton, setshowButton] = useState(null)
-
     const [clientformData, setClientformData] = useState({
         description: "",
         created_by: "",
@@ -73,15 +70,11 @@ const MainLayout6 = ({ areas }) => {
     const validateForm = () => {
         let isValid = true;
         let validationErrors = {};
-
-        if (!formData.areaId) {
-            validationErrors.areaId = "Area Name is required";
-            isValid = false;
-        }
-
-        if (!topologyName) {
-            validationErrors.topology = "Machinrio is required";
-            isValid = false;
+        if (!customDropDownData) {
+            if(formData?.machineId === ""){
+                validationErrors.topology = "È richiesto Machinrio";
+                isValid = false;
+            }
         }
 
         setErrors(validationErrors);
@@ -95,7 +88,7 @@ const MainLayout6 = ({ areas }) => {
         let isValid = true;
 
         if (!clientformData.date) {
-            newErrors.date = "Date is required";
+            newErrors.date = "La data è obbligatoria";
             isValid = false;
         }
 
@@ -163,6 +156,16 @@ const MainLayout6 = ({ areas }) => {
                 acc.updateInspectionUrl = function_name;
                 acc.updateInspectionMethod = apiMethod;
             }
+            if (key?.includes("HeaderArea4-3")) {
+                acc.userDetailsApi = function_name;
+                acc.userDetailsApiMethod = apiMethod;
+            }
+            // EditButtonArea2-27
+            if (key?.includes("EditButtonArea2-27")) {
+                acc.importExcelApi = function_name;
+                acc.importExcelApiMethod = apiMethod;
+            }
+
             return acc;
         }, {})
 
@@ -180,7 +183,7 @@ const MainLayout6 = ({ areas }) => {
         return acc;
     }, undefined);
 
-
+    console.log(AddRoute,"add route", editroute, "edit route", route,"param route");
     // api calls 
     const { data: dropdownList, refetch: refetchDropDown } = useGetAddDropDownListQuery(filterApi?.getDropDownUrl);
     const { data: rzOrderdetails, refetch, isFetching } = useGetRzOrderQuery({
@@ -242,7 +245,7 @@ const MainLayout6 = ({ areas }) => {
             date: rzData?.inspections?.[0]?.calendar_info?.date,
         });
 
-        const inspectorData = ispectorListing?.find((item) => item?.id_user == userId);
+        const inspectorData = ispectorListing?.find((item) => item?.id_user === parseInt(userId));
         setFormData({
             ...formData,
             inspector_name: inspectorData?.name,
@@ -250,7 +253,7 @@ const MainLayout6 = ({ areas }) => {
         })
 
         setshowFormData(rzOrderdetails)
-
+        refetchDropDown();
     }, [rzOrderdetails]);
 
     const handleSelectIspector = (selectedOption) => {
@@ -263,7 +266,6 @@ const MainLayout6 = ({ areas }) => {
     }
 
     const handleClientSubmit = (e) => {
-        console.log("showButton", showButton)
         e.preventDefault();
         setEditShowFormData({})
         if (showButton == "edit") {
@@ -290,27 +292,28 @@ const MainLayout6 = ({ areas }) => {
     }
 
     const handleSelectMachineryTopology = (selectedOption) => {
+        console.log(selectedOption?.__isNew__,'check select option')
 
         if (selectedOption?.__isNew__) {
-            setFormData({
-                topologyDefaultValues: "",
-                normedefaultValue: "",
-                defaultValue: "",
-                brand_name: "",
-                typology: "",
-                machineId: "",
-                atex: "",
-                ce: "",
-                inspectorId: "",
-                norm_specification: [],
-                year: "",
-                areaId: "",
-                norm: "",
-                arealavoe_defaultvalue: "",
-                notes: "",
-                normeDellData: [],
-                MachineryData: []
-            });
+            // setFormData({
+            //     topologyDefaultValues: "",
+            //     normedefaultValue: "",
+            //     defaultValue: "",
+            //     brand_name: "",
+            //     typology: "",
+            //     machineId: "",
+            //     atex: "",
+            //     ce: "",
+            //     inspectorId: "",
+            //     norm_specification: [],
+            //     year: "",
+            //     areaId: "",
+            //     norm: "",
+            //     arealavoe_defaultvalue: "",
+            //     notes: "",
+            //     normeDellData: [],
+            //     MachineryData: []
+            // });
             setNormeOptions(null)
             setMachineryID(null)
             setCustomDropDownData(true);
@@ -318,25 +321,25 @@ const MainLayout6 = ({ areas }) => {
         }
         if (!selectedOption?.__isNew__) {
             setMachineryID(null);
-            setFormData({
-                topologyDefaultValues: "",
-                normedefaultValue: "",
-                defaultValue: "",
-                brand_name: "",
-                typology: "",
-                machineId: "",
-                atex: "",
-                ce: "",
-                inspectorId: "",
-                norm_specification: [],
-                year: "",
-                areaId: "",
-                norm: "",
-                arealavoe_defaultvalue: "",
-                notes: "",
-                normeDellData: [],
-                MachineryData: []
-            });
+            // setFormData({
+            //     topologyDefaultValues: "",
+            //     normedefaultValue: "",
+            //     defaultValue: "",
+            //     brand_name: "",
+            //     typology: "",
+            //     machineId: "",
+            //     atex: "",
+            //     ce: "",
+            //     inspectorId: "",
+            //     norm_specification: [],
+            //     year: "",
+            //     areaId: "",
+            //     norm: "",
+            //     arealavoe_defaultvalue: "",
+            //     notes: "",
+            //     normeDellData: [],
+            //     MachineryData: []
+            // });
             setNormeOptions(null)
             setTopologyName(selectedOption.value);
         }
@@ -344,7 +347,7 @@ const MainLayout6 = ({ areas }) => {
 
 
     const handleSelectNormeListing = (selectedOption) => {
-        setCustomDropDownData(true);
+        // setCustomDropDownData(true);
         setNormeOptions(selectedOption);
         setFormData((prevData) => ({
             ...prevData,
@@ -374,6 +377,7 @@ const MainLayout6 = ({ areas }) => {
     }
 
     const handleClose = () => {
+        const inspectorData = ispectorListing?.find((item) => item?.id_user === parseInt(userId));
         setFormData({
             ...formData,
             topologyDefaultValues: "",
@@ -386,15 +390,17 @@ const MainLayout6 = ({ areas }) => {
             norm_specification: "",
             year: "",
             areaId: "",
-            inspectionId: "",
+            inspectorId: { inspectorId: inspectorData?.id_ispector },
             norm: "",
             topology: "",
             arealavoe_defaultvalue: "",
-            notes: ""
+            notes: "",
+            MachineryData: [],
+            normeDellData: ""
         });
         seteditId(null)
         setMachineryID(null);
-        setTopologyName(null);
+        setTopologyName("");
         setShowNextForm(false);
         setAddButtonApi(false);
         setshowButton(null)
@@ -457,14 +463,15 @@ const MainLayout6 = ({ areas }) => {
     }, [normeDellData])
 
     const handleSelectMachinery = (selectedoption) => {
-
         if (selectedoption?.__isNew__) {
+            // console.log(formData,'check form data');
             setCustomDropDownData(true);
             setFormData({
                 ...formData,
                 machineName: selectedoption,
-                name: selectedoption.label
+                name: selectedoption.label,
             });
+            // setTopologyName(selectedoption.value);
 
         }
         if (!selectedoption?.__isNew__) {
@@ -515,8 +522,6 @@ const MainLayout6 = ({ areas }) => {
         })
 
     }
-
-
     // function for DateChange Function
     const handleDateChange = (date) => {
 
@@ -527,7 +532,6 @@ const MainLayout6 = ({ areas }) => {
                 setClientformData({ ...clientformData, date: formattedDate });
                 setIsSelectActive(true);
             } else {
-                console.error("Invalid date format");
                 setIsSelectActive(false);
             }
         } else {
@@ -537,16 +541,10 @@ const MainLayout6 = ({ areas }) => {
         }
     };
 
-
-
-
-
     useMemo(() => {
 
         if (editOrderData) {
             let datas = editOrderData?.data;
-
-            console.log("datas", datas);
             setFormData([])
             setMachineryID(datas?.brand_name)
             setTopologyName(datas?.typology);
@@ -570,7 +568,7 @@ const MainLayout6 = ({ areas }) => {
                 ce: datas?.ce,
                 inspector_name: datas?.ispector_name,
                 norm_specification: machinaryInfo?.norm_specification,
-                year: datas?.year,
+                year: datas?.year ,
                 typology: datas?.typology,
                 areaId: datas?.id_working_area,
                 inspectionId: datas?.id_inspection,
@@ -580,7 +578,7 @@ const MainLayout6 = ({ areas }) => {
                 notes: datas?.notes
             };
 
-            setStatus({ status: datas?.order_state, id_state: datas?.id_state });
+            setStatus({ state: datas?.order_state, id_state: datas?.id_state });
             handleSelectMachinery({ value: datas?.machine_name, label: datas?.machine_name })
             setFormData(newdata);
 
@@ -591,103 +589,190 @@ const MainLayout6 = ({ areas }) => {
     // function for Submit Form 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-
         if (!validateForm() && showButton == "add") {
             return;
         }
 
-        try {
-
-            let body = {
-                description: clientformData?.description || null,
-                created_by: clientformData?.Machinery_created_id || null,
-                id_order: clientformData?.orderId || null,
-                date: moment(clientformData?.date).format("YYYY-MM-DD") || null,
-                id_state: status?.id_state,
-                inspections: [{
-                    machineId: formData.machineId || null,
-                    inspectorId: formData?.inspectorId.inspectorId || null,
-                    notes: formData?.notes || null,
-                    areaId: formData?.areaId || null,
-                }]
-            }
-
-            let newBody = {
-                description: clientformData?.description,
-                created_by: clientformData?.Machinery_created_id,
-                id_order: clientformData?.orderId,
-                date: moment(clientformData?.date).format("YYYY-MM-DD"),
-                id_state: status?.id_state,
-                inspections: [
+        if(showButton === "add"){
+            try {
+                let body = {
+                    description: clientformData?.description || null,
+                    created_by: clientformData?.Machinery_created_id || null,
+                    id_order: clientformData?.orderId || null,
+                    date: moment(clientformData?.date).format("YYYY-MM-DD") || null,
+                    id_state: status?.id_state,
+                    inspections: [{
+                        id_machinery_type: formData.machineId || null,
+                        id_ispector: formData?.inspectorId.inspectorId || null,
+                        notes: formData?.notes || null,
+                        id_working_area: formData?.areaId || null,
+                        year: parseInt(formData?.year) || null,
+                        atex: formData?.atex || false,
+                        ce: formData?.ce || false,
+                    }],
+                    newMachine: 0
+                }
+    
+                let newBody = {
+                  description: clientformData?.description,
+                  created_by: clientformData?.Machinery_created_id,
+                  id_order: clientformData?.orderId,
+                  date: moment(clientformData?.date).format("YYYY-MM-DD"),
+                  id_state: status?.id_state,
+                  inspections: [
                     {
-                        machineId: formData?.machineName?.label,
-                        inspectorId: formData?.inspectorId.inspectorId,
-                        notes: formData?.notes,
-                        areaId: formData?.areaId,
-
-                        newMachine: {
-                            name: formData?.name || null,
-                            brand_name: MachineryID || null,
-                            typology: topologyName,
-                            year: formData?.year || null,
-                            norm_specification: formData?.norm_specification,
-                            atex: formData?.atex || false,
-                            ce: formData?.ce || false,
-                           
-                        }
+                      // id_machinery_type: formData?.machineName?.label,
+                      id_machinery_type: null,
+                      id_ispector: formData?.inspectorId.inspectorId,
+                      notes: formData?.notes,
+                      id_working_area: formData?.areaId || null,
+                    //   year: parseInt(formData?.year) || null,
+                    //   atex: formData?.atex || false,
+                    //   ce: formData?.ce || false,
+    
+                      newMachine: {
+                        name: formData?.name || null,
+                        brand_name: MachineryID || null,
+                        typology: topologyName,
+                        year: parseInt(formData?.year) || null,
+                        norm_specification: formData?.norm_specification === "" ? [] : formData?.norm_specification,
+                        atex: formData?.atex || false,
+                        ce: formData?.ce || false,
+                      },
+                    },
+                  ],
+                  newMachine: 1,
+                };
+                
+                if (showButton == "add" || showButton == "excel") {
+                    const response = await createInspection({
+                        url: filterApi?.createInspectionUrl,
+                        method: filterApi.CreateInspectionMethod,
+                        body: customDropDownData ? newBody : body,
+                        //body:body,
+                    })
+                    if (response?.data?.status == "SUCCESS") {
+                        toast.success(response?.data?.message)
+                        setFormData({
+                            topologyDefaultValues: "",
+                            normedefaultValue: "",
+                            defaultValue: "",
+                            brand_name: "",
+                            typology: "",
+                            inspectorId: "",
+                            machineId: "",  
+                            atex: "",
+                            ce: "",
+                            inspectorId: "",
+                            norm_specification: [],
+                            year: "",
+                            areaId: "",
+                            inspectionId: "",
+                            norm: "",
+                            arealavoe_defaultvalue: "",
+                            notes: "",
+                            normeDellData: [],
+                            MachineryData: []
+                        });
+                        setNormeOptions([])
+                        refetch();
+                        setMachineryID(null);
+                        setTopologyName(null);
+                        setNormeOptions([])
+                        setCustomDropDownData(false);
                     }
-                ],
-                newMachine: 1
+                    else {
+                        toast.error(response?.data?.message);
+                    }
+                }
+    
             }
+            catch (error) {
+                console.log(error);
+            }
+        
+        }else{
 
-
-            if (showButton == "add" || showButton == "excel") {
-                const response = await createInspection({
-                    url: filterApi?.createInspectionUrl,
-                    method: filterApi.CreateInspectionMethod,
-                    body: customDropDownData ? newBody : body,
-                    //body:body,
-                })
-                if (response?.data?.status == "SUCCESS") {
-                    toast.success(response?.data?.message)
-                    setFormData({
-                        topologyDefaultValues: "",
-                        normedefaultValue: "",
-                        defaultValue: "",
-                        brand_name: "",
-                        typology: "",
-                        inspectorId: "",
-                        machineId: "",
-                        atex: "",
-                        ce: "",
-                        inspectorId: "",
-                        norm_specification: [],
-                        year: "",
-                        areaId: "",
-                        inspectionId: "",
-                        norm: "",
-                        arealavoe_defaultvalue: "",
-                        notes: "",
-                        normeDellData: [],
-                        MachineryData: []
-                    });
+            if (showFormData?.data?.inspections?.length) {
+                let clientNewData = { ...clientformData };
+    
+                // Ensure date format is correct
+                if (clientNewData?.date) {
+                  const isFormatted = /^\d{4}-\d{2}-\d{2}$/.test(clientNewData.date);
+                  if (!isFormatted) {
+                    const [day, month, year] = clientNewData.date.split("/");
+                    const formattedDate = `${year}-${month}-${day}`;
+                    clientNewData.date = formattedDate;
+                  }
+                }
+                
+                // Assign Machinery_created_id to created_by
+                clientNewData.created_by = parseInt(clientNewData.Machinery_created_id)
+                
+                // Remove unnecessary fields
+                delete clientNewData.Machinery_created_id;
+                delete clientNewData.orderId;
+                delete clientNewData.client;
+                
+                // Map inspections data
+                const updatedFormData = showFormData?.data?.inspections?.map((item) =>
+                  Object.keys(item).reduce((acc, key) => {
+                    acc[key] = item[key] === "" ? null : item[key];
+                    return acc;
+                  }, {})
+                );
+                
+                clientNewData.id_state = status.id_state;
+                clientNewData.id_order = parseInt(id_order);
+                clientNewData.newMachine = 0;
+                clientNewData.inspections = updatedFormData.map(
+                  ({ ispector_info, working_area_info, notes, id_inspection, machinery_info }) => ({
+                    id_machinery_type: machinery_info?.id_machinery_type,
+                    id_ispector: ispector_info?.id_ispector,
+                    id_working_area: working_area_info.id_working_area || null,
+                    notes,
+                    id_inspection: id_inspection,
+                    ce: machinery_info?.ce,
+                    atex: machinery_info?.atex,
+                    year: machinery_info?.year
+                  })
+                );
+    
+                try {
+                    
+                const response = await updateInspection({
+                    url: filterApi?.updateInspectionUrl,
+                    method: filterApi?.updateInspectionMethod,
+                    params: parseInt(id_order),
+                    body: clientNewData,
+                }).unwrap()
+    
+                if (response?.status == "SUCCESS") {
+                    toast.success(response?.message);
+    
+                    setShowNextForm(false)
+                    setData(null);
                     setNormeOptions([])
-                    refetch();
                     setMachineryID(null);
                     setTopologyName(null);
                     setNormeOptions([])
+                    seteditId(null)
                     setCustomDropDownData(false);
+                    setshowButton(null)
+                    setCustomDropDownData(false);
+                    refetch();
+    
+                } else if (response?.data?.status == "ERROR" || response?.data?.status == "FAIL") {
+                    toast.error(response?.message);
                 }
-                else {
-                    toast.error(response?.data?.message);
-                }
+            } catch (error) {
+                console.log(error);
+                toast.error(error?.message);
             }
+               
+              }
+        }
 
-        }
-        catch (error) {
-            console.log(error);
-        }
 
     }
 
@@ -721,14 +806,18 @@ const MainLayout6 = ({ areas }) => {
                 date: moment(clientformData?.date).format("YYYY-MM-DD"),
                 id_state: status?.id_state,
                 inspections: [{
-                    machineId: formData.machineId,
-                    inspectorId: (typeof formData?.inspectorId === "object" && formData?.inspectorId !== null)
+                    id_machinery_type: formData.machineId,
+                    id_ispector: (typeof formData?.inspectorId === "object" && formData?.inspectorId !== null)
                         ? formData?.inspectorId?.inspectorId
                         : formData?.inspectorId,
                     notes: formData?.notes,
-                    inspectionId: formData?.inspectionId,
-                    areaId: formData?.areaId,
-                }]
+                    id_inspection: formData?.inspectionId,
+                    id_working_area: formData?.areaId || null,
+                    year: parseInt(formData?.year) || null,
+                    atex: formData?.atex || false,
+                    ce: formData?.ce || false,
+                }],
+                newMachine: 0
             }
 
             let newBody = {
@@ -739,16 +828,17 @@ const MainLayout6 = ({ areas }) => {
                 id_state: status?.id_state,
                 inspections: [
                     {
-                        machineId: formData?.machineName?.label,
-                        inspectorId: formData?.inspectorId.inspectorId,
+                        // id_machinery_type: formData?.machineName?.label,
+                        id_machinery_type: null,
+                        id_ispector: formData?.inspectorId.inspectorId,
                         notes: formData?.notes,
-                        areaId: formData?.areaId,
+                        id_working_area: formData?.areaId || null,
 
                         newMachine: {
                             name: formData?.name,
                             brand_name: MachineryID,
                             typology: topologyName,
-                            year: formData?.year || null,
+                            year: parseInt(formData?.year) || null,
                             norm_specification: formData?.norm_specification,
                             atex: formData?.atex || false,
                             ce: formData?.ce || false,
@@ -825,6 +915,7 @@ const MainLayout6 = ({ areas }) => {
             "Norme",
             "CE",
             "ATEX",
+            "Data Ispezione"
         ];
 
         const excelData = showFormData?.data?.inspections?.length
@@ -839,7 +930,8 @@ const MainLayout6 = ({ areas }) => {
                     item?.notes || null,
                     item?.machinery_info?.norm_specification?.map((spec) => spec.name).join(", ") || null,
                     item?.machinery_info?.ce || false,
-                    item?.machinery_info?.atex || false
+                    item?.machinery_info?.atex || false,
+                    item?.calendar_info?.date || null
                 ];
             })
             : [];
@@ -851,8 +943,6 @@ const MainLayout6 = ({ areas }) => {
         XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
         XLSX.writeFile(wb, `${fileName}.xlsx`);
     };
-
-
 
     const transformData = (rawData) => {
         const headers = rawData[0];
@@ -866,7 +956,49 @@ const MainLayout6 = ({ areas }) => {
                 return acc;
             }, {});
         });
+
     };
+    const openExcelImportPopup = () => {
+        setIsExcelPopupOpen(true);
+      };
+    
+      const closeExcelImportPopup = () => {
+        setIsExcelPopupOpen(false);
+      };
+      const [uploadExcel] = useUploadExcelMutation()
+
+    const handleExcelImportButton = async(file) =>{
+        try {
+            const formData = new FormData();
+            formData.append("id_order", clientformData?.orderId);
+            formData.append("description", clientformData?.description);
+            formData.append("created_by", clientformData?.Machinery_created_id);
+            formData.append("id_state", status?.id_state);
+            formData.append("file", file);
+            const response = await uploadExcel({
+                url: filterApi?.importExcelApi,
+                method: filterApi?.importExcelApiMethod,
+                body: formData
+            }).unwrap()
+            
+            if(response?.status === "SUCCESS"){
+              toast.success(response?.message)
+              refetch()
+            }else if(response.status === "ERROR" || response.status === "FAIL"){
+                toast.error(response?.message);
+              }
+          } catch (error) {
+            console.log(error);
+            toast.error(error.data.message)
+          }
+          setIsExcelPopupOpen(false);
+    }
+
+    const {data: userDetails, error , isFetchingg} = useGetUserDetailsQuery({
+        url: filterApi?.userDetailsApi,
+        method: filterApi?.userDetailsApiMethod,
+        refetchOnMountOrArgChange: true,
+        })
 
     return (
         <>
@@ -916,8 +1048,8 @@ const MainLayout6 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea4') || <div>- -</div>}
+                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
+                                {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
                                 </button>
@@ -964,9 +1096,8 @@ const MainLayout6 = ({ areas }) => {
                                         ) : ""}
                                     </div>
                                     <div className="btn-set-right">
-                                        {findAreaByKeyPrefix('EditButtonArea2'
+                                        {findAreaByKeyPrefix('EditButtonArea2', {openExcelImportPopup}
                                         ) || <div>- -</div>}
-
                                         {findAreaByKeyPrefix('EditButtonArea3', { exportToExcel }) || <div>- -</div>}
                                     </div>
                                 </div>
@@ -979,20 +1110,24 @@ const MainLayout6 = ({ areas }) => {
                                         {findAreaByKeyPrefix('EditArea13', { machineTypology, handleSelectMachineryTopology, formData, errors, topologyName }) || <div>- -</div>}
                                         {findAreaByKeyPrefix('EditArea14', { MachineryData: formData?.MachineryData, formData, handleSelectChange, errors, MachineryID }) || <div>- -</div>}
                                         {findAreaByKeyPrefix('EditArea10', { normeDellData: formData?.normeDellData, handleSelectMachinery, formData, errors }) || <div>- -</div>}
-                                        {findAreaByKeyPrefix('EditArea15', { formValues: formData.year, formName: { name: "year", type: "number" }, ...(customDropDownData && { handleNotes: handleYear, formData }) }) || <div>- -</div>}
+                                        {/* {findAreaByKeyPrefix('EditArea15', { formValues: formData.year, formName: { name: "year", type: "number" }, ...(customDropDownData && { handleNotes: handleYear, formData }) }) || <div>- -</div>} */}
+                                        {findAreaByKeyPrefix('EditArea15', { formValues: formData.year, formName: { name: "year", type: "number" }, handleNotes: handleYear, formData }) || <div>- -</div>}
+
                                         {findAreaByKeyPrefix('EditArea17', {
                                             formData,
                                             handleSelectNormeListing, normeListing, normeOptions, setNormeOptions, customDropDownData
                                         }) || <div>- -</div>}
                                         <div className="col-md-4">
                                             <div className="form-custom-check inline-check ccmt-50">
-                                                {findAreaByKeyPrefix('EditCheckArea1', { formValues: formData, ...(customDropDownData && { handleChange: handleChangeeditCheckBox1 }) }) || <div>- -</div>}
-                                                {findAreaByKeyPrefix('EditCheckArea2', { formValues: formData, ...(customDropDownData && { handleChange: handleChangeeditCheckBox2 }) }) || <div>- -</div>}
+                                                {/* {findAreaByKeyPrefix('EditCheckArea1', { formValues: formData, ...(customDropDownData && { handleChange: handleChangeeditCheckBox1 }) }) || <div>- -</div>} */}
+                                                {findAreaByKeyPrefix('EditCheckArea1', { formValues: formData,  handleChange: handleChangeeditCheckBox1  }) || <div>- -</div>}
+
+                                                {findAreaByKeyPrefix('EditCheckArea2', { formValues: formData, handleChange: handleChangeeditCheckBox2  }) || <div>- -</div>}
+                                                {/* {findAreaByKeyPrefix('EditCheckArea2', { formValues: formData, ...(customDropDownData && { handleChange: handleChangeeditCheckBox2 }) }) || <div>- -</div>} */}
                                             </div>
                                         </div>
-
                                         {findAreaByKeyPrefix('EditArea12', { handleSelectArea, formData, workingListing, errors }) || <div>- -</div>}
-                                        {findAreaByKeyPrefix('EditArea11', { formData, formValues: formData?.inspectorId?.inspectorId, formData, ispectorListing, handleSelectIspector, errors }) || <div>- -</div>}
+                                        {findAreaByKeyPrefix('EditArea11', { formData, formValues: formData?.inspectorId?.inspectorId, ispectorListing, handleSelectIspector, errors }) || <div>- -</div>}
                                         {findAreaByKeyPrefix('EditArea16', { formData, formValues: formData.notes, handleNotes, formName: { name: "notes", type: "text" } }) || <div>- -</div>}
 
                                     </div>
@@ -1006,6 +1141,8 @@ const MainLayout6 = ({ areas }) => {
                                 modalRef
                             }) || <div>- -</div>}
                         </div>
+
+                        <ExcelImport isOpen={isExcelPopupOpen} onClose={closeExcelImportPopup} handleExcelImportSubmit={handleExcelImportButton}/>
                     </div>
                 </div>
             </div>
@@ -1015,3 +1152,57 @@ const MainLayout6 = ({ areas }) => {
 };
 
 export default MainLayout6;
+
+
+function ExcelImport({ isOpen, onClose,handleExcelImportSubmit }) {
+
+    const [file, setFile] = useState(null);
+    const [error, setError] = useState('');
+  
+    const handleFileChange = (event) => {
+      const selectedFile = event.target.files[0];
+      if (selectedFile) {
+        setFile(selectedFile);
+        setError(''); 
+      }
+    };
+    useEffect(() => {
+      if (isOpen) {
+        setError(''); 
+        setFile(null);
+      }
+    }, [isOpen]);
+  
+    const handleSubmit = (event) => {
+      event.preventDefault();
+      if (!file) {
+        setError('Please select a Excel File');
+        return;
+      }
+      handleExcelImportSubmit(file);
+    };
+  
+    return (
+      <Modal show={isOpen} onHide={onClose} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Upload Excel File</Modal.Title>
+        </Modal.Header>
+        <form onSubmit={handleSubmit}>
+        <Modal.Body>
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            className={`form-control ${error ? 'is-invalid' : ''}`}
+            onChange={handleFileChange}
+          />
+          {error && <div className="invalid-feedback">{error}</div>}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" type="submit">
+            Upload
+          </Button>
+        </Modal.Footer>
+        </form>
+      </Modal>
+    );
+  }

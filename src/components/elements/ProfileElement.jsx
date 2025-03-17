@@ -1,17 +1,18 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-const ProfileElement = ({ areas }) => {
-  
+const ProfileElement = ({ areas, userDetails }) => {
+    const isCheck = localStorage.getItem('check')
     const navigate = useNavigate();
     const handleLogout = () => {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("user_name",);
-        localStorage.removeItem("user_id");
+        if(isCheck){
+            localStorage.clear()
+        }else{
+            sessionStorage.clear()
+        }
         navigate('/login')
     }
 
-    const userName = localStorage.getItem("user_name")
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const toggleDropdown = () => {
         setDropdownOpen(prevState => !prevState);
@@ -29,22 +30,22 @@ const ProfileElement = ({ areas }) => {
                 aria-expanded={isDropdownOpen ? 'true' : 'false'}
                 onClick={toggleDropdown}
             >
-                <img src="img/header_user.png" alt="" />
+                <img src={userDetails?.data?.image} alt="" />
                 <div className="userHeaderName d-none d-lg-block">
-                    {userName}
+                    {userDetails?.data?.username}
                 </div>
             </a>
                 <div className={`dropdown-menu ${isDropdownOpen ? 'show' : ''}`} aria-labelledby="user-drop">
                     <div className="user_info">
                         <div className="user_name d-block d-lg-none">
-                            <div>Alex Willson</div>
+                            <div> {userDetails?.data?.username}</div>
                             <div className="user_email">
-                                <small>alexwillson@gmail.com</small>
+                                <small> {userDetails?.data?.mail}</small>
                             </div>
                         </div>
                         <ul>
                             <li>
-                                <a href="#!">
+                                <a onClick={() => navigate('/14')}>
                                     <i className="ion-android-person" /> My Profile
                                 </a>
                             </li>

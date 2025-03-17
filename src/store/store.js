@@ -1,15 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from '@reduxjs/toolkit/query'
-// import { getApi } from "../services/appServices";
-//import { devApi } from '../services/Query/dev';
 import { loginLayoutApi } from '../services/apiSlice';
-
-
+import PageReducer from './pageSlice'
+import DataReducer from './dataSlice'
 
 export const store = configureStore({
   reducer: {
     [loginLayoutApi.reducerPath]: loginLayoutApi.reducer,
   //  [getApi.reducerPath]: getApi.reducer,
+    page: PageReducer,
+    data: DataReducer
   },
   middleware: (getDefaultMiddleware) => 
     getDefaultMiddleware().concat(

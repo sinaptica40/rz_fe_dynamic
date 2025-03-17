@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 import Loader from "../../lib/loader/loader";
-import { useDeleInspectionMutation, useGetOdersIspezione0Query, useGetOdersIspezione1Query } from "../../services/apiSlice";
+import { useDeleInspectionMutation, useGetOdersIspezione0Query, useGetOdersIspezione1Query, useGetUserDetailsQuery } from "../../services/apiSlice";
 
 const MainLayout2 = ({ areas }) => {
 
@@ -11,7 +11,6 @@ const MainLayout2 = ({ areas }) => {
     const [currentPage2, setCurrentPage2] = useState(1);
     const [showModal, setShowModal] = useState();
     const [deletedInspectionId, setDeletedInspectionId] = useState(null);
-
     const modalRef = useRef(null);
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
         const area = areas.find(area => area?.key && area?.key.startsWith(prefix));
@@ -66,6 +65,22 @@ const MainLayout2 = ({ areas }) => {
 
         return acc;
     }, undefined);
+
+    let getApis = areas.filter((item) => item?.props?.children?.props?.children?.props?.api != null
+    ).reduce((acc, user) => {
+        const key = user?.key;
+        console.log("MainBodyArea4", key)
+        const functionName = user.props.children.props.children.props.api.function_name;
+        const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
+
+        if (key?.includes("HeaderArea4-3")) {
+            acc.userDetailsApi = functionName;
+            acc.userDetailsApiMethod = api_Method;
+        }
+        return acc;
+    }, {})
+
+    
 
     const [deleInspection] = useDeleInspectionMutation();
 
@@ -144,6 +159,14 @@ const MainLayout2 = ({ areas }) => {
     const handlePageClick2 = ({ selected }) => {
         setCurrentPage2(selected + 1)
     };
+    
+    // user details
+   const {data: userDetails, error , isFetchingg} = useGetUserDetailsQuery({
+    url: getApis?.userDetailsApi,
+    method: getApis?.userDetailsApiMethod,
+    refetchOnMountOrArgChange: true,
+    })
+
 
     return (
         <>
@@ -191,8 +214,8 @@ const MainLayout2 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea4') || <div>- -</div>}
+                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
+                                {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
                                 </button>

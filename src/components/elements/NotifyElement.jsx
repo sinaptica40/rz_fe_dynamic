@@ -1,11 +1,16 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const NotifyElement = (props) => {
-    console.log("props", props)
+    const navigate = useNavigate();
+    console.log("props check", props)
+    const handleNavigate = () =>{
+        navigate(`/${10}`)
+    }
     return (
         <>
         <div className="right_notfiMenu">
-            <a className="nav-link" href="#">
+            <a className="nav-link" onClick={handleNavigate}>
                 <span className="header_menuIcon">
                     <img src={props?.areas?.element_data?.interaction_name} />
                 </span>

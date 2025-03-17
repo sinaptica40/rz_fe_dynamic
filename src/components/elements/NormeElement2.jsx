@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import moment from 'moment'
 import { useNavigate } from "react-router-dom";
 
 const NormaElement2 = ({ areas, data, nestedElements, handleDeleteNorme, handleModal, modalRef, showModal, setShowModal }) => {
@@ -67,15 +68,18 @@ const NormaElement2 = ({ areas, data, nestedElements, handleDeleteNorme, handleM
                             {data?.data?.map((item, index) => {
                                 return (
                                     <tr>
+                                       {item?.id_notification? 
+                                        <td>{item?.id_notification}</td> : 
                                         <td>
                                             <div>
                                                 <a className="pdf-file" href={item?.full_url}>
-                                                    {item?.name}
+                                                    {item?.title ? item?.title : item?.name}
                                                 </a>
                                             </div>
                                         </td>
-                                        <td>{item?.language}</td>
-                                        <td>{`${item?.standard_types?.type} (${item?.standard_types?.focus})`} </td>
+                                        }
+                                        <td>{item?.title ? item?.title : item?.language}</td>
+                                        <td>{item?.created_at ? moment(item?.created_at).format('YYYY-MM-DD') : `${item?.standard_types?.type} (${item?.standard_types?.focus})`} </td>
                                         <td>{item?.description}</td>
                                         <td>{item?.standard_code}</td>
 

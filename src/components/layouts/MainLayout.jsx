@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
-import { useGetCalenderQuery, useGetInspectionsOrderQuery } from "../../services/apiSlice";
+import { useGetCalenderQuery, useGetInspectionsOrderQuery, useGetNotificheOverviewQuery, useGetReportDashboardQuery, useGetUserDetailsQuery } from "../../services/apiSlice";
 
 const MainLayout = ({ areas }) => {
     const [showModal, setShowModal] = useState(false);
 
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
+        console.log(prefix,'check is this prefix')
         const area = areas.find(area => area?.key && area?.key.startsWith(prefix));
+        // console.log(area,'check the area after prefix used');
         if (area) {
             const deepCloneChildren = (children, extraProps) => {
                 return React.Children.map(children, (child) => {
@@ -31,6 +33,8 @@ const MainLayout = ({ areas }) => {
         return null;
     };
 
+    console.log(areas,'check main layout areas')
+
     const handleModal = (clickedDateData) => {
         setShowModal(true);
     }
@@ -51,6 +55,22 @@ const MainLayout = ({ areas }) => {
             acc.calenderApi = functionName;
             acc.calenderApiApiMethod = api_Method;
         }
+
+        if (key?.includes("MainBodyArea3-6")){
+            acc.notificationApi = functionName;
+            acc.notificationApiMethod = api_Method;
+        }
+
+        if (key?.includes("MainBodyArea2-5")){
+            acc.reportApi = functionName;
+            acc.reportApiMethod = api_Method;
+        }
+
+        if (key?.includes("HeaderArea4-3")){
+            acc.userDetailsApi = functionName;
+            acc.userDetailsApiMethod = api_Method;
+        }
+
         return acc;
     }, {})
 
@@ -68,6 +88,28 @@ const MainLayout = ({ areas }) => {
         refetchOnMountOrArgChange: true,
     },
     );
+
+    // notification
+    const {data: notifiches, isFetching: isFetchingNotifiche} = useGetNotificheOverviewQuery({
+        url: getApi.notificationApi,
+        method: getApi.notificationApiMethod
+    })
+
+   // report list
+   const {data: reports, isFetching: isFetchingReports} = useGetReportDashboardQuery({
+       url: getApi.reportApi,
+       method: getApi.reportApiMethod,
+   })
+
+   // user details
+   const {data: userDetails, error , refetch} = useGetUserDetailsQuery({
+       url: getApi?.userDetailsApi,
+       method: getApi?.userDetailsApiMethod,
+       refetchOnMountOrArgChange: true,
+   })
+
+   
+   
 
     return (
         <>
@@ -114,8 +156,8 @@ const MainLayout = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea4') || <div>- -</div>}
+                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
+                                {findAreaByKeyPrefix('HeaderArea4', {userDetails}) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
                                 </button>
@@ -127,8 +169,8 @@ const MainLayout = ({ areas }) => {
             <div className="webcontent-wrapper">
                 <div className="row g-xxl-5">
                     {findAreaByKeyPrefix('MainBodyArea1')}
-                    {findAreaByKeyPrefix('MainBodyArea2')}
-                    {findAreaByKeyPrefix('MainBodyArea3')}
+                    {findAreaByKeyPrefix('MainBodyArea2', { reports })}
+                    {findAreaByKeyPrefix('MainBodyArea3', { notifiches })}
                 </div>
                 <div className="row g-xxl-5">
                     {findAreaByKeyPrefix('MainBodyArea4', { inspectionData })}

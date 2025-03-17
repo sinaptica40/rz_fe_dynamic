@@ -1,10 +1,33 @@
 import React from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
-
-const MenuElement = ({ data }) => {
+const MenuElement = ({ areas, data }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const route = location.pathname.substring(1) || '/';
+    console.log(data,'check data inside the Menu Element');
+    const handleNavigation = (id_page) =>{
+        sessionStorage.removeItem('subIndex')
+        sessionStorage.removeItem('inspectId')
+        sessionStorage.removeItem('sezione')
+        sessionStorage.removeItem('menuindex')
+        sessionStorage.setItem('navlink',0)
+        navigate(`/${id_page.toLowerCase()}`)
+    }
+    
+    function getParentPageName(key) {
+        console.log(key, 'check route');
+        
+        // Get navigation array from localStorage 
+        const pages = JSON.parse(localStorage.getItem('navPages'));
+        console.log(pages, 'check page data here');
+    
+        // Find the matching page
+        const matchedPage = pages?.find(page => page.page_name_label === key);
+    
+        // Ensure parent_page_name is not undefined before calling toLocaleLowerCase()
+        return matchedPage?.parent_page_name ? matchedPage.parent_page_name.toLocaleLowerCase() : null;
+    }
+    
 
     return (
         <>
@@ -23,14 +46,14 @@ const MenuElement = ({ data }) => {
                 </svg>
             </button>
             <ul className="navbar-nav ms-auto">
-                {data.data.map((item) => {
+                {data?.data?.map((item) => {
                     return (
-                        <li className={`nav-item ${route == item.id_page ? "active" : ""}`}>
-                            <a className="nav-link" onClick={() => navigate(`/${item.id_page}`)}>
+                        <li className={`nav-item ${route?.toLocaleLowerCase() == item?.menu_item_name?.toLowerCase() || getParentPageName(route?.toLocaleLowerCase()) == item?.menu_item_name?.toLocaleLowerCase() ? "active" : ""}`}>
+                            <a className="nav-link" onClick={() => handleNavigation(item?.menu_item_name)}>
                                 <span className="header_menuIcon">
                                     <img src={item?.image_icon} />
                                 </span>
-                                {item.menu_item_name}
+                                {item?.menu_item_name}
                             </a>
                         </li>
                     )

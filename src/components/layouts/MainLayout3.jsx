@@ -1,17 +1,13 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
-import { useDeleteNormMutation, useGetMachineryQuery } from "../../services/apiSlice";
+import { useDeleteNormMutation, useGetMachineryQuery, useGetUserDetailsQuery } from "../../services/apiSlice";
 import { useLocation, useParams } from "react-router-dom";
 import Loader from "../../lib/loader/loader";
 import { toast } from 'react-toastify';
-
+import { useSelector } from "react-redux";
 
 const MainLayout3 = ({ areas }) => {
-    console.log('==areas==33', areas)
-
     const loaction = useLocation();
-
     const route = loaction.pathname.substring(1) || '/';
-
     const params = useParams()
     const [showModal, setShowModal] = useState(false);
     const [searchText, setSearchText] = useState("");
@@ -44,6 +40,7 @@ const MainLayout3 = ({ areas }) => {
                 ...extraProps,
                 children: deepCloneChildren(area.props.children, extraProps),
             });
+            
             return clonedArea;
         }
 
@@ -76,6 +73,11 @@ const MainLayout3 = ({ areas }) => {
         if (key.includes("MachinerySearchArea")) {
             acc.apiURL = functionName;
             acc.apiMethod = api_Method;
+        }
+
+        if (key?.includes("HeaderArea4-3")) {
+            acc.userDetailsApi = functionName;
+            acc.userDetailsApiMethod = api_Method;
         }
         return acc;
     }, {});
@@ -141,26 +143,34 @@ const MainLayout3 = ({ areas }) => {
     }, [showModal]);
 
     const handleDeleteNorme = async () => {
+        console.log('delete norme')
         try {
             const res = await deleteNorm({
                 url: getDeleteApi.deleteApiURL,
                 method: getDeleteApi.deleteApiMethod,
                 params: deletedId
             })
+            console.log(res,'check res')
 
             if (res?.data?.status == "SUCCESS") {
                 toast.success(res?.data?.message);
                 refetch();
                 setDeletedId(null);
                 setShowModal(false);
-            } else if (res?.error) {
-                toast.error(res?.error?.data?.message);
+            } else if (res?.data?.status == "ERROR") {
+                toast.error(res?.data?.message);
                 setShowModal(false);
             }
         } catch (error) {
             toast.error(error)
         }
     }
+
+    const {data: userDetails, isFetchingg} = useGetUserDetailsQuery({
+        url: getapi?.userDetailsApi,
+        method: getapi?.userDetailsApiMethod,
+        refetchOnMountOrArgChange: true,
+        })
 
     return (
         <>
@@ -208,8 +218,8 @@ const MainLayout3 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea4') || <div>- -</div>}
+                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
+                                {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
                                 </button>

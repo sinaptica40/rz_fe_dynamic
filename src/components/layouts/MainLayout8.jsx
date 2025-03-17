@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
-import moment from 'moment';
-import { useGetRzOrderQuery } from "../../services/apiSlice";
-import { toast } from "react-toastify";
-import { useCallback } from "react";
-import { useMemo } from "react";
+import { useGetRzOrderQuery, useGetUserDetailsQuery } from "../../services/apiSlice";
+import { useSelector } from "react-redux";
 
 const MainLayout6 = ({ areas }) => {
     const ispenzioViewID = localStorage.getItem("ispenzioViewID");
-
     const [clientformData, setClientformData] = useState({
         description: "",
         created_by: "",
@@ -58,6 +54,12 @@ const MainLayout6 = ({ areas }) => {
                 acc.getRzOrderUrl = function_name;
                 acc.getRzOrderMethod = apiMethod
             }
+
+            if (key?.includes("HeaderArea4-3")) {
+                acc.userDetailsApi = function_name;
+                acc.userDetailsApiMethod = apiMethod;
+            }
+
             return acc;
         }, {})
 
@@ -86,6 +88,14 @@ const MainLayout6 = ({ areas }) => {
 
         }
     }, [rzOrderdetails?.data])
+
+    
+   // user details
+   const {data: userDetails, error , isFetchingg} = useGetUserDetailsQuery({
+    url: filterApi?.userDetailsApi,
+    method: filterApi?.userDetailsApiMethod,
+    refetchOnMountOrArgChange: true,
+    })
 
     return (
         <>
@@ -135,8 +145,8 @@ const MainLayout6 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>}
-                                {findAreaByKeyPrefix('HeaderArea4') || <div>- -</div>}
+                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
+                                {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
                                 </button>

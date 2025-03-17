@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { getClassName } from "../../utils/helper";
 
 const EditElement3 = ({ areas, stateListing, status, setStatus }) => {
-  
+  const [isToggele , setIsToggle] = useState(false)
   console.log("areas",areas);
+  console.log(status,'check status');
 
   return (
     <>
@@ -14,33 +15,37 @@ const EditElement3 = ({ areas, stateListing, status, setStatus }) => {
             className={`action-btn dropdown-toggle ${getClassName(
               status?.id_state
             )}`}
+            onClick={() => setIsToggle(true)}
             type="button"
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
             {status?.state ? status?.state : stateListing?.[0]?.state}
           </button>
-          <ul className="dropdown-menu dropdown-menu-dark">
+          <ul className={`dropdown-menu dropdown-menu-dark ${isToggele ? 'show' : ''}`}>
             {stateListing &&
               stateListing.length > 0 &&
               stateListing.map((state, index) =>
-
+              state?.id_state !== 1 ? (
                 <li key={index}>
                   <a
                     className={`dropdown-item ${getClassName(
                       state?.id_state
                     )}`}
                     href="#"
-                    onClick={() =>
-                      setStatus({
-                        state: state?.state,
-                        id_state: state?.id_state,
-                      })
-                    }
+                    onClick={() =>{
+                            setStatus({
+                              state: state?.state,
+                              id_state: state?.id_state,
+                            })
+                            setIsToggle(false)
+                          }
+                        }
                   >
                     {state.state}
                   </a>
                 </li>
+              ) : null
               )}
           </ul>
         </div>

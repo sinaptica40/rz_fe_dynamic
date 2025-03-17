@@ -1,11 +1,11 @@
 import React from "react";
 
-const EditButtonElement2 = ({ areas, handleExcelImportButton }) => {
+const EditButtonElement2 = ({ areas, openExcelImportPopup }) => {
   const name = areas.element_data.block_name;
   
   return (
     <>
-      <a onClick={handleExcelImportButton} className="btn-primary btn-default btn-grey">
+      <a onClick={openExcelImportPopup} className="btn-primary btn-default btn-grey">
         <span className="importIcon">
           <svg
             width={27}

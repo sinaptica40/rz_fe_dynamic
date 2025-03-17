@@ -22,7 +22,7 @@ const EditButtonElement3 = ({ areas, exportToExcel }) => {
             />
           </svg>
         </span>{" "}
-        {name}|
+        {name}
       </a>
     </>
   )
