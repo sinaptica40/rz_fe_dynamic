@@ -6,9 +6,8 @@ import { useAddNormeMutation, useEditNormeMutation, useGetEditNormDataQuery, use
 
 const MainLayout5 = ({ areas }) => {
     const params = useParams();
-
-
     const [isFormData, setisFormData] = useState(false);
+    const [loading, setLoading] = useState(false)
     const navigate = useNavigate();
     const [formValues, setFormValues] = useState({
         file: null,
@@ -190,15 +189,18 @@ const MainLayout5 = ({ areas }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        
         try {
+           
             if (getapi?.addNorme && getapi.addNormeApiMethod=="POST") {
-    
                  // Validate form values
                 const validationErrors = validate();
                 if (Object.keys(validationErrors).length > 0) {
                     setErrors(validationErrors);
                     return;
                 }
+                setLoading(true)
         
                 // Set default values for missing fields
                 if (!formValues.id_standard_type) {
@@ -225,10 +227,11 @@ const MainLayout5 = ({ areas }) => {
                 const res = await addNorme(obj);
                 if (res?.data?.status == "success" || res?.data?.status == "SUCCESS") {
                     toast.success(res?.data?.message);
+                    setLoading(false)
                     navigate(`/${res?.data?.navigate}`);
                 } else {
-                    console.error(res?.error?.data?.message || "An error occurred");
-
+                    toast.error(res?.error?.data?.message || "An error occurred");
+                    setLoading(false)
                 }
             }
             else if (getapi?.editApi && getapi?.editApiMethod =="PUT") {
@@ -238,9 +241,6 @@ const MainLayout5 = ({ areas }) => {
                     return;
                 }
                 const formData = new FormData();
-                // if (formValues.file) {
-                //     formData.append("file", formValues.file);
-                // }
                 isFormData && formData.append('file', formValues.file);
                 formData.append('id_standard_type', formValues.id_standard_type || null);
                 formData.append('language', formValues.language || null);
@@ -253,19 +253,21 @@ const MainLayout5 = ({ areas }) => {
                     params: edit_id,
                     data: formData,
                 }
-                console.warn("objEdit", objEdit.data)
                 const res = await EditNorme(objEdit);
                 console.warn("resss", res)
                 if (res?.data?.status == "success" || res?.data?.status == "SUCCESS") {
                     toast.success(res?.data?.message);
+                    setLoading(false)
                     localStorage.removeItem("id_standard");
                     navigate(`/${res?.data?.navigate}`);
                 } else {
-                    console.error(res?.error?.data?.message || "An error occurred");
+                    setLoading(false)
+                    toast.error(res?.error?.data?.message || "An error occurred");
                 }
 
             }
         } catch (error) {
+            setLoading(false)
             console.error("Error submitting form:", error);
         }
     };
@@ -280,7 +282,7 @@ const MainLayout5 = ({ areas }) => {
 
     return (
         <>
-            {isFetching && (<Loader />)}
+            {(isFetching || loading) && (<Loader />)}
             <div className="loader-wrapper" style={{ display: "none" }}>
                 <div className="loader">
                     <img src="img/logo.png" alt="" />
@@ -326,7 +328,6 @@ const MainLayout5 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
                                 {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
@@ -339,7 +340,6 @@ const MainLayout5 = ({ areas }) => {
             <div className="webcontent-wrapper">
                 <div className="container-fluid p-0">
                     <div className="cards-block">
-                        {/* {findAreaByKeyPrefix('FormArea8') || <div>- -</div>} */}
                         <div className="card-header border-0 add-form-header">
                             <div className="card-title">
                                 {findAreaByKeyPrefix('FormArea7') || <div>- -</div>}
@@ -357,8 +357,6 @@ const MainLayout5 = ({ areas }) => {
                                     {findAreaByKeyPrefix('FormArea10', { languageData, errors, handleChange, formValues }) || <div>- -</div>}
                                     {findAreaByKeyPrefix('FormArea13', { errors, handleChange, formValues }) || <div>- -</div>}
                                     {findAreaByKeyPrefix('FormArea12', { errors, handleChange, formValues }) || <div>- -</div>}
-                                    {/* {findAreaByKeyPrefix('NewMachineryArea5') || <div>- -</div>} */}
-                                    {/* </div> */}
                                     <div className="col-md-12">
 
                                         {findAreaByKeyPrefix('FormArea14') || <div>- -</div>}

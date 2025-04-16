@@ -1,8 +1,6 @@
 import React from "react";
 
 const NotificationElement = ({ areas, notifiches }) => {
-
-    console.log(notifiches,'check areas of notification');
     return (
         <>
             <div className="card-header">
@@ -26,8 +24,8 @@ const NotificationElement = ({ areas, notifiches }) => {
             </div>
             <div className="card-block-body">
                 <ul className="notificatios-list">
-                    {notifiches?.data?.slice(0,4).map((item, index) =>(
-                    <li>
+                    {notifiches?.map((item, index) =>(
+                    <li key={index}>
                         <div className="noti-title">{item?.title}</div>
                         <div className="noti-text">
                            {item?.description}

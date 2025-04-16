@@ -3,7 +3,7 @@ import Loading from '../../lib/loader/loader'
 import { useGetInspectionConformityMutation } from "../../services/apiSlice";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { setSubSectionIndex } from "../../store/pageSlice";
+import { setPageOpen, setSubSectionIndex } from "../../store/pageSlice";
 const ReportNavElement2 = ({ areas, inspectionData, getApi,page, setPage }) => {
   const [mainMenu, setMainMenu] = useState(null);
   const [showMenus, setShowMenus] = useState(0);
@@ -11,7 +11,8 @@ const ReportNavElement2 = ({ areas, inspectionData, getApi,page, setPage }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [activeSubMenuId, setActiveSubMenuId] = useState(null);
   const navigate = useNavigate();
-  const page_id = areas.element_data[0].element_type.data[0].id_page;
+  const route= areas?.element_data[0]?.element_type?.data[0]?.image_icon?.split('/');
+  const navigate_route = route[route.length - 1];
   // api to  get inspection-conformity
   const [ getInspectionConformity ] = useGetInspectionConformityMutation();
   const mainMenuIndex = sessionStorage.getItem('sezione')
@@ -33,7 +34,8 @@ const ReportNavElement2 = ({ areas, inspectionData, getApi,page, setPage }) => {
     sessionStorage.setItem('sezione', `4.${index+1}`)
     sessionStorage.setItem('inspectId',inspectId)
     sessionStorage.setItem('menuindex', index)
-    navigate(`/conformity-listing`)
+    sessionStorage.removeItem('subIndex')
+    navigate(`/${navigate_route}`)
   }
   const handleRequest = async (inspectId, index, type=null) => {
     try {
@@ -57,11 +59,11 @@ const ReportNavElement2 = ({ areas, inspectionData, getApi,page, setPage }) => {
         sessionStorage.setItem('inspectId',inspectId)
         sessionStorage.setItem('menuindex', index)
         if(type !== "navigate"){
-          navigate(`/${page_id}`)
+          navigate(`/${navigate_route}`)
         }
       }
     } catch (error) {
-      console.error("Failed to fetch submenu data:", error);
+      console.error(error);
       setIsLoading(false)
     } finally {
       setIsLoading(false)
@@ -78,7 +80,9 @@ const ReportNavElement2 = ({ areas, inspectionData, getApi,page, setPage }) => {
     sessionStorage.setItem('submenuMain',mainIndex)
     sessionStorage.setItem('submenu',idNotConformityDetected)
     navigate(`/edit-conformity`)
+    dispatch(setPageOpen(false));
   };
+
 
   useEffect(() => {
       if(parseInt(inspectionIndex)){
@@ -93,6 +97,7 @@ const ReportNavElement2 = ({ areas, inspectionData, getApi,page, setPage }) => {
       {inspectionData?.data?.inspections.map((value, index) => (
             <li className="dash_nav_item" key={index}>
                <a
+               style={{cursor:"pointer"}}
               //  ref={anchorRef}
                 className={`subMenuLink collapsed ${mainMenu === index || `4.${index + 1}` === `${mainMenuIndex}` ? "active" : ""}`}
                 data-bs-toggle="collapse"
@@ -100,6 +105,7 @@ const ReportNavElement2 = ({ areas, inspectionData, getApi,page, setPage }) => {
                 onClick={() => {
                   setMainMenu(index); // Update the active main menu
                   handleRequest2(value?.id_inspection, index); // Fetch submenu data
+                  
                 }}
               >
                 <span className="icon_sideHolder">
@@ -109,11 +115,11 @@ const ReportNavElement2 = ({ areas, inspectionData, getApi,page, setPage }) => {
                     xmlns="http://www.w3.org/2000/svg">
                     <path d="M1.5 1.5H10.738"
                       stroke="#ECAD42"
-                      stroke-width="2"
-                      stroke-linecap="round" />
+                      strokeWidth="2"
+                      strokeLinecap="round" />
                   </svg> :
                   <svg width="12" className="icon_sidePlus" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6.25 10.75V6M6.25 6V1.25M6.25 6H11M6.25 6H1.5" stroke="#ECAD42" stroke-width="2" stroke-linecap="round" />
+                    <path d="M6.25 10.75V6M6.25 6V1.25M6.25 6H11M6.25 6H1.5" stroke="#ECAD42" strokeWidth="2" strokeLinecap="round" />
                   </svg>}
                 </span>
                 <span className="title_dash_nav">Sezione 4.{index + 1}</span>
@@ -132,11 +138,12 @@ const ReportNavElement2 = ({ areas, inspectionData, getApi,page, setPage }) => {
                     >
                      
                       <a
+                      style={{cursor: "pointer"}}
                         className={`subMenuLink ${activeSubMenuId === item?.id_not_conformity_detected || `4.${index + 1}.${subIndex+1}` === subMainIndex ? "active" : ""}`}
                       >
                          <div className="sezione_dotBox">
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="18" viewBox="0 0 16 18" fill="none">
-                              <path d="M14.841 8.13965H13.441V3.52565C13.441 2.82654 13.1633 2.15606 12.6689 1.66171C12.1746 1.16737 11.5041 0.889648 10.805 0.889648H5.69598C4.99687 0.889648 4.32639 1.16737 3.83204 1.66171C3.3377 2.15606 3.05998 2.82654 3.05998 3.52565V8.13965H1.65998C1.5734 8.13952 1.48765 8.15647 1.40763 8.18954C1.32762 8.22261 1.25492 8.27115 1.1937 8.33237C1.13248 8.39359 1.08394 8.46629 1.05087 8.5463C1.0178 8.62632 1.00085 8.71207 1.00098 8.79865V16.7076C1.00085 16.7942 1.0178 16.88 1.05087 16.96C1.08394 17.04 1.13248 17.1127 1.1937 17.1739C1.25492 17.2351 1.32762 17.2837 1.40763 17.3168C1.48765 17.3498 1.5734 17.3668 1.65998 17.3666H14.841C14.9276 17.3668 15.0133 17.3498 15.0933 17.3168C15.1733 17.2837 15.246 17.2351 15.3073 17.1739C15.3685 17.1127 15.417 17.04 15.4501 16.96C15.4832 16.88 15.5001 16.7942 15.5 16.7076V8.79865C15.5001 8.71207 15.4832 8.62632 15.4501 8.5463C15.417 8.46629 15.3685 8.39359 15.3073 8.33237C15.246 8.27115 15.1733 8.22261 15.0933 8.18954C15.0133 8.15647 14.9276 8.13952 14.841 8.13965ZM4.54298 3.52565C4.54298 3.21976 4.66442 2.92639 4.88062 2.71C5.09682 2.49361 5.39009 2.37191 5.69598 2.37165H10.804C11.1097 2.37191 11.4028 2.49347 11.619 2.70965C11.8352 2.92582 11.9567 3.21894 11.957 3.52465V8.13865H4.54298V3.52565ZM14.017 15.8836H2.48298V9.62165H14.017V15.8836Z" fill="#D9D8D7" stroke="#D9D8D7" stroke-width="0.035"/>
+                              <path d="M14.841 8.13965H13.441V3.52565C13.441 2.82654 13.1633 2.15606 12.6689 1.66171C12.1746 1.16737 11.5041 0.889648 10.805 0.889648H5.69598C4.99687 0.889648 4.32639 1.16737 3.83204 1.66171C3.3377 2.15606 3.05998 2.82654 3.05998 3.52565V8.13965H1.65998C1.5734 8.13952 1.48765 8.15647 1.40763 8.18954C1.32762 8.22261 1.25492 8.27115 1.1937 8.33237C1.13248 8.39359 1.08394 8.46629 1.05087 8.5463C1.0178 8.62632 1.00085 8.71207 1.00098 8.79865V16.7076C1.00085 16.7942 1.0178 16.88 1.05087 16.96C1.08394 17.04 1.13248 17.1127 1.1937 17.1739C1.25492 17.2351 1.32762 17.2837 1.40763 17.3168C1.48765 17.3498 1.5734 17.3668 1.65998 17.3666H14.841C14.9276 17.3668 15.0133 17.3498 15.0933 17.3168C15.1733 17.2837 15.246 17.2351 15.3073 17.1739C15.3685 17.1127 15.417 17.04 15.4501 16.96C15.4832 16.88 15.5001 16.7942 15.5 16.7076V8.79865C15.5001 8.71207 15.4832 8.62632 15.4501 8.5463C15.417 8.46629 15.3685 8.39359 15.3073 8.33237C15.246 8.27115 15.1733 8.22261 15.0933 8.18954C15.0133 8.15647 14.9276 8.13952 14.841 8.13965ZM4.54298 3.52565C4.54298 3.21976 4.66442 2.92639 4.88062 2.71C5.09682 2.49361 5.39009 2.37191 5.69598 2.37165H10.804C11.1097 2.37191 11.4028 2.49347 11.619 2.70965C11.8352 2.92582 11.9567 3.21894 11.957 3.52465V8.13865H4.54298V3.52565ZM14.017 15.8836H2.48298V9.62165H14.017V15.8836Z" fill="#D9D8D7" stroke="#D9D8D7" strokeWidth="0.035"/>
                               <path d="M2.48291 15.8836H14.0169V9.62256H2.48291V15.8836ZM8.24991 11.2286C8.45916 11.2286 8.66299 11.2951 8.83209 11.4183C9.0012 11.5416 9.12685 11.7153 9.19098 11.9144C9.25511 12.1136 9.25442 12.328 9.189 12.5268C9.12358 12.7255 8.99681 12.8984 8.82691 13.0206V14.1126C8.82691 14.1563 8.80953 14.1983 8.77858 14.2292C8.74764 14.2602 8.70567 14.2776 8.66191 14.2776H7.83791C7.79415 14.2776 7.75218 14.2602 7.72124 14.2292C7.69029 14.1983 7.67291 14.1563 7.67291 14.1126V13.0206C7.50301 12.8984 7.37624 12.7255 7.31082 12.5268C7.2454 12.328 7.24471 12.1136 7.30884 11.9144C7.37297 11.7153 7.49863 11.5416 7.66773 11.4183C7.83683 11.2951 8.04066 11.2286 8.24991 11.2286Z" fill="#9B9696" fill-opacity="0.15"/>
                               <path d="M7.67322 13.0206V14.1126C7.67322 14.1564 7.6906 14.1984 7.72155 14.2293C7.75249 14.2602 7.79446 14.2776 7.83822 14.2776H8.66222C8.70598 14.2776 8.74795 14.2602 8.77889 14.2293C8.80983 14.1984 8.82722 14.1564 8.82722 14.1126V13.0206C8.99733 12.8986 9.12433 12.7257 9.18993 12.5269C9.25552 12.3281 9.25633 12.1135 9.19223 11.9142C9.12813 11.7149 9.00243 11.5411 8.83324 11.4178C8.66405 11.2945 8.46008 11.228 8.25072 11.228C8.04135 11.228 7.83739 11.2945 7.6682 11.4178C7.499 11.5411 7.37331 11.7149 7.30921 11.9142C7.24511 12.1135 7.24592 12.3281 7.31151 12.5269C7.37711 12.7257 7.5031 12.8986 7.67322 13.0206Z" fill="#D9D8D7"/>
                           </svg>

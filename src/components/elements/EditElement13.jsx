@@ -1,9 +1,18 @@
-import React from 'react'
+import React from "react";
 import CreatableSelect from "react-select/creatable";
 
-const EditElement13 = ({ areas, machineTypology, topologyName, handleSelectMachineryTopology, formData, errors }) => {
+const EditElement13 = ({
+  areas,
+  machineTypology,
+  topologyName,
+  handleSelectMachineryTopology,
+  formData,
+  errors,
+}) => {
   const { element_data } = areas;
-  const defaultOption = machineTypology?.find(machine => machine?.typology === formData?.typology);
+  const defaultOption = machineTypology?.find(
+    (machine) => machine?.typology === formData?.typology
+  );
 
   return (
     <>
@@ -24,7 +33,7 @@ const EditElement13 = ({ areas, machineTypology, topologyName, handleSelectMachi
       />
       <label htmlFor="floating-select">{element_data.block_name}</label>
     </>
-  )
-}
+  );
+};
 
 export default EditElement13;

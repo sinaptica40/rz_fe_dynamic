@@ -214,7 +214,7 @@ export const loginLayoutApi = createApi({
     createInspection: builder.mutation({
       query: (data) => {
         return {
-          url: "/api/v1/inspections/create-inspection",
+          url: "/api/v1/inspections/create-inspection-points",
           method: "POST",
           body: data?.body,
         };
@@ -294,7 +294,7 @@ export const loginLayoutApi = createApi({
       query: (credentials) => ({
         url: credentials.url, // dynamic URL passed from the request
         method: credentials.method, // dynamic method passed from the request
-        body: JSON.stringify(credentials.data), // dynamic body
+        body: JSON.stringify(credentials.body), // dynamic body
         headers: { "Content-Type": "application/json" },
       }),
     }),
@@ -457,7 +457,14 @@ export const loginLayoutApi = createApi({
         body: Credentials.body
       })
     }),
-  }),
+    createInspectionData : builder.mutation({
+      query: (credentials) =>({
+        url: credentials.url,
+        method: credentials.method,
+        body: credentials.body
+      })
+    })
+  })
 });
 
 export const {
@@ -510,5 +517,6 @@ export const {
   useResetPasswordMutation,
   useGetDropdownListQuery,
   useUpdateAreaMutation,
-  useUpdateStatusPriorityMutation
+  useUpdateStatusPriorityMutation,
+  useCreateInspectionDataMutation
 } = loginLayoutApi;

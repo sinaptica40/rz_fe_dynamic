@@ -121,11 +121,13 @@ const MainLayout14 = ({ areas }) => {
                 method: getApi.editProfileApiMethod,
                 body: formData,  // Send FormData instead of userData object
             }).unwrap();
-            if(response.status === "SUCCESS"){
+            if(response?.status === "SUCCESS"){
                 setIsLoading(false)
                 refetch()
                 toast.success("Profile updated successfully!");
-            }
+              }else if(response.status === "ERROR" || response.status === "FAIL"){
+                  toast.error(response?.message);
+                }
         } catch (error) {
             setIsLoading(false)
             console.error("Error updating profile:", error);

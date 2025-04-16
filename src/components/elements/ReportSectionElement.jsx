@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useGetInspectionConformityMutation, useGetInspectionPointsQuery, useCreateInspectionMutation, useAddConformityMutation, useGetConformityTypesQuery, useCreateClusterMutation, useGetInspectionPointsMutation, useDeleteConformityDataMutation, useOpenAitextMutation, useGetDropdownListQuery, useUpdateAreaMutation } from '../../services/apiSlice'
 import Swal from 'sweetalert2'
@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux'
 import { setIsUpdate } from '../../store/pageSlice'
 import Loader from '../../lib/loader/loader'
 import { getStatusColorCode } from '../../utils/helper'
+import SignPad from '../SignPad'
 const ReportSectionElement = ({ areas, getApi }) => {
   const inspectId = sessionStorage.getItem('inspectId')
   const [isLoading, setIsLoading] = useState(false)
@@ -61,7 +62,7 @@ const ReportSectionElement = ({ areas, getApi }) => {
     //  sessionStorage.removeItem('menuindex')
       sessionStorage.setItem('subIndex',`${sezioneIndex}.${index}`)
       sessionStorage.setItem('submenu', id_not_conformity_detected)
-      navigate(`/${13}`)
+      navigate(`/edit-conformity`)
   }
 
   const [deleteConformityData] = useDeleteConformityDataMutation()
@@ -69,14 +70,14 @@ const ReportSectionElement = ({ areas, getApi }) => {
   const handleDelete = async (id) => {
       try {
           const result = await Swal.fire({
-              title: 'Are you sure?',
-              text: "You won't be able to revert this!",
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Yes, delete it!',
-              cancelButtonText: 'Cancel'
+            title: "Sei sicuro?",
+            text: "Non potrai più tornare indietro!",
+            icon: "avvertimento",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sì, cancellalo!",
+            cancelButtonText: "Cancellare",
           });
 
           if (result.isConfirmed) {
@@ -119,7 +120,7 @@ const ReportSectionElement = ({ areas, getApi }) => {
                         <div className="folded">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="17" viewBox="0 0 6 10"
                                 fill="none">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                <path fillRule="evenodd" clipRule="evenodd"
                                     d="M0.603669 0.690378C0.802481 0.497088 1.12482 0.497088 1.32363 0.690377L5.39636 4.64997C5.49183 4.74279 5.54547 4.86869 5.54547 4.99996C5.54547 5.13122 5.49183 5.25712 5.39636 5.34994L1.32363 9.30953C1.12482 9.50282 0.802481 9.50282 0.603669 9.30953C0.404856 9.11624 0.404856 8.80286 0.603669 8.60957L4.31641 4.99996L0.603669 1.39034C0.404856 1.19705 0.404856 0.883667 0.603669 0.690378Z"
                                     fill="#ECAD42" />
                             </svg>
@@ -139,7 +140,7 @@ const ReportSectionElement = ({ areas, getApi }) => {
                           <div>Ispezione | {inspect?.order_info?.client}</div>
                           <div>{inspect?.order_info?.order_code}</div>
                           {/* {moment(inspaction_date).format('YYYY-MM-DD')} */}
-                          <div>Data Inizio Ispezione <span>{moment(inspect?.calendar_info?.date).format('YYYY-MM-DD')}</span></div>
+                          <div>Data Inizio Ispezione <span>{moment(inspect?.order_info?.create_at).format('YYYY-MM-DD')}</span></div>
                         </div>
                         <div className="report_innerBox">
                             <div className="tab_previewBox">
@@ -185,7 +186,7 @@ const ReportSectionElement = ({ areas, getApi }) => {
                                                                 <div className="sezione_tableFlex">
                                                                     <button className="switchEquipment pe-0 sezione_dotBox">
                                                                         <svg width="20" height="23" viewBox="0 0 20 23" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                            <path d="M18.899 10.3511H17.087V4.38508C17.087 3.93715 16.9987 3.49361 16.8272 3.07981C16.6557 2.66602 16.4043 2.29008 16.0875 1.97349C15.7706 1.65689 15.3944 1.40585 14.9805 1.23471C14.5665 1.06357 14.1229 0.975681 13.675 0.976076H7.075C6.62707 0.975681 6.18346 1.06357 5.76951 1.23471C5.35557 1.40585 4.97941 1.65689 4.66253 1.97349C4.34566 2.29008 4.09429 2.66602 3.92278 3.07981C3.75128 3.49361 3.663 3.93715 3.663 4.38508V10.3511H1.852C1.74008 10.3509 1.62923 10.3729 1.5258 10.4157C1.42237 10.4584 1.32839 10.5212 1.24925 10.6003C1.17011 10.6795 1.10736 10.7734 1.06459 10.8769C1.02182 10.9803 0.999869 11.0912 1 11.2031V21.4311C0.999869 21.543 1.02182 21.6539 1.06459 21.7573C1.10736 21.8607 1.17011 21.9547 1.24925 22.0338C1.32839 22.113 1.42237 22.1757 1.5258 22.2185C1.62923 22.2613 1.74008 22.2832 1.852 22.2831H18.899C19.0109 22.2832 19.1218 22.2613 19.2252 22.2185C19.3286 22.1757 19.4226 22.113 19.5017 22.0338C19.5809 21.9547 19.6436 21.8607 19.6864 21.7573C19.7292 21.6539 19.7511 21.543 19.751 21.4311V11.2031C19.7511 11.0912 19.7292 10.9803 19.6864 10.8769C19.6436 10.7734 19.5809 10.6795 19.5017 10.6003C19.4226 10.5212 19.3286 10.4584 19.2252 10.4157C19.1218 10.3729 19.0109 10.3509 18.899 10.3511ZM5.581 4.38508C5.581 4.18898 5.61966 3.9948 5.69476 3.81365C5.76987 3.6325 5.87995 3.46794 6.0187 3.32936C6.15746 3.19079 6.32217 3.08094 6.50342 3.00607C6.68467 2.93121 6.8789 2.89281 7.075 2.89308H13.675C14.0707 2.89308 14.4502 3.05027 14.73 3.33007C15.0098 3.60988 15.167 3.98937 15.167 4.38508V10.3511H5.581V4.38508ZM17.833 20.3661H2.918V12.2661H17.833V20.3661Z" fill="#D9D8D7" stroke="#D9D8D7" stroke-width="0.035" />
+                                                                            <path d="M18.899 10.3511H17.087V4.38508C17.087 3.93715 16.9987 3.49361 16.8272 3.07981C16.6557 2.66602 16.4043 2.29008 16.0875 1.97349C15.7706 1.65689 15.3944 1.40585 14.9805 1.23471C14.5665 1.06357 14.1229 0.975681 13.675 0.976076H7.075C6.62707 0.975681 6.18346 1.06357 5.76951 1.23471C5.35557 1.40585 4.97941 1.65689 4.66253 1.97349C4.34566 2.29008 4.09429 2.66602 3.92278 3.07981C3.75128 3.49361 3.663 3.93715 3.663 4.38508V10.3511H1.852C1.74008 10.3509 1.62923 10.3729 1.5258 10.4157C1.42237 10.4584 1.32839 10.5212 1.24925 10.6003C1.17011 10.6795 1.10736 10.7734 1.06459 10.8769C1.02182 10.9803 0.999869 11.0912 1 11.2031V21.4311C0.999869 21.543 1.02182 21.6539 1.06459 21.7573C1.10736 21.8607 1.17011 21.9547 1.24925 22.0338C1.32839 22.113 1.42237 22.1757 1.5258 22.2185C1.62923 22.2613 1.74008 22.2832 1.852 22.2831H18.899C19.0109 22.2832 19.1218 22.2613 19.2252 22.2185C19.3286 22.1757 19.4226 22.113 19.5017 22.0338C19.5809 21.9547 19.6436 21.8607 19.6864 21.7573C19.7292 21.6539 19.7511 21.543 19.751 21.4311V11.2031C19.7511 11.0912 19.7292 10.9803 19.6864 10.8769C19.6436 10.7734 19.5809 10.6795 19.5017 10.6003C19.4226 10.5212 19.3286 10.4584 19.2252 10.4157C19.1218 10.3729 19.0109 10.3509 18.899 10.3511ZM5.581 4.38508C5.581 4.18898 5.61966 3.9948 5.69476 3.81365C5.76987 3.6325 5.87995 3.46794 6.0187 3.32936C6.15746 3.19079 6.32217 3.08094 6.50342 3.00607C6.68467 2.93121 6.8789 2.89281 7.075 2.89308H13.675C14.0707 2.89308 14.4502 3.05027 14.73 3.33007C15.0098 3.60988 15.167 3.98937 15.167 4.38508V10.3511H5.581V4.38508ZM17.833 20.3661H2.918V12.2661H17.833V20.3661Z" fill="#D9D8D7" stroke="#D9D8D7" strokeWidth="0.035" />
                                                                             <path d="M2.91699 20.3661H17.833V12.2661H2.91699V20.3661ZM10.375 14.3471C10.6455 14.3474 10.9089 14.4334 11.1274 14.5928C11.3459 14.7521 11.5083 14.9767 11.5912 15.2341C11.6741 15.4916 11.6732 15.7687 11.5887 16.0256C11.5043 16.2826 11.3405 16.5061 11.121 16.6641V18.0751C11.1207 18.1315 11.0982 18.1855 11.0583 18.2254C11.0184 18.2653 10.9644 18.2879 10.908 18.2881H9.84199C9.78558 18.2879 9.73156 18.2653 9.69167 18.2254C9.65178 18.1855 9.62926 18.1315 9.62899 18.0751V16.6631C9.40949 16.5051 9.24573 16.2816 9.16125 16.0246C9.07676 15.7677 9.07591 15.4906 9.1588 15.2331C9.24169 14.9757 9.40406 14.7511 9.62258 14.5918C9.8411 14.4324 10.1045 14.3464 10.375 14.3461V14.3471Z" fill="#9B9696" fill-opacity="0.15" />
                                                                             <path d="M9.63019 16.6612V18.0732C9.63045 18.1296 9.65298 18.1836 9.69287 18.2235C9.73276 18.2634 9.78678 18.2859 9.84319 18.2862H10.9082C10.9646 18.2859 11.0186 18.2634 11.0585 18.2235C11.0984 18.1836 11.1209 18.1296 11.1212 18.0732V16.6612C11.3411 16.5033 11.5052 16.2797 11.5899 16.0226C11.6747 15.7655 11.6756 15.4881 11.5927 15.2304C11.5098 14.9727 11.3472 14.748 11.1284 14.5886C10.9096 14.4292 10.6459 14.3433 10.3752 14.3433C10.1045 14.3433 9.84076 14.4292 9.62197 14.5886C9.40319 14.748 9.24063 14.9727 9.15769 15.2304C9.07476 15.4881 9.07572 15.7655 9.16045 16.0226C9.24518 16.2797 9.4103 16.5033 9.63019 16.6612Z" fill="#D9D8D7" />
                                                                         </svg>
@@ -207,21 +208,21 @@ const ReportSectionElement = ({ areas, getApi }) => {
                                                             <td>
                                                                 {inspect?.ispector_info?.name}
                                                             </td>
-                                                            <td className='d-flex align-item-center gap-2'>
+                                                            <td className='status-box'>
                                                             <span className="dot_dropStatus" style={{ backgroundColor: value?.conformity_status}}></span>
                                                             <span>{getStatusColorCode(value?.conformity_status)}</span>
                                                             </td>
                                                             <td>
                                                                 <div className="table_action_list">
-                                                                    <a className="table_actionBtn" onClick={() => handleConformity(value?.id_not_conformity_detected, index + 1)}>
+                                                                    <a className="table_actionBtn" style={{cursor: "pointer"}} onClick={() => handleConformity(value?.id_not_conformity_detected, index + 1)}>
                                                                         <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                            <path d="M22.619 18.1552L6.65001 2.18517C6.01951 1.57864 5.17625 1.24363 4.30142 1.25211C3.42659 1.26059 2.58998 1.61188 1.97135 2.23051C1.35273 2.84914 1.00143 3.68574 0.992955 4.56058C0.984476 5.43541 1.31949 6.27866 1.92601 6.90917L17.9 22.8782C18.2644 23.2427 18.7286 23.4911 19.234 23.5922L24.361 24.6182L23.332 19.4892C23.231 18.9838 22.9835 18.5196 22.619 18.1552Z" stroke="currentcolor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                                                            <path d="M10.188 4.83984L4.43103 10.0088" stroke="currentcolor" stroke-width="1.5"></path>
+                                                                            <path d="M22.619 18.1552L6.65001 2.18517C6.01951 1.57864 5.17625 1.24363 4.30142 1.25211C3.42659 1.26059 2.58998 1.61188 1.97135 2.23051C1.35273 2.84914 1.00143 3.68574 0.992955 4.56058C0.984476 5.43541 1.31949 6.27866 1.92601 6.90917L17.9 22.8782C18.2644 23.2427 18.7286 23.4911 19.234 23.5922L24.361 24.6182L23.332 19.4892C23.231 18.9838 22.9835 18.5196 22.619 18.1552Z" stroke="currentcolor" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round"></path>
+                                                                            <path d="M10.188 4.83984L4.43103 10.0088" stroke="currentcolor" strokeWidth="1.5"></path>
                                                                         </svg>
                                                                     </a>
-                                                                    <a className="table_actionBtn" onClick={() => handleDelete(value?.id_not_conformity_detected)}>
+                                                                    <a className="table_actionBtn" style={{cursor: "pointer"}} onClick={() => handleDelete(value?.id_not_conformity_detected)}>
                                                                         <svg width="26" height="25" viewBox="0 0 26 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                            <path d="M1.5 5.5138H24.859M10.844 11.3538V17.1938M15.516 11.3538V17.1938M3.836 5.5138H22.523L20.677 22.1218C20.6137 22.6934 20.3418 23.2215 19.9134 23.6052C19.485 23.9888 18.9301 24.2008 18.355 24.2008H8C7.42544 24.2001 6.87129 23.9877 6.44348 23.6042C6.01567 23.2206 5.74421 22.6929 5.681 22.1218L3.836 5.5138ZM7.743 2.1818C7.93182 1.78122 8.23061 1.44256 8.60455 1.20531C8.97848 0.968063 9.41215 0.841992 9.855 0.841797H16.5C16.9432 0.841612 17.3773 0.967505 17.7516 1.20478C18.1259 1.44205 18.425 1.78091 18.614 2.1818L20.184 5.5138H6.172L7.743 2.1818Z" stroke="currentcolor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                                            <path d="M1.5 5.5138H24.859M10.844 11.3538V17.1938M15.516 11.3538V17.1938M3.836 5.5138H22.523L20.677 22.1218C20.6137 22.6934 20.3418 23.2215 19.9134 23.6052C19.485 23.9888 18.9301 24.2008 18.355 24.2008H8C7.42544 24.2001 6.87129 23.9877 6.44348 23.6042C6.01567 23.2206 5.74421 22.6929 5.681 22.1218L3.836 5.5138ZM7.743 2.1818C7.93182 1.78122 8.23061 1.44256 8.60455 1.20531C8.97848 0.968063 9.41215 0.841992 9.855 0.841797H16.5C16.9432 0.841612 17.3773 0.967505 17.7516 1.20478C18.1259 1.44205 18.425 1.78091 18.614 2.1818L20.184 5.5138H6.172L7.743 2.1818Z" stroke="currentcolor" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round"></path>
                                                                         </svg>
                                                                     </a>
                                                                 </div>
@@ -231,6 +232,11 @@ const ReportSectionElement = ({ areas, getApi }) => {
 
                                                 </tbody>
                                             </table>
+                                            {
+                                inspect?.conformity_info?.length === 0 ? (
+                                    <h4 className='text-center my-4' style={{ color: '#ecad42' }}>Nessun record trovato</h4>
+                                ) : null
+                            }
                                         </div>
                                     </div>
                                     <div className="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
@@ -246,13 +252,13 @@ const ReportSectionElement = ({ areas, getApi }) => {
                                                                     <div className="sezioneHeadLink">
                                                                         <a className="table_actionBtn" onClick={() => handleConformity(value?.id_not_conformity_detected,index+1)}>
                                                                             <svg width="24" height="24" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                <path d="M22.619 18.1552L6.65001 2.18517C6.01951 1.57864 5.17625 1.24363 4.30142 1.25211C3.42659 1.26059 2.58998 1.61188 1.97135 2.23051C1.35273 2.84914 1.00143 3.68574 0.992955 4.56058C0.984476 5.43541 1.31949 6.27866 1.92601 6.90917L17.9 22.8782C18.2644 23.2427 18.7286 23.4911 19.234 23.5922L24.361 24.6182L23.332 19.4892C23.231 18.9838 22.9835 18.5196 22.619 18.1552Z" stroke="currentcolor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                                                                <path d="M10.188 4.83984L4.43103 10.0088" stroke="currentcolor" stroke-width="1.5"></path>
+                                                                                <path d="M22.619 18.1552L6.65001 2.18517C6.01951 1.57864 5.17625 1.24363 4.30142 1.25211C3.42659 1.26059 2.58998 1.61188 1.97135 2.23051C1.35273 2.84914 1.00143 3.68574 0.992955 4.56058C0.984476 5.43541 1.31949 6.27866 1.92601 6.90917L17.9 22.8782C18.2644 23.2427 18.7286 23.4911 19.234 23.5922L24.361 24.6182L23.332 19.4892C23.231 18.9838 22.9835 18.5196 22.619 18.1552Z" stroke="currentcolor" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round"></path>
+                                                                                <path d="M10.188 4.83984L4.43103 10.0088" stroke="currentcolor" strokeWidth="1.5"></path>
                                                                             </svg>
                                                                         </a>
                                                                         <a className="table_actionBtn" onClick={() => handleDelete(value?.id_not_conformity_detected)}>
                                                                             <svg width="24" height="24" viewBox="0 0 26 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                <path d="M1.5 5.5138H24.859M10.844 11.3538V17.1938M15.516 11.3538V17.1938M3.836 5.5138H22.523L20.677 22.1218C20.6137 22.6934 20.3418 23.2215 19.9134 23.6052C19.485 23.9888 18.9301 24.2008 18.355 24.2008H8C7.42544 24.2001 6.87129 23.9877 6.44348 23.6042C6.01567 23.2206 5.74421 22.6929 5.681 22.1218L3.836 5.5138ZM7.743 2.1818C7.93182 1.78122 8.23061 1.44256 8.60455 1.20531C8.97848 0.968063 9.41215 0.841992 9.855 0.841797H16.5C16.9432 0.841612 17.3773 0.967505 17.7516 1.20478C18.1259 1.44205 18.425 1.78091 18.614 2.1818L20.184 5.5138H6.172L7.743 2.1818Z" stroke="currentcolor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                                                <path d="M1.5 5.5138H24.859M10.844 11.3538V17.1938M15.516 11.3538V17.1938M3.836 5.5138H22.523L20.677 22.1218C20.6137 22.6934 20.3418 23.2215 19.9134 23.6052C19.485 23.9888 18.9301 24.2008 18.355 24.2008H8C7.42544 24.2001 6.87129 23.9877 6.44348 23.6042C6.01567 23.2206 5.74421 22.6929 5.681 22.1218L3.836 5.5138ZM7.743 2.1818C7.93182 1.78122 8.23061 1.44256 8.60455 1.20531C8.97848 0.968063 9.41215 0.841992 9.855 0.841797H16.5C16.9432 0.841612 17.3773 0.967505 17.7516 1.20478C18.1259 1.44205 18.425 1.78091 18.614 2.1818L20.184 5.5138H6.172L7.743 2.1818Z" stroke="currentcolor" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round"></path>
                                                                             </svg>
                                                                         </a>
                                                                     </div>
@@ -281,6 +287,12 @@ const ReportSectionElement = ({ areas, getApi }) => {
                                                     ))
                                                 ))}
                                             </div>
+
+                                            {
+                                inspect?.conformity_info?.length === 0 ? (
+                                    <h4 className='text-center my-4' style={{ color: '#ecad42' }}>Nessun record trovato</h4>
+                                ) : null
+                            }
                                         </div>
                                     </div>
                                 </div>
@@ -344,6 +356,11 @@ const ReportAdd = ({data, setFlag, getInspectConformity, sezioneIndex}) => {
     commento: "",
   });
 
+
+  const [errorss, setErrorss] = useState({
+    groupName: '',
+})
+
 const [getInspectionPoints] = useGetInspectionPointsMutation();
 const [openAitext] = useOpenAitextMutation()
 
@@ -360,14 +377,27 @@ useEffect(() => {
     fetchInspectionPoints();
 }, [])
 
+const validates = () => {
+  const newErrors = {};
+  
+  if (!groupName.trim()) newErrors.groupName = 'Il nome è obbligatorio.';
+
+  setErrorss(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+
 
 // create inspection points
 const [createInspection] = useCreateInspectionMutation();
 const [updateArea] = useUpdateAreaMutation();
-
+const location = useLocation();
 const [addConformity ] = useAddConformityMutation();
   // create inspection point
   const handleCreateInspectionPoint = async () => {
+    if(!validates()){
+      return;
+    }
       try {
           if(groupName !== ""){
           const response = await createInspection({
@@ -378,6 +408,10 @@ const [addConformity ] = useAddConformityMutation();
           if (response.status === "SUCCESS") {
               toast.success(response?.message)
               setGroupName('')
+              const cancelButton = document.querySelector('#aggiungiModal .modal_borderBtn');
+            if (cancelButton) {
+                cancelButton.click();
+              }
               fetchInspectionPoints();
           }
       }else{
@@ -385,7 +419,7 @@ const [addConformity ] = useAddConformityMutation();
       }
       } catch (error) {
           console.log(error);
-          toast.error(error.data.message)
+          // toast.error(error.message)
           setGroupName('')
       }
      
@@ -432,7 +466,7 @@ const validateFields = () => {
 
 
   // handleEdit 
-  const handleEdit = async(shapes, snapshot_file, original_image_file) =>{
+  const handleEdit = async(shapes, snapshot_file, original_image_file, newTextData) =>{
        if (validateFields()) {
          formData.append("id_machinery", data?.id_machinery);
          formData.append("id_cluster", subTitle?.id_cluster);
@@ -457,6 +491,7 @@ const validateFields = () => {
          formData.append("comment_2", clientformData2.commento);
          formData.append("priority", priority);
          formData.append("status", selectedColor)
+         formData.append("rz_not_conformity[text_note]", newTextData ? newTextData : null)
          formData.append(
            "rz_not_conformity[ai_notes]",
            ai_notes !== "" ? ai_notes : null
@@ -469,7 +504,7 @@ const validateFields = () => {
              // dispatch(deleteList("flag"))
              getInspectConformity();
              setFlag(true);
-             window.location.href = `/${12}`;
+             window.location.href = location.pathname.split('/').pop();;
              toast.success(response?.message);
            }
            if (response.status === "ERROR") {
@@ -482,7 +517,7 @@ const validateFields = () => {
        }
   }
 
-  if (isLoading) return <div>Loading....</div>
+  if (isLoading) return <Loader />
 
   const handleNavigate = () =>{
       localStorage.setItem('mainMenuIndex',null)
@@ -492,13 +527,11 @@ const validateFields = () => {
   // handle autio file
   const handleChange = (e) => {
       const file = e.target.files[0];
-      console.log(file,'check file after delete audio files')
       if (file && file.type.startsWith('audio/')) {
+        console.log("uuuuuu",file);
         setAudioFile(file);
         setAudio_file_url(URL.createObjectURL(file));
-      } else {
-        console.error('Invalid file type. Please upload an audio file.');
-      }
+      } 
     };
 
 
@@ -596,17 +629,13 @@ const validateFields = () => {
           }
       } catch (err) {
           toast.error("Something went wrong");
-          console.error("Error generating text:", err);
           setIsGenerate(false);
           setGeneratingField(""); // Reset the generating field after error
       }
   };
   
 
-      console.log(ai_notes,'check this ainotes value here');
-
       const handleChangePriorityStatus = async (eventOrValue, type) => {
-        console.log('check');
         let value;
 
         if (type === "priority") {
@@ -618,7 +647,7 @@ const validateFields = () => {
         }
 
     }
-
+;
   
 
     const handleChangearea = async (event) => {
@@ -650,8 +679,8 @@ const validateFields = () => {
                 fill="none"
               >
                 <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
                   d="M0.603669 0.690378C0.802481 0.497088 1.12482 0.497088 1.32363 0.690377L5.39636 4.64997C5.49183 4.74279 5.54547 4.86869 5.54547 4.99996C5.54547 5.13122 5.49183 5.25712 5.39636 5.34994L1.32363 9.30953C1.12482 9.50282 0.802481 9.50282 0.603669 9.30953C0.404856 9.11624 0.404856 8.80286 0.603669 8.60957L4.31641 4.99996L0.603669 1.39034C0.404856 1.19705 0.404856 0.883667 0.603669 0.690378Z"
                   fill="#ECAD42"
                 />
@@ -729,7 +758,7 @@ const validateFields = () => {
                             Non conformita Rilavata
                           </label>
                           <div
-                            className="inputRightIcon"
+                            className="inputRightIcon inputRightIcon_track"
                             onClick={() => handleToggle1()}
                           >
                             <svg
@@ -742,14 +771,14 @@ const validateFields = () => {
                               <path
                                 d="M31.3164 24.8518L9.5914 3.12583C8.73232 2.3092 7.5882 1.86048 6.403 1.87536C5.21781 1.89023 4.08531 2.36752 3.24699 3.20545C2.40867 4.04338 1.93085 5.17565 1.91542 6.36084C1.9 7.54603 2.34818 8.69036 3.1644 9.54983L24.8934 31.2768C25.389 31.7724 26.0202 32.1103 26.7074 32.2478L33.6824 33.6478L32.2824 26.6708C32.1448 25.9836 31.807 25.3524 31.3114 24.8568L31.3164 24.8518Z"
                                 stroke="#ECAD42"
-                                stroke-width="2"
-                                stroke-linecap="round"
+                                strokeWidth="2"
+                                strokeLinecap="round"
                                 stroke-linejoin="round"
                               />
                               <path
                                 d="M14.4033 6.73682L6.57129 13.7688"
                                 stroke="#ECAD42"
-                                stroke-width="2"
+                                strokeWidth="2"
                               />
                             </svg>
                           </div>
@@ -778,6 +807,9 @@ const validateFields = () => {
                             value={selectedArea}
                             onChange={handleChangearea}
                           >
+                            <option value={0} selected>
+                              Area
+                            </option>
                             {workingListing?.map((item) => (
                               <option value={item?.id_working_area}>
                                 {item?.wa_name}
@@ -834,8 +866,8 @@ const validateFields = () => {
                               <path
                                 d="M4 12H20M12 4V20"
                                 stroke="#000000"
-                                stroke-width="2"
-                                stroke-linecap="round"
+                                strokeWidth="2"
+                                strokeLinecap="round"
                                 stroke-linejoin="round"
                               />
                             </svg>
@@ -922,8 +954,8 @@ const validateFields = () => {
                                 <path
                                   d="M15.899 2.67483C15.7317 2.3483 15.4774 2.07427 15.1644 1.88292C14.8513 1.69158 14.4915 1.59033 14.1245 1.59033C13.7576 1.59033 13.3978 1.69158 13.0847 1.88292C12.7716 2.07427 12.5174 2.3483 12.35 2.67483L1.38503 24.6058C1.23217 24.9093 1.15939 25.2468 1.17362 25.5863C1.18785 25.9259 1.28861 26.2561 1.46634 26.5457C1.64406 26.8354 1.89286 27.0748 2.1891 27.2412C2.48535 27.4077 2.81922 27.4957 3.15903 27.4968H25.091C25.4308 27.4957 25.7647 27.4077 26.061 27.2412C26.3572 27.0748 26.606 26.8354 26.7837 26.5457C26.9614 26.2561 27.0622 25.9259 27.0764 25.5863C27.0907 25.2468 27.0179 24.9093 26.865 24.6058L15.899 2.67483Z"
                                   stroke="#252525"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
                                   stroke-linejoin="round"
                                 />
                                 <path
@@ -996,7 +1028,7 @@ const validateFields = () => {
                                 <path
                                   d="M24.4449 9.33582L16.6759 1.56682C16.4791 1.3708 16.2126 1.26074 15.9349 1.26074C15.6571 1.26074 15.3907 1.3708 15.1939 1.56682L10.1149 6.64982C9.72974 6.60676 9.34244 6.58572 8.95489 6.58682C6.58824 6.58317 4.29125 7.38752 2.44389 8.86682C2.32961 8.95925 2.23601 9.07464 2.16915 9.20553C2.10228 9.33641 2.06364 9.47988 2.05572 9.62665C2.0478 9.77341 2.07079 9.9202 2.12318 10.0575C2.17558 10.1948 2.25622 10.3196 2.35989 10.4238L8.08889 16.1528L1.29689 22.9368C1.21381 23.0196 1.16248 23.129 1.15189 23.2458L1.04489 24.4188C1.03803 24.4885 1.04587 24.5588 1.06791 24.6252C1.08994 24.6917 1.12568 24.7527 1.17282 24.8045C1.21995 24.8562 1.27742 24.8975 1.34151 24.9257C1.40561 24.9538 1.47489 24.9682 1.54489 24.9678C1.56052 24.9694 1.57626 24.9694 1.59189 24.9678L2.76489 24.8608C2.88171 24.8502 2.99109 24.7989 3.07389 24.7158L9.86489 17.9248L15.5939 23.6538C15.6981 23.7577 15.823 23.8386 15.9604 23.8911C16.0979 23.9436 16.2449 23.9666 16.3918 23.9586C16.5388 23.9505 16.6824 23.9117 16.8133 23.8445C16.9443 23.7774 17.0596 23.6835 17.1519 23.5688C18.0076 22.4982 18.6435 21.2693 19.0233 19.9524C19.403 18.6355 19.5191 17.2566 19.3649 15.8948L24.4439 10.8158C24.6393 10.6199 24.749 10.3545 24.749 10.0778C24.749 9.80112 24.6393 9.53572 24.4439 9.33982L24.4449 9.33582Z"
                                   stroke="#252525"
-                                  stroke-width="2"
+                                  strokeWidth="2"
                                 />
                               </svg>
                               Adeguamento proposto{" "}
@@ -1118,7 +1150,7 @@ const validateFields = () => {
                             Upload Audio
                           </label>
 
-                          <div className="records_photography_box ">
+                          <div className="records_photography_box space-0">
                             <div className="records_photographyImg">
                               <EditSection2 handleEdit={handleEdit} />
                             </div>
@@ -1167,8 +1199,8 @@ const validateFields = () => {
                               className="form-control"
                               onChange={handleCommentoChange}
                               id="floatingCommento"
-                              placeholder="Commento :"
                             />
+                              <span className="commento-text">Commento :</span>
                           </div>
                         </div>
                       </div>
@@ -1214,8 +1246,10 @@ const validateFields = () => {
                               className="form-control"
                               onChange={handleCommentoChange2}
                               id="floatingCommento"
-                              placeholder="Commento :"
+                              
                             />
+                              <span className="commento-text">Commento :</span>
+
                           </div>
                         </div>
                       </div>
@@ -1250,13 +1284,19 @@ const validateFields = () => {
                       <div className="form-floating ">
                         <input
                           type="text"
-                          className="form-control"
+                          className={`form-control ${errorss.groupName ? 'is-invalid' : ''}`}
                           id="floatingInput"
                           value={groupName}
-                          onChange={(e) => setGroupName(e.target.value)}
+                          onChange={(e) => {
+                            setGroupName(e.target.value);
+                            if (errorss.groupName) {
+                                setErrorss((prev) => ({ ...prev, groupName: null }));
+                            }
+                        }}
                           placeholder="Name"
                         />
                         <label htmlFor="floatingInput">Name</label>
+                        {errorss?.groupName && <div className="invalid-feedback">{errorss.groupName}</div>}
                       </div>
                     </div>
                   </div>
@@ -1266,7 +1306,6 @@ const validateFields = () => {
             <div className="modal-footer">
               <button
                 onClick={handleCreateInspectionPoint}
-                data-bs-dismiss="modal"
                 type="button"
                 className="modal_solidBtn"
               >
@@ -1299,6 +1338,7 @@ const EditSection2 = ({handleEdit }) => {
   const [image, setImage] = useState(null);
   const [originalImageUrl, setOriginalImageUrl] = useState(null);
   const [imagefile, setImageFile] = useState(null)
+  const [newTextData, setNewTextData] = useState("")
   const CLOSE_DISTANCE = 10;
   
   
@@ -1324,21 +1364,23 @@ const EditSection2 = ({handleEdit }) => {
   
       shapes.forEach((shape, index) => {
         const isSelected = index === selectedShapeIndex;
-        shape.points.forEach((point) => drawPoint(ctx, point.x, point.y));
-        drawLines(ctx, shape.points, isSelected ? "green" : "#000000");
+        // shape.points.forEach((point) => drawPoint(ctx, point.x, point.y));
+        shape.points.forEach((point) => drawPoint(ctx, point.x, point.y, shape.withLines === true ? "black" : "red"));
+        // drawLines(ctx, shape.points, isSelected ? "green" : "#000000");
+        drawLines(ctx, shape.points, shape.withLines === true ? "black" : "red");
         if (shape.withLines) fillWithDiagonalLines(ctx, shape.points, isSelected);
       });
   
-      currentShape.forEach((point) => drawPoint(ctx, point.x, point.y));
+      currentShape.forEach((point) => drawPoint(ctx, point.x, point.y, "black"));
       if (currentShape.length > 1) drawLines(ctx, currentShape, "black");
     };
   
     useEffect(() => redraw(), [shapes, currentShape, image, selectedShapeIndex]);
   
-    const drawPoint = (ctx, x, y) => {
+    const drawPoint = (ctx, x, y, color) => {
       ctx.beginPath();
       ctx.arc(x, y, 5, 0, Math.PI * 2);
-      ctx.fillStyle = "black";
+      ctx.fillStyle = color;
       ctx.fill();
     };
   
@@ -1441,9 +1483,12 @@ const EditSection2 = ({handleEdit }) => {
   
     
     return (
-  
+      <>
+      <div className='mt-5'>
+      <SignPad setNewTextData={setNewTextData}/>
+      </div>
       <div className="col-lg-12 mb-4 mt-4">
-      <div className="records_photography_box">
+      <div className="records_photography_box records_photography_section space-0">
         <div>
           <canvas ref={canvasRef} width="999" height="600" onClick={handleCanvasClick} />
         </div>
@@ -1541,15 +1586,13 @@ const EditSection2 = ({handleEdit }) => {
                     setCapturedFile1(file);
 
                     // Call handleEdit inside the callback after file is created
-                    handleEdit(shapes, file, imagefile);
-                  } else {
-                    console.error("Snapshot capture failed!");
+                    handleEdit(shapes, file, imagefile, newTextData);
                   }
                 });
               }}
             >
               <svg width="17" height="17" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M12.353 0.146L13.853 1.646L14 2V13.5L13.5 14H0.5L0 13.5V0.5L0.5 0H12L12.353 0.146ZM1 1V13H13V2.208L11.793 1H10V5H3V1H1ZM7 1V4H9V1H7Z" fill="white" />
+                <path fillRule="evenodd" clipRule="evenodd" d="M12.353 0.146L13.853 1.646L14 2V13.5L13.5 14H0.5L0 13.5V0.5L0.5 0H12L12.353 0.146ZM1 1V13H13V2.208L11.793 1H10V5H3V1H1ZM7 1V4H9V1H7Z" fill="white" />
               </svg>
               Salva
             </button>
@@ -1557,7 +1600,7 @@ const EditSection2 = ({handleEdit }) => {
         </div>
       </div>
     </div>
-  
+    </>
     );
   };
 
@@ -1635,6 +1678,10 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
         priority: '',
     });
 
+    const [name, setName] = useState("");
+    const [priority, setPriority] = useState()
+    
+
     const [createCluster] = useCreateClusterMutation();
 
     useEffect(() => {
@@ -1654,29 +1701,18 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
         setDisplay(false);
     };
 
-    const handleInputChange = (field, value) => {
-        setPointData((prev) => ({ ...prev, [field]: value }));
-        setErrors((prev) => ({ ...prev, [field]: '' }));
-    };
-
-    const validateForm = () => {
-        if (!pointData.name) {
-            toast.error("Name is required.");
-            return false;
-        }
-
-        if (!pointData.priority) {
-            toast.error("Priority is required.");
-            return false;
-        } else if (isNaN(pointData.priority) || pointData.priority <= 0) {
-            toast.error("Priority must be a positive number.");
-            return false;
-        }
-        return true;
-    };
+    const validate = () => {
+      const newErrors = {};
+      if (!name.trim()) newErrors.name = 'Il nome è obbligatorio.';
+      if (!priority || isNaN(priority) || Number(priority) < 0) {
+          newErrors.priority = 'È richiesta la priorità.';
+      }
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+  };
 
     const handleCreateCluster = async () => {
-        if (!validateForm()) {
+        if (!validate()) {
             return;
         }
 
@@ -1685,15 +1721,23 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
                 url: `/api/v1/conformity/create-cluster`,
                 method: "POST",
                 body: {
-                    name: pointData?.name,
-                    priority: pointData?.priority,
+                    name: name,
+                    priority: priority,
                     id_not_conformity_type: clusterdata?.id_not_conformity_type,
                 },
             }).unwrap();
-
+            
+            
             if (response.status === "SUCCESS") {
                 toast.success(response.message);
+                setName("")
+                setPriority("")
                 fetchedClusterPoints();
+
+                const closeButton = document.querySelector('#aggiungiModal .btn-close');
+                if (closeButton) closeButton.click();
+
+            
             }
         } catch (error) {
             console.log(error);
@@ -1768,12 +1812,18 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
                                                     type="text"
                                                     className={`form-control ${errors.name ? 'is-invalid' : ''}`}
                                                     id="floatingInput"
-                                                    value={pointData.name}
+                                                    value={name}
                                                     placeholder="Name"
-                                                    onChange={(e) => handleInputChange("name", e.target.value)}
+                                                    onChange={(e) => {
+                                                          setName(e.target.value);
+                                                          if (errors.name) {
+                                                              setErrors((prev) => ({ ...prev, name: null }));
+                                                          }
+                                                      }}
+
                                                 />
                                                 <label htmlFor="floatingInput">Name</label>
-                                                {/* {errors.name && <div className="invalid-feedback">{errors.name}</div>} */}
+                                                {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                                             </div>
                                         </div>
                                         <div className="col-md-12">
@@ -1782,12 +1832,17 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
                                                     type="number"
                                                     className={`form-control ${errors.priority ? 'is-invalid' : ''}`}
                                                     id="floatingInput1"
-                                                    value={pointData.priority}
+                                                    value={priority}
                                                     placeholder="Priority"
-                                                    onChange={(e) => handleInputChange("priority", e.target.value)}
+                                                    onChange={(e) => {
+                                                      setPriority(e.target.value);
+                                                      if (errors.priority) {
+                                                          setErrors((prev) => ({ ...prev, priority: null }));
+                                                      }
+                                                  }}
                                                 />
                                                 <label htmlFor="floatingInput1">Priority</label>
-                                                {/* {errors.priority && <div className="invalid-feedback">{errors.priority}</div>} */}
+                                                {errors.priority && <div className="invalid-feedback">{errors.priority}</div>}
                                             </div>
                                         </div>
                                     </div>
@@ -1799,7 +1854,7 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
                                 onClick={handleCreateCluster}
                                 type="button"
                                 className="modal_solidBtn"
-                                data-bs-dismiss="modal">
+                                >
                                 Confirm
                             </button>
                             <button type="button" className="modal_borderBtn" data-bs-dismiss="modal">
@@ -1812,6 +1867,8 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
         </>
     );
 }
+
+
 
 // date picker components
 

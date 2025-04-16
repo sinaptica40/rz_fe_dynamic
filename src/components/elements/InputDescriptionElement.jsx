@@ -1,7 +1,6 @@
 import React from 'react'
 
 function InputDescriptionElement({ areas, handleChange, errors, formValues, editNormeData }) {
-  console.log(errors,'check validation');
   return (
     <div className="col-md-12">
       <div className="form-floating">

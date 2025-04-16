@@ -1,8 +1,6 @@
 import React from "react";
 
 const LandingImageElement = ({areas}) => {
-
-    console.log("areas",areas);
     return (
         <>
             <div className="login_logoBox">

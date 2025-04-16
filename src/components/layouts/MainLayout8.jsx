@@ -145,7 +145,6 @@ const MainLayout6 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
                                 {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
@@ -185,7 +184,7 @@ const MainLayout6 = ({ areas }) => {
                                         <div key={index}>
                                             <div className="heading-bg-element mb-4">
                                                 <div className="heading-elm-itle">
-                                                {findAreaByKeyPrefix("ViewPageHeadingArea",{index})}
+                                                        {findAreaByKeyPrefix("ViewPageHeadingArea",{index})}
                                                 </div>
                                             </div>
                                             <div className="row row-gap">

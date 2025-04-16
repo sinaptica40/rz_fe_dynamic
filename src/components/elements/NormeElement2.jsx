@@ -50,26 +50,29 @@ const NormaElement2 = ({ areas, data, nestedElements, handleDeleteNorme, handleM
 
     return (
         <>
-            <div className="card-block-body">
+            <div className="pt-1">
                 <div className="table-responsive">
                     <table className="table m b-0">
                         <thead className="thbold">
                             <tr>
-                                {filteredData?.map((tableHead) => {
+                                {filteredData?.map((tableHead,index) => {
                                     return (
-                                        <th>
+                                        <th key={index}>
                                             {tableHead?.table_fields?.field_name}
                                         </th>
                                     )
                                 })}
+                                <th></th>
+                                <th></th>
+
                             </tr>
                         </thead>
                         <tbody>
                             {data?.data?.map((item, index) => {
                                 return (
-                                    <tr>
+                                    <tr key={index}>
                                        {item?.id_notification? 
-                                        <td>{item?.id_notification}</td> : 
+                                        <td>{index +1}</td> : 
                                         <td>
                                             <div>
                                                 <a className="pdf-file" href={item?.full_url}>
@@ -85,10 +88,10 @@ const NormaElement2 = ({ areas, data, nestedElements, handleDeleteNorme, handleM
 
                                         <td>
                                             <div className="table_action_list">
-                                                <a onClick={() => handleEdit(item?.id_standard)} className="table_actionBtn">
+                                                <a style={{cursor: "pointer"}} onClick={() => handleEdit(item?.id_standard)} className="table_actionBtn">
                                                     <img src={editRoute?.table_fields?.label} />
                                                 </a>
-                                                <a onClick={() => handleModal(item?.id_standard)} className="table_actionBtn">
+                                                <a style={{cursor: "pointer"}}  onClick={() => handleModal(item?.id_standard)} className="table_actionBtn">
                                                     <img src={deleteRoute?.table_fields?.label} />
                                                 </a>
                                             </div>
@@ -98,6 +101,12 @@ const NormaElement2 = ({ areas, data, nestedElements, handleDeleteNorme, handleM
                             })}
                         </tbody>
                     </table>
+
+                    {
+                                data?.data?.length === 0 ? (
+                                    <h4 className='text-center my-4' style={{ color: '#ecad42' }}>Nessun record trovato</h4>
+                                ) : null
+                            }
                 </div>
             </div>
             {showModal && (

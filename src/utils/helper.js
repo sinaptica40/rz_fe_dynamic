@@ -78,3 +78,12 @@ export function getPageId(key){
   const page = pages.find(p => p.page_name_label === key);
     return page ? page.parent_page_id : null; 
 }
+
+export function loadScript() {
+      const script = document.createElement("script");
+      script.src = "/assets/js/script.js";
+      script.type = "text/javascript";
+      // script.onload = () => console.log("Script loaded successfully!");
+      script.onerror = () => console.error("Failed to load the script.");
+      document.body.appendChild(script);
+}

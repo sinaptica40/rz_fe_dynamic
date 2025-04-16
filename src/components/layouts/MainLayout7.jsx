@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import moment from 'moment';
-import { useCreateInspectionMutation, useDeleInspectionMutation, useGetAddDropDownListQuery, useGetEditIDOrderQuery, useGetMachineryIDOrderQuery, useGetRzOrderQuery, useGetUserDetailsQuery, useUpdateInspectionMutation, useUploadExcelMutation } from "../../services/apiSlice";
+import { useCreateInspectionMutation, useDeleInspectionMutation, useGetAddDropDownListQuery, useGetEditIDOrderQuery, useGetMachineryIDOrderQuery, useGetRzOrderQuery, useGetUserDetailsQuery, useUpdateInspectionMutation, useUploadExcelMutation, useCreateInspectionDataMutation } from "../../services/apiSlice";
 import { toast } from "react-toastify";
 import { useMemo } from "react";
 import * as XLSX from "xlsx";
@@ -15,7 +15,7 @@ const MainLayout6 = ({ areas }) => {
     const userId = localStorage.getItem("user_id") ?? sessionStorage.getItem("user_id")
     const modalRef = useRef(null);
 
-    const id_order = localStorage.getItem("id_order");
+    const id_order = localStorage.getItem("ispenzioEditID");
     const AddRoute = localStorage.getItem("addRoute");
     const [customDropDownData, setCustomDropDownData] = useState(false);
     const [isExcelPopupOpen, setIsExcelPopupOpen] = useState(false);
@@ -35,7 +35,7 @@ const MainLayout6 = ({ areas }) => {
     const [isSelectActive, setIsSelectActive] = useState(false);
 
     const [editShowFormData, setEditShowFormData] = useState({});
-
+    const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState({});
     const [errorsForm1, setErrorsForm1] = useState({});
 
@@ -183,7 +183,6 @@ const MainLayout6 = ({ areas }) => {
         return acc;
     }, undefined);
 
-    console.log(AddRoute,"add route", editroute, "edit route", route,"param route");
     // api calls 
     const { data: dropdownList, refetch: refetchDropDown } = useGetAddDropDownListQuery(filterApi?.getDropDownUrl);
     const { data: rzOrderdetails, refetch, isFetching } = useGetRzOrderQuery({
@@ -215,7 +214,7 @@ const MainLayout6 = ({ areas }) => {
 
     const [deleInspection] = useDeleInspectionMutation()
 
-    const [createInspection] = useCreateInspectionMutation();
+    const [createInspectionData] = useCreateInspectionDataMutation();
 
     const [updateInspection] = useUpdateInspectionMutation();
 
@@ -235,7 +234,6 @@ const MainLayout6 = ({ areas }) => {
 
     useEffect(() => {
         const rzData = rzOrderdetails?.data;
-
         setClientformData({
             description: rzData?.description,
             created_by: rzData?.created_by_name,
@@ -251,6 +249,14 @@ const MainLayout6 = ({ areas }) => {
             inspector_name: inspectorData?.name,
             inspectorId: { inspectorId: inspectorData?.id_ispector },
         })
+
+    
+        if(rzData?.id_state?.id_state !== 1){
+            setStatus(rzData?.id_state)
+        }else{
+            setStatus({ id_state: 2, state: "Pianificata" })
+        }
+        
 
         setshowFormData(rzOrderdetails)
         refetchDropDown();
@@ -292,28 +298,8 @@ const MainLayout6 = ({ areas }) => {
     }
 
     const handleSelectMachineryTopology = (selectedOption) => {
-        console.log(selectedOption?.__isNew__,'check select option')
 
         if (selectedOption?.__isNew__) {
-            // setFormData({
-            //     topologyDefaultValues: "",
-            //     normedefaultValue: "",
-            //     defaultValue: "",
-            //     brand_name: "",
-            //     typology: "",
-            //     machineId: "",
-            //     atex: "",
-            //     ce: "",
-            //     inspectorId: "",
-            //     norm_specification: [],
-            //     year: "",
-            //     areaId: "",
-            //     norm: "",
-            //     arealavoe_defaultvalue: "",
-            //     notes: "",
-            //     normeDellData: [],
-            //     MachineryData: []
-            // });
             setNormeOptions(null)
             setMachineryID(null)
             setCustomDropDownData(true);
@@ -321,25 +307,6 @@ const MainLayout6 = ({ areas }) => {
         }
         if (!selectedOption?.__isNew__) {
             setMachineryID(null);
-            // setFormData({
-            //     topologyDefaultValues: "",
-            //     normedefaultValue: "",
-            //     defaultValue: "",
-            //     brand_name: "",
-            //     typology: "",
-            //     machineId: "",
-            //     atex: "",
-            //     ce: "",
-            //     inspectorId: "",
-            //     norm_specification: [],
-            //     year: "",
-            //     areaId: "",
-            //     norm: "",
-            //     arealavoe_defaultvalue: "",
-            //     notes: "",
-            //     normeDellData: [],
-            //     MachineryData: []
-            // });
             setNormeOptions(null)
             setTopologyName(selectedOption.value);
         }
@@ -347,7 +314,6 @@ const MainLayout6 = ({ areas }) => {
 
 
     const handleSelectNormeListing = (selectedOption) => {
-        // setCustomDropDownData(true);
         setNormeOptions(selectedOption);
         setFormData((prevData) => ({
             ...prevData,
@@ -404,6 +370,7 @@ const MainLayout6 = ({ areas }) => {
         setShowNextForm(false);
         setAddButtonApi(false);
         setshowButton(null)
+        setErrors({})
     };
 
     // function for  delete inspection in add form  
@@ -417,6 +384,7 @@ const MainLayout6 = ({ areas }) => {
 
             if (response?.data?.status == "SUCCESS") {
                 toast.success(response?.data?.message);
+                handleClose();
                 refetch();
                 setShowModal(false);
                 showNextForm(false);
@@ -464,14 +432,12 @@ const MainLayout6 = ({ areas }) => {
 
     const handleSelectMachinery = (selectedoption) => {
         if (selectedoption?.__isNew__) {
-            // console.log(formData,'check form data');
             setCustomDropDownData(true);
             setFormData({
                 ...formData,
                 machineName: selectedoption,
                 name: selectedoption.label,
             });
-            // setTopologyName(selectedoption.value);
 
         }
         if (!selectedoption?.__isNew__) {
@@ -581,14 +547,15 @@ const MainLayout6 = ({ areas }) => {
             setStatus({ state: datas?.order_state, id_state: datas?.id_state });
             handleSelectMachinery({ value: datas?.machine_name, label: datas?.machine_name })
             setFormData(newdata);
-
         }
     }, [editOrderData])
+
 
 
     // function for Submit Form 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true)
         if (!validateForm() && showButton == "add") {
             return;
         }
@@ -645,7 +612,7 @@ const MainLayout6 = ({ areas }) => {
                 };
                 
                 if (showButton == "add" || showButton == "excel") {
-                    const response = await createInspection({
+                    const response = await createInspectionData({
                         url: filterApi?.createInspectionUrl,
                         method: filterApi.CreateInspectionMethod,
                         body: customDropDownData ? newBody : body,
@@ -680,8 +647,10 @@ const MainLayout6 = ({ areas }) => {
                         setTopologyName(null);
                         setNormeOptions([])
                         setCustomDropDownData(false);
+                        setLoading(false)
                     }
                     else {
+                        setLoading(false)
                         toast.error(response?.data?.message);
                     }
                 }
@@ -749,7 +718,7 @@ const MainLayout6 = ({ areas }) => {
     
                 if (response?.status == "SUCCESS") {
                     toast.success(response?.message);
-    
+                    setLoading(false)
                     setShowNextForm(false)
                     setData(null);
                     setNormeOptions([])
@@ -763,11 +732,13 @@ const MainLayout6 = ({ areas }) => {
                     refetch();
     
                 } else if (response?.data?.status == "ERROR" || response?.data?.status == "FAIL") {
+                    setLoading(false)
                     toast.error(response?.message);
                 }
             } catch (error) {
                 console.log(error);
                 toast.error(error?.message);
+                setLoading(false)
             }
                
               }
@@ -797,7 +768,7 @@ const MainLayout6 = ({ areas }) => {
     // function for Edited Data
     const submitEditedForm = async () => {
         try {
-
+            setLoading(true)
             let body = {
                 // machineId: formData.machineId,
                 description: clientformData?.description,
@@ -857,7 +828,7 @@ const MainLayout6 = ({ areas }) => {
 
             if (response?.data?.status == "SUCCESS") {
                 toast.success(response?.data?.message);
-
+                setLoading(false)
                 setShowNextForm(false)
                 setFormData({
                     topologyDefaultValues: "",
@@ -892,11 +863,13 @@ const MainLayout6 = ({ areas }) => {
                 refetch();
 
             } else if (response?.data?.status == "ERROR" || response?.data?.status == "FAIL") {
+                setLoading(false)
                 toast.error(response?.data?.message);
             }
 
         } catch (error) {
             console.log("error", error);
+            setLoading(false)
         }
 
     }
@@ -1002,7 +975,7 @@ const MainLayout6 = ({ areas }) => {
 
     return (
         <>
-            {(isFetching || editedDataFetching) && (<Loader />)}
+            {(isFetching || editedDataFetching || loading) && (<Loader />)}
             <div className="loader-wrapper" style={{ display: "none" }}>
                 <div className="loader">
                     <img src="img/logo.png" alt="" />
@@ -1048,7 +1021,6 @@ const MainLayout6 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
                                 {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
@@ -1110,7 +1082,6 @@ const MainLayout6 = ({ areas }) => {
                                         {findAreaByKeyPrefix('EditArea13', { machineTypology, handleSelectMachineryTopology, formData, errors, topologyName }) || <div>- -</div>}
                                         {findAreaByKeyPrefix('EditArea14', { MachineryData: formData?.MachineryData, formData, handleSelectChange, errors, MachineryID }) || <div>- -</div>}
                                         {findAreaByKeyPrefix('EditArea10', { normeDellData: formData?.normeDellData, handleSelectMachinery, formData, errors }) || <div>- -</div>}
-                                        {/* {findAreaByKeyPrefix('EditArea15', { formValues: formData.year, formName: { name: "year", type: "number" }, ...(customDropDownData && { handleNotes: handleYear, formData }) }) || <div>- -</div>} */}
                                         {findAreaByKeyPrefix('EditArea15', { formValues: formData.year, formName: { name: "year", type: "number" }, handleNotes: handleYear, formData }) || <div>- -</div>}
 
                                         {findAreaByKeyPrefix('EditArea17', {
@@ -1119,11 +1090,8 @@ const MainLayout6 = ({ areas }) => {
                                         }) || <div>- -</div>}
                                         <div className="col-md-4">
                                             <div className="form-custom-check inline-check ccmt-50">
-                                                {/* {findAreaByKeyPrefix('EditCheckArea1', { formValues: formData, ...(customDropDownData && { handleChange: handleChangeeditCheckBox1 }) }) || <div>- -</div>} */}
                                                 {findAreaByKeyPrefix('EditCheckArea1', { formValues: formData,  handleChange: handleChangeeditCheckBox1  }) || <div>- -</div>}
-
                                                 {findAreaByKeyPrefix('EditCheckArea2', { formValues: formData, handleChange: handleChangeeditCheckBox2  }) || <div>- -</div>}
-                                                {/* {findAreaByKeyPrefix('EditCheckArea2', { formValues: formData, ...(customDropDownData && { handleChange: handleChangeeditCheckBox2 }) }) || <div>- -</div>} */}
                                             </div>
                                         </div>
                                         {findAreaByKeyPrefix('EditArea12', { handleSelectArea, formData, workingListing, errors }) || <div>- -</div>}

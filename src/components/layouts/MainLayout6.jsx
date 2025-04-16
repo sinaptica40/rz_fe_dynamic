@@ -48,7 +48,6 @@ const MainLayout5 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
                                 {findAreaByKeyPrefix('HeaderArea4') || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />

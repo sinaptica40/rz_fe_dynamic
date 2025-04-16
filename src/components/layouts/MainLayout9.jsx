@@ -3,6 +3,7 @@ import {useDeleteNotificheMutation, useGetNotificheQuery, useGetUserDetailsQuery
 import { useLocation, useParams } from "react-router-dom";
 import Loader from "../../lib/loader/loader";
 import { toast } from 'react-toastify';
+import Swal from "sweetalert2";
 
 const MainLayout3 = ({ areas }) => {
     const loaction = useLocation();
@@ -123,7 +124,19 @@ const MainLayout3 = ({ areas }) => {
 
 
     const handleDeleteNotifiche = async() =>{
+        const result = await Swal.fire({
+            title: "Sei sicuro?",
+            text: "Non potrai più tornare indietro!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sì, cancellalo!",
+            cancelButtonText: "Cancellare",
+          });
+  
         try {
+            if (result.isConfirmed) {
             const res = await deleteNotifiche({
                 url: deleteapi.apiURL,
                 method: deleteapi.apiMethod,
@@ -132,11 +145,12 @@ const MainLayout3 = ({ areas }) => {
             if (res?.data?.status === "SUCCESS") {
                 toast.success(res?.data?.message);
                 refetch();
-            } else if (res?.error) {
-                toast.error(res?.error?.data?.message);
+              }else if(res?.data?.status === "ERROR" || res?.data?.status === "FAIL"){
+                  toast.error(res?.data?.message);
+                }
             }
         } catch (error) {
-            toast.error(error)
+            console.log(error);
         }
     }
 
@@ -194,7 +208,6 @@ const MainLayout3 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
                                 {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
@@ -206,10 +219,9 @@ const MainLayout3 = ({ areas }) => {
             </header>
             <div className="webcontent-wrapper">
                 <div className="container-fluid p-0">
-                <div className="card-header">
-                <div className="card-title">
-                    <span className="title-icon">
-                        <svg
+                <a  className="dash_navTitle">
+                <span className="icon_holder">
+                <svg
                             width="23"
                             height="26"
                             viewBox="0 0 23 26"
@@ -221,11 +233,9 @@ const MainLayout3 = ({ areas }) => {
                                 fill="#ECAD42"
                             />
                         </svg>
-                    </span>
-                    <span>{"Notifiche"}</span>
-                </div>
-            </div>
-
+                </span>
+                Notifiche
+            </a>
             <div className="col-lg-12 p-0">
                 <div className="cards-block Ispezioni-block">
                      <div className="card-header border-0 pb-0 add-form-header">
@@ -235,9 +245,9 @@ const MainLayout3 = ({ areas }) => {
                             </div>
                         </div>
                         {data?.data?.length > 0 &&
-                            <div>
-                        {findAreaByKeyPrefix("ButtonArea", {handleDeleteNotifiche})}
-                        </div>
+                            <div className="">
+                                    {findAreaByKeyPrefix("ButtonArea", {handleDeleteNotifiche})}
+                            </div>
                         }
 
                     </div> 

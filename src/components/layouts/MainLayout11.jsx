@@ -2,12 +2,13 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import { useGetInspectionOrderDataQuery, useGetUserDetailsQuery } from "../../services/apiSlice";
 import Loader from "../../lib/loader/loader";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setPageOpen } from "../../store/pageSlice";
 const MainLayout11 = ({ areas }) => {
-  const order_id = localStorage.getItem("id_order")
+  const order_id = localStorage.getItem("ispenzioEditID")
   const isPageOpen = useSelector((state) => state.page.isPageOpen);
   const [page, setPage] = useState(0)
-
+  const dispatch = useDispatch()
   const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
     const area = areas.find(
       (area) => area?.key && area?.key.startsWith(prefix)
@@ -148,7 +149,6 @@ const MainLayout11 = ({ areas }) => {
                 {findAreaByKeyPrefix("HeaderArea1") || <div>- -</div>}
                 <div className="overlay" style={{ display: "none" }} />
                 {findAreaByKeyPrefix("HeaderArea2") || <div>- -</div>}
-                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
                 {findAreaByKeyPrefix("HeaderArea4", { userDetails }) || <div>- -</div>}
                 <button className="navbar-toggler" type="button">
                   <span className="navbar-toggler-icon" />
@@ -161,7 +161,7 @@ const MainLayout11 = ({ areas }) => {
       {/* Side Nav Report */}
       <div className="layout">
       <div className="side_nav">
-        <a href="javascript:void(0);" className="dashIconClose">
+        <a style={{cursor: "pointer"}} className="dashIconClose" onClick={() => dispatch(setPageOpen(false))}>
           {/* SVG Icon */}
           <svg
             width="17"

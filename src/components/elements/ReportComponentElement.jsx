@@ -5,6 +5,7 @@ import { useDeleteReportMutation, useGenerateReportsMutation, useGetRevisionRepo
 import { useDispatch } from "react-redux";
 import Swal from 'sweetalert2'
 import { setIsUpdate, setPageOpen } from "../../store/pageSlice";
+import Loader from "../../lib/loader/loader";
 const ReportComponentElement = ({ areas, page , inspectionData, areadata}) => {
   const id_order = localStorage.getItem('id_order')
   const dispatch = useDispatch();
@@ -61,8 +62,8 @@ const ReportComponentElement = ({ areas, page , inspectionData, areadata}) => {
               fill="none"
             >
               <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
+                fillRule="evenodd"
+                clipRule="evenodd"
                 d="M0.603669 0.690378C0.802481 0.497088 1.12482 0.497088 1.32363 0.690377L5.39636 4.64997C5.49183 4.74279 5.54547 4.86869 5.54547 4.99996C5.54547 5.13122 5.49183 5.25712 5.39636 5.34994L1.32363 9.30953C1.12482 9.50282 0.802481 9.50282 0.603669 9.30953C0.404856 9.11624 0.404856 8.80286 0.603669 8.60957L4.31641 4.99996L0.603669 1.39034C0.404856 1.19705 0.404856 0.883667 0.603669 0.690378Z"
                 fill="#ECAD42"
               />
@@ -70,7 +71,7 @@ const ReportComponentElement = ({ areas, page , inspectionData, areadata}) => {
           </div>
         </a>
         <div className="contentBox">
-          <a href="/" className="close-iconBtn">
+          <a href="/report" className="close-iconBtn">
             <svg
               width="26"
               height="26"
@@ -89,7 +90,7 @@ const ReportComponentElement = ({ areas, page , inspectionData, areadata}) => {
             <div>{inspectionData?.data?.order_code}</div>
             <div>
               Data Inizio Ispezione
-              <span> {moment(inspectionData?.data?.update_at).format('YYYY-MM-DD')}</span>
+              <span> {moment(inspectionData?.data?.create_at).format('YYYY-MM-DD')}</span>
             </div>
           </div>
           <div className="report_innerBox">
@@ -319,23 +320,26 @@ const ReportDocs = ({id, areas}) =>{
       page: currentPage
     }
   });
+  const [loading, setLoading] =useState(false);
   const [generateReports] = useGenerateReportsMutation()
   const [deleteReport] = useDeleteReportMutation();
 
   // generate Reports
   const generateReport = async() => {
+    setLoading(true)
       await generateReports(id).unwrap().then((res) =>{
         if(res.status === "SUCCESS"){
           toast.success(res?.message)
+          setLoading(false)
           refetch();
         }
       }).catch((err) => {
+        setLoading(false)
         toast.error("Something went wrong");
         console.log(err)})
   }
 
   const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
-    console.log('is this function is running');
     const area = areas?.find(area => area?.key && area?.key.startsWith(prefix));
     if (area) {
         const deepCloneChildren = (children, extraProps) => {
@@ -374,15 +378,15 @@ const totalDocuments = reports?.pagination?.total_items;
 
 const handleDeleteReport = async(id) =>{
   const result = await Swal.fire({
-    title: 'Are you sure?',
-    text: "You won't be able to revert this!",
-    icon: 'warning',
+    title: "Sei sicuro?",
+    text: "Non potrai più tornare indietro!",
+    icon: "avvertimento",
     showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel'
-});
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Sì, cancellalo!",
+    cancelButtonText: "Cancellare",
+  });
 
 if (result.isConfirmed) {
     await deleteReport(id).unwrap().then((res) =>{
@@ -397,6 +401,8 @@ if (result.isConfirmed) {
     })
 }
 }
+
+if(loading) return <Loader />
 
   return (
     <div>
@@ -446,7 +452,8 @@ if (result.isConfirmed) {
                     <tbody>
                       {reports?.data?.map((item, index) => (
                         <tr>
-                          <td>{index + 1}</td>
+                          {/* <td>{index + 1}</td> */}
+                          <td>{(currentPage - 1) * perPageItem + index + 1}</td>
                           <td>{item?.report_name.replace(".pdf", "")}</td>
                           <td>{moment(item?.time).format("YYYY-MM-DD")}</td>
                           <td className="table_action_list">
@@ -468,11 +475,11 @@ if (result.isConfirmed) {
                                 >
                                   <g
                                     id="SVGRepo_bgCarrier"
-                                    stroke-width="0"
+                                    strokeWidth="0"
                                   ></g>
                                   <g
                                     id="SVGRepo_tracerCarrier"
-                                    stroke-linecap="round"
+                                    strokeLinecap="round"
                                     stroke-linejoin="round"
                                   ></g>
                                   <g id="SVGRepo_iconCarrier">
@@ -480,15 +487,15 @@ if (result.isConfirmed) {
                                     <path
                                       d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15"
                                       stroke="#f8ba35"
-                                      stroke-width="1.9200000000000004"
-                                      stroke-linecap="round"
+                                      strokeWidth="1.9200000000000004"
+                                      strokeLinecap="round"
                                       stroke-linejoin="round"
                                     ></path>{" "}
                                     <path
                                       d="M12 3V16M12 16L16 11.625M12 16L8 11.625"
                                       stroke="#f8ba35"
-                                      stroke-width="1.9200000000000004"
-                                      stroke-linecap="round"
+                                      strokeWidth="1.9200000000000004"
+                                      strokeLinecap="round"
                                       stroke-linejoin="round"
                                     ></path>{" "}
                                   </g>
@@ -512,8 +519,8 @@ if (result.isConfirmed) {
                                 <path
                                   d="M1.5 5.5138H24.859M10.844 11.3538V17.1938M15.516 11.3538V17.1938M3.836 5.5138H22.523L20.677 22.1218C20.6137 22.6934 20.3418 23.2215 19.9134 23.6052C19.485 23.9888 18.9301 24.2008 18.355 24.2008H8C7.42544 24.2001 6.87129 23.9877 6.44348 23.6042C6.01567 23.2206 5.74421 22.6929 5.681 22.1218L3.836 5.5138ZM7.743 2.1818C7.93182 1.78122 8.23061 1.44256 8.60455 1.20531C8.97848 0.968063 9.41215 0.841992 9.855 0.841797H16.5C16.9432 0.841612 17.3773 0.967505 17.7516 1.20478C18.1259 1.44205 18.425 1.78091 18.614 2.1818L20.184 5.5138H6.172L7.743 2.1818Z"
                                   stroke="currentcolor"
-                                  stroke-width="1.5"
-                                  stroke-linecap="round"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
                                   stroke-linejoin="round"
                                 ></path>
                               </svg>
@@ -523,6 +530,15 @@ if (result.isConfirmed) {
                       ))}
                     </tbody>
                   </table>
+
+                  {reports?.data?.length === 0 ? (
+                    <h4
+                      className="text-center my-4"
+                      style={{ color: "#ecad42" }}
+                    >
+                      Nessun record trovato
+                    </h4>
+                  ) : null}
                 </div>
 
                 {/* pagination */}

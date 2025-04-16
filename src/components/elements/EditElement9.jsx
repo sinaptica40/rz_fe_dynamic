@@ -3,7 +3,6 @@ import CreatableSelect from "react-select/creatable";
 
 const EditElement9 = ({ areas, formData, formValues, ispectorListing, handleSelectIspector, errors }) => {
   const { element_data } = areas;
-  console.log(formValues,"formvalue",formData,'check form vlaue id of inspectior')
   const defaultOption = ispectorListing?.find(machine => machine?.id_ispector === formValues);
   return (
     <>

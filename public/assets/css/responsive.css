@@ -218,6 +218,12 @@
 }
 
 @media (max-width: 1199.98px) {
+  .card-header.add-form-header {
+    padding-top: 20px;
+}
+.card-header {
+  padding: 15px 16px;
+}
   .webcontent-wrapper {
     min-height: calc(100lvh - 110px);
   }
@@ -292,9 +298,7 @@
     font-size: 22px;
   }
 
-  .tableFont24 table .thbold tr th {
-    font-size: 20px;
-  }
+
   /*  */
   .right_notfiMenu {
     margin-left: 30px;
@@ -322,7 +326,6 @@
   }
 
   .Ispezioni-block {
-    margin: 0;
     height: auto;
   }
 
@@ -447,18 +450,16 @@
     margin-bottom: 40px;
   }
 
-  .Ispezioni-block {
-    margin: 0;
-  }
+
 
   .Ispezioni-block.calender-block {
     margin-top: 15px;
   }
 
   .card-header {
-    align-items: flex-start;
+    align-items: center;
     padding: 15px 30px;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 32px;
   }
 
@@ -537,10 +538,6 @@
     margin-bottom: 18px;
   }
 
-  .tableFont24 table .thbold tr th {
-    font-size: 19px;
-  }
-
   .reportNormativa {
     font-size: 19px;
   }
@@ -588,6 +585,7 @@
   .app.is-folded .side_nav {
     width: 100%;
     left: 0;
+    padding-top: 40px;
   }
 
   .app .side_nav {
@@ -938,6 +936,45 @@
 }
 
 @media (max-width: 767.98px) {
+  .records_photographyImg img  , .records_photographyImg canvas {
+    width: 100%;
+  }
+  .reportNormativa h4 {
+    font-size: 18px;
+    white-space: nowrap;
+    margin: 0;
+}
+  .reportHeader {
+    gap: 10px;
+    flex-wrap: wrap;
+    overflow: unset;
+}
+  .reportHeader {
+    padding-bottom: 9px;
+}
+::-webkit-scrollbar {
+  width: 7px;
+}
+  .sezione_tableTitle {
+    font-size: 22px;
+}
+.tab_previewBox .nav-link {
+  font-size: 20px;
+  padding: 0px 23px 0;
+  height: 44px;
+}
+  .records_photography_box {
+    flex-direction: column;
+    margin-bottom: 0px;
+    padding-bottom: 0;
+}
+.records_photographyImg img, .records_photographyImg canvas {
+  max-height: 600px;
+  min-height: 400px;
+}
+.right_photographyList li {
+  padding-bottom: 25px;
+}
   .app .side_nav {
     top: 89px;
 }
@@ -996,17 +1033,17 @@
     height: auto;
   }
 
-  .Ispezioni-block {
-    margin: 0;
-  }
+ 
 
   .card-header {
-    align-items: flex-start;
+    align-items: center;
     padding: 15px 30px;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 32px;
   }
-
+  .btn-primary {
+    min-width: 150px;
+}
   .card-title {
     font-size: 23px;
   }
@@ -1131,17 +1168,60 @@
   }
 
   .btn-default {
-    padding-top: 7px;
-    padding-bottom: 6px;
+    padding-top: 11px;
+    padding-bottom: 10px;
   }
 
   .btn-primary {
     font-size: 16px;
-    padding: 8px 10px;
-  }
+    padding: 12px 15px 13px;
+}
 }
 
 @media (max-width: 575.98px) {
+  
+  .save_photoBtn {
+    padding: 9px 18px;
+    font-size: 17px;
+}
+.finalizza_cardBox h3 {
+  font-size: 18px;
+  min-height: 50px;
+}
+.generate_aiBtn {
+  padding: 7px 18px;
+  font-size: 15px;
+}
+button.generate_aiBtn svg {
+  width: 19px;
+  height: 19px;
+}
+.modal_borderBtn , .modal_solidBtn {
+  font-size: 16px;
+  padding: 8px 15px;
+  min-width: 145px;
+}
+.finalizza_cardBox img {
+  max-width: 37px;
+  max-height: 37px;
+  margin-bottom: 13px;
+}
+.salvaDeletaBTn{
+  display: flex;
+  gap: 15px;
+}
+.right_photographyBtn {
+  padding: 30px 16px 20px;
+  flex: 0 0 260px;
+}
+  .ccmt-50 {
+    margin-bottom: 26px;
+    margin-top: 10px;
+}
+  .otp_inout_box .otp-field {
+    width: 50px;
+    font-size: 17px;
+}
   .user_dropdown img {
     height: 40px;
     width: 40px;
@@ -1150,7 +1230,7 @@
   }
 
   table .thbold tr th {
-    font-size: 15px;
+    font-size: 16px !important;
   }
 
   .form-btn-sets {
@@ -1168,13 +1248,13 @@
 
   .btn-primary {
     font-size: 15px;
-    padding: 8px 18px;
-    min-width: 100%;
+    padding: 12px 18px;
+    /* width: 100%; */
   }
 
   .btn-default {
-    padding-top: 8px;
-    padding-bottom: 7px;
+    padding-top: 11px;
+    padding-bottom: 10px;
   }
 
   .heading-bg-element {

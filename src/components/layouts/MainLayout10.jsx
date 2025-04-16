@@ -5,6 +5,7 @@ import { useGetOdersIspezione1Query, useGetUserDetailsQuery } from "../../servic
 const MainLayout10 = ({ areas }) => {
 
     const [searchText1, setSearchText1] = useState("");
+    const [debouncedSearchText, setDebouncedSearchText] = useState(searchText1);
     const [currentPage1, setCurrentPage1] = useState(1);
     const [showModal, setShowModal] = useState();
     const modalRef = useRef(null);
@@ -76,6 +77,21 @@ const MainLayout10 = ({ areas }) => {
             };
         }
     }, [showModal]);
+    const debounceDelay = 500;
+
+// Update the debounced search text after the delay
+useEffect(() => {
+    const handler = setTimeout(() => {
+        setDebouncedSearchText(searchText1);
+    }, debounceDelay);
+
+    // Clean up the previous timeout if searchText1 changes before the delay
+    return () => {
+        clearTimeout(handler);
+    };
+}, [searchText1]);
+
+
 
     const { data: TableData1, isFetching: isFetching1, refetch } = useGetOdersIspezione1Query({
         endpointName: getapi.getOdersIspezione,
@@ -83,7 +99,7 @@ const MainLayout10 = ({ areas }) => {
         params: {
             id_state: 0,
             page: currentPage1,
-            ...(searchText1 ? { search: searchText1 } : {}),
+            ...(debouncedSearchText ? { search: debouncedSearchText } : {}),
         },
         refetchOnMountOrArgChange: true,
     })
@@ -149,7 +165,6 @@ const MainLayout10 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
                                 {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
@@ -163,7 +178,7 @@ const MainLayout10 = ({ areas }) => {
                 <div className="container-fluid p-0">
                     <div className="row">
                         <div className="col-lg-12">
-                            <div className="cards-block Ispezioni-block">
+                            <div className="cards-block Ispezioni-block card-block-body">
                                 <div className="card-header border-0 add-form-header pb-0">
                                     <div className="card-title">
                                         {findAreaByKeyPrefix('IspezioniFormArea2') || <div>- -</div>}
@@ -171,7 +186,7 @@ const MainLayout10 = ({ areas }) => {
                                     </div>
                                     {findAreaByKeyPrefix('IspezioniSearchArea2', { searchText: searchText1, setSearchText: setSearchText1 }) || <div>- -</div>}
                                 </div>
-                                <div className="card-block-body">
+                                <div className="pt-1">
                                     {findAreaByKeyPrefix('IspezioniArea1', { TableData1 }) || <div>- -</div>}
                                     {totalDocuments1 > perPageItem1 && (
                                         findAreaByKeyPrefix('PaginationArea1', { totalDocuments: totalDocuments1, currentPage: currentPage1, perPageItem: perPageItem1, handlePageClick }) || <div>- -</div>

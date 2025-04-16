@@ -5,13 +5,13 @@ const NormaElement1 = ({ api, data }) => {
     const navigate = useNavigate();
 
     const handleClick = (id_page) => {
-        console.log(id_page,'check page name for navigation')
         navigate(`${id_page}`);
     };
     
     return (
         <>
             <a
+            style={{cursor: "pointer"}}
                 onClick={() => handleClick(api?.function_name)}
                 className="dash_navTitle">
                 <span className="icon_holder">

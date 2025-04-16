@@ -11,6 +11,8 @@ const MainLayout2 = ({ areas }) => {
     const [currentPage2, setCurrentPage2] = useState(1);
     const [showModal, setShowModal] = useState();
     const [deletedInspectionId, setDeletedInspectionId] = useState(null);
+    const [debouncedSearch1, setDebouncedSearch1] = useState(searchText1);
+    const [debouncedSearch2, setDebouncedSearch2] = useState(searchText2);
     const modalRef = useRef(null);
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
         const area = areas.find(area => area?.key && area?.key.startsWith(prefix));
@@ -69,7 +71,6 @@ const MainLayout2 = ({ areas }) => {
     let getApis = areas.filter((item) => item?.props?.children?.props?.children?.props?.api != null
     ).reduce((acc, user) => {
         const key = user?.key;
-        console.log("MainBodyArea4", key)
         const functionName = user.props.children.props.children.props.api.function_name;
         const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
 
@@ -117,6 +118,7 @@ const MainLayout2 = ({ areas }) => {
                 tableTwoRefetch()
                 refetch()
             } else {
+                setShowModal(false)
                 toast.error(response?.data?.message);
             }
         } catch (error) {
@@ -130,7 +132,7 @@ const MainLayout2 = ({ areas }) => {
         params: {
             id_state: 0,
             page: currentPage2,
-            ...(searchText2 ? { search: searchText2 } : {}),
+            ...(debouncedSearch2 ? { search: debouncedSearch2 } : {}),
         },
         refetchOnMountOrArgChange: true,
     })
@@ -141,10 +143,27 @@ const MainLayout2 = ({ areas }) => {
         params: {
             id_state: 1,
             page: currentPage1,
-            ...(searchText1 ? { search: searchText1 } : {}),
+            ...(debouncedSearch1 ? { search: debouncedSearch1 } : {}),
         },
         refetchOnMountOrArgChange: true,
     })
+
+
+useEffect(() => {
+    const handler = setTimeout(() => {
+        setDebouncedSearch1(searchText1);
+    }, 500);
+
+    return () => clearTimeout(handler);
+}, [searchText1]);
+
+useEffect(() => {
+    const handler = setTimeout(() => {
+        setDebouncedSearch2(searchText2);
+    }, 500);
+
+    return () => clearTimeout(handler);
+}, [searchText2]);
 
     let perPageItem1 = TableData1?.pagination?.per_page;
     const totalDocuments1 = TableData1?.pagination?.total_items;
@@ -214,7 +233,6 @@ const MainLayout2 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
                                 {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
@@ -228,7 +246,7 @@ const MainLayout2 = ({ areas }) => {
                 <div className="container-fluid p-0">
                     <div className="row">
                         <div className="col-lg-12">
-                            <div className="cards-block Ispezioni-block">
+                            <div className="cards-block Ispezioni-block card-block-body">
                                 <div className="card-header border-0 add-form-header pb-0">
                                     <div className="card-title">
                                         {findAreaByKeyPrefix('IspezioniFormArea1') || <div>- -</div>}
@@ -236,7 +254,7 @@ const MainLayout2 = ({ areas }) => {
                                     </div>
                                     {findAreaByKeyPrefix('IspezioniSearchArea1', { searchText: searchText1, setSearchText: setSearchText1 }) || <div>- -</div>}
                                 </div>
-                                <div className="card-block-body">
+                                <div className="pt-1">
                                     {findAreaByKeyPrefix('IspezioniArea1', { TableData1 }) || <div>- -</div>}
                                     {totalDocuments1 > perPageItem1 && (
                                         findAreaByKeyPrefix('PaginationArea1', { totalDocuments: totalDocuments1, currentPage: currentPage1, perPageItem: perPageItem1, handlePageClick }) || <div>- -</div>
@@ -249,7 +267,7 @@ const MainLayout2 = ({ areas }) => {
                 <div className="container-fluid p-0">
                     <div className="row">
                         <div className="col-lg-12">
-                            <div className="cards-block Ispezioni-block">
+                            <div className="cards-block Ispezioni-block card-block-body">
                                 <div className="card-header border-0 add-form-header pb-0">
                                     <div className="card-title">
                                         {findAreaByKeyPrefix('IspezioniFormArea2') || <div>- -</div>}
@@ -257,7 +275,7 @@ const MainLayout2 = ({ areas }) => {
                                     </div>
                                     {findAreaByKeyPrefix('IspezioniSearchArea2', { searchText: searchText2, setSearchText: setSearchText2 }) || <div>- -</div>}
                                 </div>
-                                <div className="card-block-body">
+                                <div className="pt-1">
                                     {findAreaByKeyPrefix('IspezioniArea2', { TableData2, handleModal, modalRef, deleteInspection, showModal, setShowModal }) || <div>- -</div>}
                                     {totalDocuments2 > perPageItem2 && (
                                         findAreaByKeyPrefix('PaginationArea1', { totalDocuments: totalDocuments2, currentPage: currentPage2, perPageItem: perPageItem2, handlePageClick2 }) || <div>- -</div>

@@ -152,19 +152,19 @@ body.scroll-off {
 }
 
 .form-control::-webkit-input-placeholder {
-  color: #9c9c9c;
+  color: #757575;
 }
 
 .form-control::-moz-placeholder {
-  color: #9c9c9c;
+  color: #757575;
 }
 
 .form-control:-ms-input-placeholder {
-  color: #9c9c9c;
+  color: #757575;
 }
 
 .form-control:-moz-placeholder {
-  color: #9c9c9c;
+  color: #757575;
 }
 
 /*==================== User Dropdown Start ===================*/
@@ -1022,9 +1022,10 @@ footer h6 {
   font-size: 19px;
   font-weight: 700;
   color: #fff;
-  padding: 8px 25px;
+  padding: 12px 25px 15px 25px;
   min-width: 175px;
   border: 1px solid var(--rz-primary);
+  line-height: 1;
 }
 
 .btn-primary:hover {
@@ -1343,16 +1344,15 @@ footer h6 {
   display: block;
   width: 100%;
   height: auto;
-  padding: 8px 19px;
-  padding-top: 21px;
-  min-height: 55px;
+  padding: 10px 16px;
+  min-height: 50px;
   font-size: 1rem;
   color: #000;
   background-color: #fff;
-  border: 1px solid #dfe3e7;
-  border-radius: 0.267rem;
+  border: 1px solid #bebebe;
+  border-radius: 8px;
   -webkit-transition: border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  box-shadow 0.15s ease-in-out;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
@@ -1657,8 +1657,9 @@ svg.css-tj5bde-Svg {
     margin: 0 0 31px;
   }
   .login_sign_up_block .btn-primary {
-    font-size: 22px;
+    font-size: 20px;
     min-width: 125px;
+    padding: 14px 18px 16px;
   }
 }
 
@@ -1693,8 +1694,9 @@ svg.css-tj5bde-Svg {
     padding-right: 15px;
   }
   .login_sign_up_block .btn-primary {
-    font-size: 22px;
+    font-size: 19px;
     min-width: 125px;
+    padding: 14px 18px 16px;
   }
 }
 
@@ -2012,6 +2014,7 @@ svg.css-tj5bde-Svg {
   width: 280px;
   font-size: 16px;
   color: #009fff;
+  padding-bottom: 3px;
   font-weight: 600;
 }
 
@@ -2404,7 +2407,7 @@ svg.css-tj5bde-Svg {
   border: 0 !important;
   border-bottom: 1px solid #000 !important;
   padding: 0 0 3px 0 !important;
-  min-height: 26px !important;
+  min-height: 32px !important;
 }
 .react-select__indicator-separator{
   display: none;  
@@ -2606,7 +2609,7 @@ div#upload-filename\ upload-pdfNaam span{
   margin-left: 5px;
 }
 table .thbold tr th {
-  font-size: 18px;
+  font-size: 18px !important;
   color: #252525;
   font-weight: 600;
   border-bottom: 2px solid var(--rz-primary);
@@ -2771,7 +2774,7 @@ table .thbold tr th {
   min-height: 51px;
   font-style: italic;
   padding-bottom: 0;
-  padding-top: 19px;
+  padding-top: 8px;
   z-index: 3;
 }
 
@@ -2923,6 +2926,7 @@ table .thbold tr th {
   padding: 15px 14px;
   border-bottom: 2px solid #E5A940;
   margin-bottom: 21px;
+  gap: 15px;
 }
 
 .report_appliedUl {
@@ -2967,6 +2971,7 @@ table .thbold tr th {
   position: absolute;
   right: 30px;
   top: 20px;
+  cursor: pointer;
   display: none;
   z-index: 99;
 }
@@ -3155,8 +3160,8 @@ table .thbold tr th {
 
 .inputRightIcon {
   position: absolute;
-  right: 15px;
-  bottom: 5px;
+  right: 25px;
+  bottom: 20px;
   cursor: pointer;
 }
 
@@ -3175,6 +3180,9 @@ table .thbold tr th {
 .status_label_box {
   font-size: 16px;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .status_dropdownBox .action-btn {
@@ -3206,7 +3214,7 @@ table .thbold tr th {
   border-radius: 30px;
   background: #ECAD42;
   border: 0;
-  padding: 4px 18px;
+  padding: 8px 18px;
   color: #FFF;
   font-size: 17px;
   font-weight: 700;
@@ -3304,6 +3312,7 @@ table .thbold tr th {
   box-shadow: rgba(99, 99, 99, 0.1) -2px 0px 7px 0px;
   max-height: 850px;
   min-height: 600px;
+  width: calc(100% - 300px);
 }
 .right_photoSubItem {
   list-style: none;
@@ -3438,8 +3447,10 @@ table .thbold tr th {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-
 
 .rischi_checkBox {
   list-style: none;
@@ -3548,4 +3559,168 @@ table .thbold tr th {
 }
 .react-datepicker-popper {
   z-index: 2 !important;
+}
+
+.signaturePad_box {
+  max-width: 1301px;
+  margin: 0 auto;
+  box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.16);
+  filter: drop-shadow(0px 0px 7px rgba(0, 0, 0, 0.16));
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.signaturePad_title{
+  color: #000;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 13px;
+}
+
+ .signatureCanvas_max canvas{
+  max-height: 240px !important;
+  min-height: 240px !important;
+  /* width: 100%; */
+}
+
+
+.btn-secondry {
+  background-color: var(--rz-primary);
+  border-radius: 50px;
+  font-size: 19px;
+  font-weight: 700;
+  color: #fff;
+  padding: 8px 25px;
+  min-width: 175px;
+  cursor: pointer;
+  border: 1px solid var(--rz-primary);
+}
+
+.btn-secondry:hover {
+  color: var(--rz-primary);
+  background-color: transparent;
+  border: 1px solid var(--rz-primary);
+
+}
+
+
+/*  */
+.themeModal  .modal-header {
+  padding: 0 0 10px;
+  border-bottom: 1px solid #D9D8D7;
+}
+.themeModal  .modal-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+  color: #121212;
+}
+.themeModal  .modal-content {
+  padding: 15px 20px;
+  border-radius: 20px;
+}
+.themeModal  .modal-body {
+  padding: 20px 0 15px;
+}
+  .modal_form_desc{
+  font-size: 16px;
+  font-weight: 400;
+  color:#121212;
+  margin-bottom: 15px;
+
+}
+.themeModal  .form-label{
+  font-size: 16px;
+  font-weight: 500;
+  color:#000;
+  margin-bottom: 6px;
+}
+
+.otp_main_box{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+  margin: 25px 0 25px;
+}
+.otp_inout_box .otp-field{
+  font-weight: 600;
+  width: 70px;
+  height: 50px;
+  font-size: 20px;
+}
+.commento_placeAdd {
+  position: relative;
+}
+span.commento_placeTag {
+  position: absolute;
+  left: 0;
+  top: 1px;
+  z-index: 1;
+}
+.commento_placeAdd .form-control {
+  padding-left: 90px;
+}
+.dataTables_paginate  .pagination {
+  justify-content: center;
+  margin: 10px auto;
+}
+.dataTables_paginate  .page-link {
+  color: #ecad42;
+  text-decoration: none;
+}
+.dataTables_paginate  .page-item.active .page-link{
+  color: #fff;
+}
+.cardSearchIcon img {
+  width: 20px;
+  height: 20px;
+}
+.pagi_mainBoxFlex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 0 20px;
+}
+/*  */
+
+
+.signaturePad-section .signatureCanvas_max canvas,
+.records_photography_section canvas{
+  width: 100%;
+}
+.records_photography_row canvas {
+  width: 100%;
+}
+.commento_inputBox {
+  position: relative;
+}
+.status-box .dot_dropStatus{
+    display: inline-block;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+.commento_inputBox .form-floating {
+  position: relative;
+}
+.commento_inputBox .form-control{
+  padding-left: 90px;
+}
+.commento-text {
+  position: absolute;
+  top: 0;
+  color: #3c3c3c;
+}
+.inputRightIcon_track{
+  bottom: 0;
+  top: 0;
+}
+.space-0{
+  padding: 0px !important;
+  margin: 0px !important;
+}
+.form-floating>.form-control-plaintext~label::after, .form-floating>.form-control:focus~label::after, .form-floating>.form-control:not(:placeholder-shown)~label::after, .form-floating>.form-select~label::after{
+  background-color: transparent !important;
 }

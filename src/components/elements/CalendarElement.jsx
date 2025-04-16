@@ -123,26 +123,23 @@ const CalendarElement = ({ areas, calenderData, showModal, setShowModal, handleM
     const navigate = useNavigate();
 
     const isHighlightedDate = (date) => {
-        if (!calenderData || !calenderData.data) return false;
-        return calenderData.data.some((item) => new Date(item.date).toDateString() === date.toDateString());
+        if (!calenderData ) return false;
+        return calenderData?.some((item) => new Date(item.date).toDateString() === date?.toDateString());
     };
 
     const handleDateClick = (date) => {
-        const clickedDateData = calenderData.data.find(
-            (item) => new Date(item.date).toDateString() === date.toDateString()
+        const clickedDateData = calenderData?.find(
+            (item) => new Date(item.date).toDateString() === date?.toDateString()
         );
         if (clickedDateData) {
-            console.log(clickedDateData, 'clickedDateDataclickedDateData')
             setSelectedDateData(clickedDateData);
             setShowModal(true); // Open the modal
             const handleDateClick = (date) => {
-                const clickedDateData = calenderData.data.find(
-                    (item) => new Date(item.date).toDateString() === date.toDateString()
+                const clickedDateData = calenderData?.find(
+                    (item) => new Date(item.date).toDateString() === date?.toDateString()
                 );
                 if (clickedDateData) {
-                    console.log(clickedDateData, 'clickedDateDataclickedDateData')
                     setSelectedDateData(clickedDateData);
-                    console.log("selectedDate", selectedDateData)
                     setShowModal(true); // Open the modal
                     handleModal(clickedDateData);
                 }
@@ -150,9 +147,14 @@ const CalendarElement = ({ areas, calenderData, showModal, setShowModal, handleM
         }
     };
 
-    const ViewCalendarData = (id) => {
-        localStorage.setItem("order_Data", id)
-        navigate("/99");
+    const ViewCalendarData = (id, item) => {
+        localStorage.setItem('ispenzioViewID',id)
+        const newObj = {
+            client: item.client_name,
+            order_code: item.order_code
+        }
+        localStorage.setItem("order_Data", JSON.stringify(newObj))
+        navigate("/ispezioni-view");
     }
 
     return (
@@ -221,7 +223,7 @@ const CalendarElement = ({ areas, calenderData, showModal, setShowModal, handleM
                                                 <th>{item.order_code}</th>
                                                 <th>{item.description}</th>
                                                 <th>{item.state?.name}</th>
-                                                <th onClick={() => ViewCalendarData(item?.id_order)}>
+                                                <th onClick={() => ViewCalendarData(item?.id_order, item)}>
 
                                                     <svg
                                                         width={24}

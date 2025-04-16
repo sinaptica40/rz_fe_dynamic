@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useState } from "react";
 import { useGetCalenderQuery, useGetInspectionsOrderQuery, useGetNotificheOverviewQuery, useGetReportDashboardQuery, useGetUserDetailsQuery } from "../../services/apiSlice";
 
@@ -6,9 +6,7 @@ const MainLayout = ({ areas }) => {
     const [showModal, setShowModal] = useState(false);
 
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
-        console.log(prefix,'check is this prefix')
         const area = areas.find(area => area?.key && area?.key.startsWith(prefix));
-        // console.log(area,'check the area after prefix used');
         if (area) {
             const deepCloneChildren = (children, extraProps) => {
                 return React.Children.map(children, (child) => {
@@ -33,8 +31,6 @@ const MainLayout = ({ areas }) => {
         return null;
     };
 
-    console.log(areas,'check main layout areas')
-
     const handleModal = (clickedDateData) => {
         setShowModal(true);
     }
@@ -43,23 +39,9 @@ const MainLayout = ({ areas }) => {
     let getApi = areas.filter((item) => item?.props?.children?.props?.children?.props?.api != null
     ).reduce((acc, user) => {
         const key = user?.key;
-        console.log("MainBodyArea4", key)
         const functionName = user.props.children.props.children.props.api.function_name;
         const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
 
-        if (key?.includes("MainBodyArea4")) {
-            acc.getInspectionOrder = functionName;
-            acc.getOderApiMethod = api_Method;
-        }
-        if (key?.includes("MainBodyArea5")) {
-            acc.calenderApi = functionName;
-            acc.calenderApiApiMethod = api_Method;
-        }
-
-        if (key?.includes("MainBodyArea3-6")){
-            acc.notificationApi = functionName;
-            acc.notificationApiMethod = api_Method;
-        }
 
         if (key?.includes("MainBodyArea2-5")){
             acc.reportApi = functionName;
@@ -74,42 +56,20 @@ const MainLayout = ({ areas }) => {
         return acc;
     }, {})
 
-    const { data: inspectionData, isFetching: isFetchingOrder } = useGetInspectionsOrderQuery({
-        url: getApi.getInspectionOrder,
-        params: {
-            id_state: 0,
-        },
-        refetchOnMountOrArgChange: true,
-    },
-    );
-
-    const { data: calenderData, isFetching } = useGetCalenderQuery({
-        url: getApi.calenderApi,
-        refetchOnMountOrArgChange: true,
-    },
-    );
-
-    // notification
-    const {data: notifiches, isFetching: isFetchingNotifiche} = useGetNotificheOverviewQuery({
-        url: getApi.notificationApi,
-        method: getApi.notificationApiMethod
-    })
 
    // report list
-   const {data: reports, isFetching: isFetchingReports} = useGetReportDashboardQuery({
+   const {data, isFetching} = useGetReportDashboardQuery({
        url: getApi.reportApi,
        method: getApi.reportApiMethod,
    })
 
-   // user details
-   const {data: userDetails, error , refetch} = useGetUserDetailsQuery({
+//    // user details
+   const {data: userDetails, refetch} = useGetUserDetailsQuery({
        url: getApi?.userDetailsApi,
        method: getApi?.userDetailsApiMethod,
        refetchOnMountOrArgChange: true,
    })
 
-   
-   
 
     return (
         <>
@@ -156,7 +116,6 @@ const MainLayout = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
                                 {findAreaByKeyPrefix('HeaderArea4', {userDetails}) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
@@ -169,12 +128,12 @@ const MainLayout = ({ areas }) => {
             <div className="webcontent-wrapper">
                 <div className="row g-xxl-5">
                     {findAreaByKeyPrefix('MainBodyArea1')}
-                    {findAreaByKeyPrefix('MainBodyArea2', { reports })}
-                    {findAreaByKeyPrefix('MainBodyArea3', { notifiches })}
+                    {findAreaByKeyPrefix('MainBodyArea2', { reports: data?.data?.reportList })}
+                    {findAreaByKeyPrefix('MainBodyArea3', { notifiches: data?.data?.notificationsList })}
                 </div>
                 <div className="row g-xxl-5">
-                    {findAreaByKeyPrefix('MainBodyArea4', { inspectionData })}
-                    {findAreaByKeyPrefix('MainBodyArea5', { calenderData, showModal, setShowModal, handleModal })}
+                    {findAreaByKeyPrefix('MainBodyArea4', { inspectionData: data?.data?.orderList })}
+                    {findAreaByKeyPrefix('MainBodyArea5', { calenderData: data?.data?.calendarList, showModal, setShowModal, handleModal })}
                 </div>
             </div>
         </>

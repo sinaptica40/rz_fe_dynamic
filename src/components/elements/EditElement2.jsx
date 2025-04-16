@@ -3,7 +3,7 @@ import React from "react";
 const EditElement2 = ({ areas, handleSubmit }) => {
   return (
     <div onClick={handleSubmit}>
-      <span className="check-icon" >
+      <span className="check-icon">
         <svg
           width={14}
           height={10}
@@ -21,7 +21,7 @@ const EditElement2 = ({ areas, handleSubmit }) => {
       </span>{" "}
       {areas?.element_data.block_name}
     </div>
-  )
-}
+  );
+};
 
-export default EditElement2
+export default EditElement2;

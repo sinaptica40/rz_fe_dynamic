@@ -68,8 +68,6 @@ const MainLayout4 = ({ areas }) => {
         const functionName = user.props.children.props.children.props.api.function_name;
         const api_Method = user?.props?.children?.props?.children?.props?.api?.method_type;
 
-        console.log("functionName", functionName);
-
         if (key.includes("FormArea14")) {
             acc.addMachinery = functionName;
             acc.addMachineryApiMethod = api_Method;
@@ -174,7 +172,6 @@ const MainLayout4 = ({ areas }) => {
                     norm_specification: previouslySelected,
                 }));
             }
-            console.warn("Final formValues:", formValues);
         }
     }, [editNormedata, isFetching]);
 
@@ -216,7 +213,7 @@ const MainLayout4 = ({ areas }) => {
         if (name === "year" && value !== "" && !Number.isInteger(Number(value))) {
             setErrors((prevErrors) => ({
                 ...prevErrors,
-                year: "Please enter a valid year. The value must be a number.",
+                year: "Inserisci un anno valido. Il valore deve essere un numero.",
             }));
             return;
         }
@@ -262,22 +259,6 @@ const MainLayout4 = ({ areas }) => {
             newErrors.typology = "è richiesta la tipologia";
         }
 
-        // if (!formValues.id_standard_type) {
-        //     newErrors.id_standard_type = "Blocco Norme Base is required.";
-        // }
-
-        // if (!formValues.year) {
-        //     newErrors.year = "Costrizione is required.";
-        // }
-
-        // if (formValues.year.toString().length > 5) {
-        //     newErrors.year = "Costrizione must be 5 digits or less.";
-        // }
-
-        // if (formValues.norm_specification.length === 0) {
-        //     newErrors.norm_specification =
-        //         "At least one Norma Specifica must be selected.";
-        // }
         return newErrors;
     };
 
@@ -337,7 +318,6 @@ const MainLayout4 = ({ areas }) => {
                     typology: formValues?.typology || null,
                     atex: formValues?.atex || false,
                     ce: formValues?.ce || false,
-                    // id_standard_type: formValues?.id_standard_type || null,
                     name: formValues?.name || null,
                     year: parseInt(formValues?.year) || null,
                     norm_specification: formValues?.norm_specification || null
@@ -358,11 +338,10 @@ const MainLayout4 = ({ areas }) => {
                     navigate(`/${res?.data?.navigate}`);
                 } else {
                     toast.error(res?.data?.message);
-                    console.error(res?.error?.data?.message || "An error occurred");
                 }
             }
         } catch (error) {
-            console.error("Error submitting form:", error);
+            console.error("Error submitting form:");
         }
     };
 
@@ -419,7 +398,6 @@ const MainLayout4 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
                                 {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />

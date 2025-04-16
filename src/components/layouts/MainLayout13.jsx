@@ -2,12 +2,14 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import {useGetInspectionOrderDataQuery, useGetUserDetailsQuery } from "../../services/apiSlice";
 import Loader from "../../lib/loader/loader";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setPageOpen } from "../../store/pageSlice";
 
 const MainLayout13 = ({ areas }) => {
-  const order_id = localStorage.getItem("id_order") ?? sessionStorage.getItem("id_order")
+  const order_id = localStorage.getItem("ispenzioEditID")
   const [page, setPage] = useState(0)
   const isPageOpen = useSelector((state) => state.page.isPageOpen);
+  const dispatch = useDispatch()
   const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
     const area = areas.find(
       (area) => area?.key && area?.key.startsWith(prefix)
@@ -41,6 +43,7 @@ const MainLayout13 = ({ areas }) => {
     return null;
   };
 
+
   // function for get All apis
   let getApi = areas
     .filter(
@@ -65,6 +68,11 @@ const MainLayout13 = ({ areas }) => {
         acc.userDetailsApi = functionName;
         acc.userDetailsApiMethod = api_Method;
     }
+    if (key?.includes("ReportEditArea-6")) {
+      acc.navigation = functionName;
+      acc.navigationMethod = api_Method;
+  }
+    
       return acc;
     }, {});
     
@@ -76,8 +84,6 @@ const subIndex = sessionStorage.getItem('subIndex')
      }
     }, [])
     
-  // check data here in this section
-  // const [getInspectionOrderData2] = useGetInspectionOrderData2Mutation();
     const { data: inspectionData, isFetching: isFetchingOrder , refetch} =
     useGetInspectionOrderDataQuery({
       url: getApi.getInspectionOrder,
@@ -156,7 +162,7 @@ const subIndex = sessionStorage.getItem('subIndex')
       </header>
       {/* Side Nav Report */}
       <div className="side_nav">
-        <a href="javascript:void(0);" className="dashIconClose">
+        <a style={{cursor: "pointer"}} className="dashIconClose" onClick={() => dispatch(setPageOpen(false))}>
           {/* SVG Icon */}
           <svg
             width="17"

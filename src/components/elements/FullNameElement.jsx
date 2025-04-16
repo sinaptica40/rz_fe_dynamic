@@ -10,7 +10,6 @@ const FullNameElement = ({areas, userData, handleChange}) => {
                 className="form-control"
                 id="floatingInput"
                 value={userData?.fullname ?? ""}
-                // placeholder={areas?.element_data.block_name}
                 onChange={handleChange}
                 name="fullname"
             />

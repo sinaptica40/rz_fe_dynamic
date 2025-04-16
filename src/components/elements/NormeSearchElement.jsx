@@ -10,7 +10,7 @@ const NormeSearchElement = ({ areas, setSearchText, searchText }) => {
                 value={searchText}
                 type="text"
                 className="form-control"
-                placeholder="Cerca un Macchinario"
+                placeholder="Ricerca"
                 onChange={(e) => setSearchText(e.target.value)}
             />
         </>

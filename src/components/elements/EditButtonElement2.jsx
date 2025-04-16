@@ -2,10 +2,14 @@ import React from "react";
 
 const EditButtonElement2 = ({ areas, openExcelImportPopup }) => {
   const name = areas.element_data.block_name;
-  
+
   return (
     <>
-      <a onClick={openExcelImportPopup} className="btn-primary btn-default btn-grey">
+      <a
+        style={{ cursor: "pointer" }}
+        onClick={openExcelImportPopup}
+        className="btn-primary btn-default btn-grey"
+      >
         <span className="importIcon">
           <svg
             width={27}
@@ -19,12 +23,11 @@ const EditButtonElement2 = ({ areas, openExcelImportPopup }) => {
               fill="currentColor"
             />
           </svg>
-        </span>
-        {" "}
+        </span>{" "}
         {name}
       </a>
     </>
-  )
-}
+  );
+};
 
-export default EditButtonElement2
+export default EditButtonElement2;

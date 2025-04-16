@@ -60,9 +60,9 @@ const TableElement2 = ({ areas, inspectionData }) => {
                     <table className="table">
                         <thead>
                             <tr>
-                                {tableHeding?.map((item) => {
+                                {tableHeding?.map((item,index) => {
                                     return (
-                                        <th scope="col">
+                                        <th scope="col" key={index}>
                                             {item?.table_fields?.field_name}
                                         </th>
                                     )
@@ -70,11 +70,7 @@ const TableElement2 = ({ areas, inspectionData }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {inspectionData?.data
-                                .filter(client => client?.id_state?.id_state !== 1)
-                                .slice(0, 4)
-                                .map((client, index) => {
-                                    console.log("client", client)
+                            {inspectionData?.map((client, index) => {
                                     return (
                                         <tr key={index}>
                                             <td>{client?.id_order}</td>

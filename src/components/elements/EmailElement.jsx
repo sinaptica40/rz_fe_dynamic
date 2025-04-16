@@ -10,8 +10,6 @@ const EmailElement = ({areas, userData, handleChange}) => {
                 className="form-control"
                 id="floatingInput"
                 value={ userData?.email ?? ""}
-                // placeholder={areas?.element_data.block_name}
-                // onChange={handleChange}
                 name="email"
             />
             <label htmlFor="floatingInput">{areas?.element_data.block_name}</label>

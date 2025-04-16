@@ -58,6 +58,7 @@ const EditTableElement = ({
                   <th scope="col">{table_fields?.field_name}</th>
                 )
               })}
+              <th></th>
             </tr>
           </thead>
           <tbody>

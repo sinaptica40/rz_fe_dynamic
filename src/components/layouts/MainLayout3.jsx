@@ -13,8 +13,9 @@ const MainLayout3 = ({ areas }) => {
     const [searchText, setSearchText] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [deletedId, setDeletedId] = useState(null);
-
+    const [debouncedSearch, setDebouncedSearch] = useState(searchText);
     const modalRef = useRef(null);
+    const [loading, setLoading] = useState(false)
 
     const findAreaByKeyPrefix = (prefix, extraProps = {}) => {
         const area = areas.find(area => area.key && area.key.startsWith(prefix));
@@ -88,12 +89,22 @@ const MainLayout3 = ({ areas }) => {
             method: getapi.apiMethod,
             params: {
                 page: currentPage,
-                ...(searchText ? { search: searchText } : {}),
+                ...(debouncedSearch ? { search: debouncedSearch } : {}),
             },
             refetchOnMountOrArgChange: true,
         },
 
     );
+
+
+
+useEffect(() => {
+    const timeout = setTimeout(() => {
+        setDebouncedSearch(searchText);
+    }, 500); // debounce delay in ms
+
+    return () => clearTimeout(timeout); // cleanup
+}, [searchText]);
 
     const [deleteNorm, { isLoading }] = useDeleteNormMutation();
 
@@ -143,25 +154,27 @@ const MainLayout3 = ({ areas }) => {
     }, [showModal]);
 
     const handleDeleteNorme = async () => {
-        console.log('delete norme')
+        setLoading(true)
         try {
             const res = await deleteNorm({
                 url: getDeleteApi.deleteApiURL,
                 method: getDeleteApi.deleteApiMethod,
                 params: deletedId
             })
-            console.log(res,'check res')
 
             if (res?.data?.status == "SUCCESS") {
                 toast.success(res?.data?.message);
+                setLoading(false)
                 refetch();
                 setDeletedId(null);
                 setShowModal(false);
             } else if (res?.data?.status == "ERROR") {
+                setLoading(false)
                 toast.error(res?.data?.message);
                 setShowModal(false);
             }
         } catch (error) {
+            setLoading(false)
             toast.error(error)
         }
     }
@@ -174,7 +187,7 @@ const MainLayout3 = ({ areas }) => {
 
     return (
         <>
-            {isFetching && (<Loader />)}
+            {(isFetching || loading ) && (<Loader />)}
             <div className="loader-wrapper" style={{ display: "none" }}>
                 <div className="loader">
                     <img src="img/logo.png" alt="" />
@@ -218,7 +231,6 @@ const MainLayout3 = ({ areas }) => {
                                 {findAreaByKeyPrefix('HeaderArea1') || <div>- -</div>}
                                 <div className="overlay" style={{ display: "none" }} />
                                 {findAreaByKeyPrefix('HeaderArea2') || <div>- -</div>}
-                                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
                                 {findAreaByKeyPrefix('HeaderArea4', { userDetails }) || <div>- -</div>}
                                 <button className="navbar-toggler" type="button">
                                     <span className="navbar-toggler-icon" />
@@ -233,7 +245,7 @@ const MainLayout3 = ({ areas }) => {
                     {findAreaByKeyPrefix('MachineryArea1')}
                     <div className="row">
                         <div className="col-lg-12">
-                            <div className="cards-block Ispezioni-block">
+                            <div className="cards-block Ispezioni-block card-block-body">
                                 <div className="card-header border-0 add-form-header pb-0">
                                     <div className="card-title">
                                         {findAreaByKeyPrefix('FormArea7') || <div>- -</div>}
@@ -241,7 +253,7 @@ const MainLayout3 = ({ areas }) => {
                                     </div>
                                     {findAreaByKeyPrefix('MachinerySearchArea', { setSearchText, searchText }) || <div>- -</div>}
                                 </div>
-                                <div className="card-block-body">
+                                <div className="pt-1">
                                     {findAreaByKeyPrefix('MachineryArea2', { data, handleModal, modalRef, showModal, setShowModal, handleDeleteNorme }) || <div>- -</div>}
                                     {totalDocuments > perPageItem ? (
                                         findAreaByKeyPrefix('PaginationArea', { totalDocuments, currentPage, perPageItem, handlePageClick }) || <div>- -</div>

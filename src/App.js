@@ -6,6 +6,7 @@ import { store } from './store/store';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux';
+import ScriptLoader from './components/ScriptLoader';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -36,9 +37,7 @@ const fetchPages = async () => {
 const fetchData = async (route, token) => {
   
   const pages = await fetchPages();
-  console.log(pages,'check pages array')
   let pageId;
-
   if (!token) {
     pageId = pages['login']
   } else {
@@ -79,7 +78,6 @@ const fetchData = async (route, token) => {
       },
     });
     const data = await response.json();
-    console.log(data,'check data here get from url')
     return data.data;
   } catch (error) {
     return {
@@ -103,16 +101,12 @@ const fetchData = async (route, token) => {
   }
 };
 
-
-
-
 const AppContent = () => {
   const [jsonData, setJsonData] = React.useState(null);
   const location = useLocation();
   const dispatch = useDispatch()
   const navigate = useNavigate();
-  const route = location.pathname.substring(1) || '/';
-  console.log(route,'check the route name here')
+  const route = location.pathname.substring(1) || 'dashboard';
   React.useEffect(() => {
     const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
     if(!token){
@@ -121,9 +115,7 @@ const AppContent = () => {
     
     const getData = async () => {
       const data = await fetchData(route, token);
-      console.log(data,'check getData Function')
       setJsonData(data);
-      console.warn("dataaaa",jsonData)
      
     };
    
@@ -144,6 +136,7 @@ function App() {
  
   return (
     <Router>
+      <ScriptLoader />
       <Provider store={store}>
         <div className="App">
           <Routes>

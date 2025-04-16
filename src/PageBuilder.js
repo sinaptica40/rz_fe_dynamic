@@ -3,7 +3,6 @@ import { Routes, Route } from 'react-router-dom';
 import Loader from './lib/loader/loader';
 
 const importComponent = (type, path) => {
-  console.log(type, path, 'inside then importcomponent function')
   try {
     let componentPath = '';
     switch (type) {
@@ -19,7 +18,6 @@ const importComponent = (type, path) => {
       default:
         throw new Error(`Unknown component type: ${type}`);
     }
-    // console.log('==import ', lazy(() => import(`./${componentPath}`)))
     return lazy(() => import(`./${componentPath}`));
   } catch (error) {
     console.error(`Error loading ${type} component at ${path}:`, error);
@@ -37,7 +35,6 @@ const importCss = (path) => {
 };
 
 const renderNestedAreas = (nestedAreas) => {
-  console.log(nestedAreas,'check nested area here')
   const LayoutComponent = importComponent('layout', nestedAreas.layout_name);
 
   const resultAreas = nestedAreas.result.map((nestedArea, nestedIndex) => {
@@ -142,11 +139,6 @@ const PageBuilder = ({ jsonData }) => {
             const subpageColumns = areas?.table_columns?.filter(
               column => column?.table_fields?.page_type === 'subpage'
             );
-            console.log('==for==pageColumns==', areas)
-            
-            // const pageColumns = areas?.table_columns?.filter(
-            //   column => column?.table_fields?.page_type === 'page'
-            // );
 
             if (subpageColumns?.length > 0) {
               const nestedElements = subpageColumns.map((subpageColumn, index) => {

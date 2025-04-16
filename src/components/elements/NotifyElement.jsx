@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 const NotifyElement = (props) => {
     const navigate = useNavigate();
-    console.log("props check", props)
     const handleNavigate = () =>{
         navigate(`/${10}`)
     }

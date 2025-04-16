@@ -1,7 +1,7 @@
 import React from "react";
 
 const AccordionLayout = ({ children }) => {
-    console.log('===AccordionLayout==', children)
+    //console.log('===AccordionLayout==', children)
     return (
         <>
             <div className="col-md-12 col-lg-12 col-xl-12 col-xxl-4">

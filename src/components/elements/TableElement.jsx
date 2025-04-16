@@ -29,14 +29,14 @@ const TableElement = ({ areas, reports }) => {
             <table className="table">
               <thead>
                 <tr>
-                  {tableHeading?.map((item) => (
-                    <th scope="col">{item?.table_fields?.field_name}</th>
+                  {tableHeading?.map((item,index) => (
+                    <th scope="col" key={index}>{item?.table_fields?.field_name}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {reports?.data?.length > 0 ? (
-                  reports?.data?.map((item, index) => (
+                {reports?.length > 0 ? (
+                  reports?.map((item, index) => (
                     <tr key={index}>
                       <td>{item?.id_order}</td>
                       <td>{item?.order_code}</td>

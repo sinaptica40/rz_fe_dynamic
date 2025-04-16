@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {Modal , Button, Form, Row, Col} from 'react-bootstrap'
 import { toast } from "react-toastify";
 import Loader from "../../lib/loader/loader";
+import { loadScript } from "../../utils/helper";
 const LoginLayout = ({ areas }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -74,7 +75,6 @@ const LoginLayout = ({ areas }) => {
     }
     return null;
   };
-  console.log(getApi,'check area');
 
   const validateForm = () => {
     let valid = true;
@@ -99,7 +99,6 @@ const LoginLayout = ({ areas }) => {
   };
 
   const handlePasswordChange = (e) => {
-    console.log("e.target.value", e.target.value)
     setPassword(e.target.value)
   };
 
@@ -124,7 +123,6 @@ const LoginLayout = ({ areas }) => {
           };
 
           const response = await login(credentials);
-          console.log(response, "response")
 
           if (response.data.status !== "SUCCESS") {
             setIsLoading(false)
@@ -194,6 +192,7 @@ const LoginLayout = ({ areas }) => {
   const [sendOpt] =  useSendOtpMutation()
   const handleSendOtp = async(email) =>{
     try {
+      sessionStorage.setItem('email',email)
       setIsLoading(true)
       const response = await sendOpt({
         url: getApi?.loginForgetApi,
@@ -217,7 +216,8 @@ const LoginLayout = ({ areas }) => {
   }
 const [resetPassword] = useResetPasswordMutation();
 
-  const handlePasswordReset = async(otp, newPassword, confirmPassword, email) =>{
+  const handlePasswordReset = async(otp, newPassword, confirmPassword, emails) =>{
+    const email = sessionStorage.getItem('email')
     try {
       setIsLoading(true)
       const body ={
@@ -226,9 +226,10 @@ const [resetPassword] = useResetPasswordMutation();
         confirm_password: confirmPassword,
         email
       }
-      console.log(body,'check body');
+
       const response = await resetPassword(body).unwrap();
       if(response.status === "SUCCESS"){
+        sessionStorage.removeItem('email')
         setIsLoading(false)
         toast.success(response?.message)
         ModelClose()
@@ -385,8 +386,7 @@ const LoginForgetElementModel = ({ isOpen, onClose,step, handleSendOtp, handlePa
     }
 
     const resp = await handlePasswordReset(otp, newPassword, confirmPassword, email)
-    console.log(resp,'check resp');
-    // setEmail("")
+ 
     if(resp && resp === "SUCCESS"){
       setEmail("")
       setNewPassword("")
@@ -396,22 +396,23 @@ const LoginForgetElementModel = ({ isOpen, onClose,step, handleSendOtp, handlePa
   };
 
   const handleClose = () =>{
-    console.log('handle close');
     setEmail("")
     onClose()
   }
 
   return (
-    <Modal show={isOpen} onHide={handleClose} centered>
+    <Modal show={isOpen} onHide={handleClose} centered className="themeModal">
       <Modal.Header closeButton>
         <Modal.Title>{step === 1 ? "Enter Email" : "Reset Password"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {step === 1 ? (
-          <Form>
-            <Form.Group className="mb-3">
+          <Form className="modal_form_box">
+            <div className="mb-3">
+              <p className="modal_form_desc">Non preoccuparti! Reimpostare la tua password è facile, basta digitare l'email che hai usato per registrarti su RZ Solution.</p>
+            <div className="form-group">
               <Form.Label>
-              Non preoccuparti! Reimpostare la tua password è facile, basta digitare l'email che hai usato per registrarti su RZ Solution.
+                Email
               </Form.Label>
               <Form.Control
                 type="email"
@@ -420,19 +421,23 @@ const LoginForgetElementModel = ({ isOpen, onClose,step, handleSendOtp, handlePa
                 onChange={handleEmailChange}
               />
               {errors.email && <small className="text-danger">{errors.email}</small>}
-            </Form.Group>
+              </div>
+            </div>
+            <div className="text-center my-2">
             <Button variant="primary" onClick={handleEmailSubmit}>
               Send OTP
             </Button>
+            </div>
           </Form>
         ) : (
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Don't worry! Resetting your password is easy, just type the email you used to register on RZ Solution.
-Non preoccuparti! Reimpostare la password è semplice, basta digitare l'e-mail con cui ti sei registrato su RZ Solution.</Form.Label>
-              <Row className="mb-2 justify-content-center w-full">
+            <p className="modal_form_desc">Don't worry! Resetting your password is easy, just type the email you used to register on RZ Solution.
+Non preoccuparti! Reimpostare la password è semplice, basta digitare l'e-mail con cui ti sei registrato su RZ Solution.</p>
+
+              <div className="otp_main_box">
                 {otp?.map((digit, index) => (
-                  <Col key={index} xs={2}>
+                  <div className="otp_inout_box">
                     <Form.Control
                       id={`otp-${index}`}
                       type="text"
@@ -442,13 +447,13 @@ Non preoccuparti! Reimpostare la password è semplice, basta digitare l'e-mail c
                       onKeyDown={(e) => handleOtpChange(index, "", e)}
                       className="text-center otp-field"
                     />
-                  </Col>
+                  </div>
                 ))}
-              </Row>
+              </div>
               {errors.otp && <small className="text-danger">{errors.otp}</small>}
             </Form.Group>
 
-            <Form.Group className="mb-3">
+            <div className="form-group">
               <Form.Label>New Password</Form.Label>
               <Form.Control
                 type="password"
@@ -457,9 +462,9 @@ Non preoccuparti! Reimpostare la password è semplice, basta digitare l'e-mail c
                 onChange={handlePasswordChange}
               />
               {errors.newPassword && <small className="text-danger">{errors.newPassword}</small>}
-            </Form.Group>
+            </div>
 
-            <Form.Group className="mb-3">
+            <div className="form-group">
               <Form.Label>Confirm Password</Form.Label>
               <Form.Control
                 type="password"
@@ -468,24 +473,18 @@ Non preoccuparti! Reimpostare la password è semplice, basta digitare l'e-mail c
                 onChange={handleConfirmPasswordChange}
               />
               {errors.confirmPassword && <small className="text-danger">{errors.confirmPassword}</small>}
-            </Form.Group>
+            </div>
 
+            <div className="text-center my-2">
             <Button variant="primary" onClick={handlePasswordResets}>
               Reset Password
             </Button>
+            </div>
           </Form>
         )}
       </Modal.Body>
 
-      <style>
-        {`
-          .otp-field {
-            height: 50px;
-            font-size: 20px;
-            font-weight: bold;
-          }
-        `}
-      </style>
+     
     </Modal>
   );
 };

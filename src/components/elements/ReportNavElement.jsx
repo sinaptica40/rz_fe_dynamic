@@ -1,18 +1,23 @@
 import React from 'react'
+import { useDispatch } from 'react-redux';
 import {useNavigate} from 'react-router-dom'
+import { setPageOpen } from '../../store/pageSlice';
 const ReportNavElement = ({ areas,page, setPage }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSetPage = (index) =>{
-    console.log(areas,'check this areas data ');
-    navigate(`/${11}`)
+    const route= areas?.element_data[0]?.element_type?.data[0]?.image_icon?.split('/');
+    const navigate_route = route[route.length - 1];
+    navigate(`/${navigate_route}`)
     setPage(parseInt(index))
     sessionStorage.setItem('navlink', index)
     sessionStorage.removeItem('subIndex')
     sessionStorage.removeItem('sezione')
     sessionStorage.removeItem('inspectId')
-     sessionStorage.removeItem('menuindex')
+    sessionStorage.removeItem('menuindex')
+    dispatch(setPageOpen(false));
   }
-  console.log(areas.element_data[0].element_type.data,'check this areas data ');
+
   return (
     <>
       <div>
@@ -24,7 +29,7 @@ const ReportNavElement = ({ areas,page, setPage }) => {
       <a href="javascript:void(0);" className={`${parseInt(index) === parseInt(page) && "active"}`}>
         <span className="icon_sideHolder">
           <svg width="12" height="3" viewBox="0 0 12 3" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M1.5 1.5H10.738" stroke="#ECAD42" stroke-width="2" strokeLinejoin="round" />
+            <path d="M1.5 1.5H10.738" stroke="#ECAD42" strokeWidth="2" strokeLinejoin="round" />
           </svg>
         </span>
         <span className="title_dash_nav">

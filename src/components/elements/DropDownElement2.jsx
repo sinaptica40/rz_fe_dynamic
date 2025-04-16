@@ -1,14 +1,23 @@
-import React from 'react'
+import React from "react";
 import Select from "react-select";
-function DropDownElement2({ areas, formValues, handleSelectChange, errors, normeOptions, selectedOption, isSelectActive }) {
+function DropDownElement2({
+  areas,
+  formValues,
+  handleSelectChange,
+  errors,
+  normeOptions,
+  selectedOption,
+  isSelectActive,
+}) {
   let { element_data } = areas;
 
   return (
     <div className="col-md-6">
       <div
-        className={`form-floating ${isSelectActive ? "active-floating-select" : ""
-          }`}
-        style={{ borderBottom: 'none' }}
+        className={`form-floating ${
+          isSelectActive ? "active-floating-select" : ""
+        }`}
+        style={{ borderBottom: "none" }}
       >
         <Select
           id="floatingSelect"
@@ -27,10 +36,9 @@ function DropDownElement2({ areas, formValues, handleSelectChange, errors, norme
         )}
 
         <label htmlFor="floating-select">{element_data.block_name}</label>
-
       </div>
     </div>
-  )
+  );
 }
 
-export default DropDownElement2
+export default DropDownElement2;

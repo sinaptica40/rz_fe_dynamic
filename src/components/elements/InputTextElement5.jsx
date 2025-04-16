@@ -1,6 +1,4 @@
 const InputTextElement5 = ({areas,value,label})=>{
-
-    console.log("clientformData",value,label)
     return(
          <>
             <input

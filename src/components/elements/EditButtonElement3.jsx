@@ -1,10 +1,14 @@
 import React from "react";
 
 const EditButtonElement3 = ({ areas, exportToExcel }) => {
-  const name = areas.element_data.block_name
+  const name = areas.element_data.block_name;
   return (
     <>
-      <a onClick={exportToExcel} className="btn-primary btn-default btn-grey">
+      <a
+        style={{ cursor: "pointer" }}
+        onClick={exportToExcel}
+        className="btn-primary btn-default btn-grey"
+      >
         <span className="downloadIcon">
           <svg
             width={28}
@@ -25,7 +29,7 @@ const EditButtonElement3 = ({ areas, exportToExcel }) => {
         {name}
       </a>
     </>
-  )
-}
+  );
+};
 
-export default EditButtonElement3
+export default EditButtonElement3;
