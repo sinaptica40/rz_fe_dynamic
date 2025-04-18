@@ -74,6 +74,7 @@ const SignPad = ({ existingSignature = null, setNewTextData }) => {
     setImageURL(null);
     setIsModified(false);
     setIsSignatureExists(false);
+    setNewTextData(null);
   };
 
   const saveSignature = () => {

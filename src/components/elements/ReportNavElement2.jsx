@@ -18,11 +18,8 @@ const ReportNavElement2 = ({ areas, inspectionData, getApi,page, setPage }) => {
   const mainMenuIndex = sessionStorage.getItem('sezione')
   const inspectionIndex = sessionStorage.getItem('inspectId')
   const menuindex = sessionStorage.getItem('menuindex')
-  // const checkIndex = sessionStorage.getItem('submenuMain')
-  // const submenu = sessionStorage.getItem('submenu')
   const subMainIndex = sessionStorage.getItem('subIndex')
   const dispatch = useDispatch()
-  // const anchorRef = useRef(null);
   const check = useSelector((state) => state.isUpdateState)
 
   const handleRequest2 = async(inspectId, index, type=null) =>{
@@ -55,7 +52,6 @@ const ReportNavElement2 = ({ areas, inspectionData, getApi,page, setPage }) => {
       if(response?.data?.status === "SUCCESS"){
         setSubInspection(response?.data?.data)
         setIsLoading(false)
-        // sessionStorage.removeItem('subIndex')
         sessionStorage.setItem('inspectId',inspectId)
         sessionStorage.setItem('menuindex', index)
         if(type !== "navigate"){
@@ -67,14 +63,11 @@ const ReportNavElement2 = ({ areas, inspectionData, getApi,page, setPage }) => {
       setIsLoading(false)
     } finally {
       setIsLoading(false)
-      // setLoadingSubMenu(false);
     }
   };
 
   const handleSubMenus = (idNotConformityDetected, index, mainIndex = null) => {
     setActiveSubMenuId(idNotConformityDetected); // Set active submenu ID
-    // sessionStorage.removeItem('inspectId')
-    //  sessionStorage.removeItem('menuindex')
      sessionStorage.setItem('subIndex',`${mainMenuIndex}.${index}`)
      dispatch(setSubSectionIndex(`${mainMenuIndex}.${index}`))
     sessionStorage.setItem('submenuMain',mainIndex)
@@ -90,7 +83,6 @@ const ReportNavElement2 = ({ areas, inspectionData, getApi,page, setPage }) => {
       }
   }, [inspectionIndex])
 
-  // if(isLoading) return <Loading />
   return (
     <>
       <ul className="sideNav_menu new_menu">

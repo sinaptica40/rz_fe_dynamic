@@ -142,15 +142,11 @@ const LoginLayout = ({ areas }) => {
             ) {
               if (rememberMe) { 
                 localStorage.setItem('check', rememberMe)
-                // sessionStorage.setItem("email", email.toString());
-                // sessionStorage.setItem("password", password.toString());
                 localStorage.setItem("access_token", response?.data?.data?.access_token);
               localStorage.setItem("user_name", response?.data?.data?.user?.name);
               localStorage.setItem("user_id", response?.data?.data?.user?.id);
 
               } else {
-                // sessionStorage.removeItem("email");
-                // sessionStorage.removeItem("password");
                 sessionStorage.setItem("access_token", response?.data?.data?.access_token);
                 sessionStorage.setItem("user_name", response?.data?.data?.user?.name);
                 sessionStorage.setItem("user_id", response?.data?.data?.user?.id);

@@ -319,7 +319,7 @@ export default function ReportEdit({ getApi }) {
     formData.append("comment_2", clientformData2.commento === undefined ? null : clientformData2?.commento);
     formData.append(
       "rz_not_conformity[ai_notes]", selectedAiNote);
-    formData.append("rz_not_conformity[text_note]", newTextData ? newTextData : null)
+    formData.append("rz_not_conformity[text_note]", newTextData ? newTextData : newTextData === null ? null : data?.['rz_not_conformity'][0]['text_note_full_url'])
 
     try {
       const response = await editConformity({
@@ -1624,12 +1624,12 @@ const EditSection = ({ data, handleEdit, handleImage, index = null }) => {
     <>
       <div className="col-lg-12  mb-4">
 
-        {(data?.audio_notes_full_url !== null || audio_file_url) && (<div className="col-md-12 w-100">
+        {(data?.audio_notes_full_url_mp3 !== null || audio_file_url) && (<div className="col-md-12 w-100">
           <label className="status_label_box">Audio file</label>
           
           <div className="form-floating">
             <div className="d-flex align-items-center gap-md-4 gap-2">
-              <audio controls src={data?.audio_notes_full_url === null ? audio_file_url : data?.audio_notes_full_url} />
+              <audio controls src={data?.audio_notes_full_url === null ? audio_file_url : data?.audio_notes_full_url_mp3} />
               <svg
                 onClick={() => data?.audio_notes_full_url === null ? handleAudio() : handleImage(data?.id_not_conformity_detail, "audio")}
                 className="table_actionBtn"
@@ -1665,10 +1665,10 @@ const EditSection = ({ data, handleEdit, handleImage, index = null }) => {
           <span className="me-2"><svg width="18" height="19" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.438 10.7791V0.327148H10.452V10.7791H0V13.7651H10.452V24.2171H13.438V13.7651H23.89V10.7791H13.438Z" fill="currentcolor"></path></svg></span> Carica Audio
         </label>
 
-        <div className="mt-5">
+        <div className="mt-5 mb-4">
           <SignPad existingSignature={textUrl} setNewTextData={setNewTextData} />
         </div>
-        <div className="records_photography_box space-0 222222">
+        <div className="records_photography_box space-0">
           <div className="records_photography_box records_photography_row space-0 ">
             <canvas
               ref={canvasRef}

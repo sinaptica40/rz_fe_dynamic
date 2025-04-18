@@ -12,26 +12,11 @@ export const loginLayoutApi = createApi({
       if (token) {
         headers.set("authorization", `Bearer ${token}`);
       }
-      headers.set("Accept-Language", "en");
+      headers.set("Accept-Language", "it");
       return headers;
     },
   }),
   endpoints: (builder) => ({
-    // getLoginLayoutData: builder.query({
-    //   query: () => `login-page`,
-    // }),
-
-    // getUserProfile: builder.query({
-    //   query: () => 'user-profile',
-    // }),
-
-    // getNormes: builder.query({
-    //   query: ({ endpointName, params }) => {
-    //     const queryString = params ? `?${new URLSearchParams(params).toString()}` : '';
-    //     return `${endpointName}${queryString}`;
-    //   },
-    // }),
-
     getMachinery: builder.query({
       query: ({ endpointName, params }) => {
         const queryString = params

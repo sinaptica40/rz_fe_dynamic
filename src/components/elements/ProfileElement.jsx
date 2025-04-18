@@ -44,12 +44,12 @@ const ProfileElement = ({ areas, userDetails }) => {
                             </div>
                         </div>
                         <ul>
-                            <li>
+                            <li className="cursor-pointer">
                                 <a onClick={() => navigate('/14')}>
                                     <i className="ion-android-person" /> My Profile
                                 </a>
                             </li>
-                            <li>
+                            <li className="cursor-pointer">
                                 <a
                                     onClick={handleLogout}
                                 // href="#!"
