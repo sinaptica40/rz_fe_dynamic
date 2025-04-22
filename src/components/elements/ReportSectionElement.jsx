@@ -87,13 +87,14 @@ const ReportSectionElement = ({ areas, getApi }) => {
                   method: 'DELETE',
               }).unwrap();
               if (response?.status == 'success' || response?.status == 'SUCCESS') {
+                console.log("response",response);
                   setLoader(false)
                   toast.success(response?.message);
                   setInspectData(response.data)
                   dispatch(setIsUpdate(1))
                 //   dispatch(deleteList(`${sectionId}`));
                   getInspectConformity()
-                  window.location.href = `/${12}`;
+                  window.location.href = `/${response?.navigate}`;
                  
               } else {
                   setLoader(false)
@@ -127,7 +128,7 @@ const ReportSectionElement = ({ areas, getApi }) => {
                         </div>
                     </a>
                     <div className="contentBox">
-                        <a className="close-iconBtn" onClick={handleNavigate}>
+                        <a className="close-iconBtn" style={{cursor: "Pointer"}} onClick={handleNavigate}>
                             <svg width="26" height="26" viewBox="0 0 26 26"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -463,10 +464,8 @@ const validateFields = () => {
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0; // Return true if no errors
 };
-
-
   // handleEdit 
-  const handleEdit = async(shapes, snapshot_file, original_image_file, newTextData) =>{
+  const handleEdit = async(shapes, snapshot_file, original_image_file, newTextData, texts) =>{
        if (validateFields()) {
          formData.append("id_machinery", data?.id_machinery);
          formData.append("id_cluster", subTitle?.id_cluster);
@@ -496,6 +495,7 @@ const validateFields = () => {
            "rz_not_conformity[ai_notes]",
            ai_notes !== "" ? ai_notes : null
          );
+         formData.append("rz_not_conformity[polygon_text]", texts ? JSON.stringify(texts) : null)
          try {
            const response = await addConformity(formData).unwrap();
 
@@ -688,7 +688,7 @@ const validateFields = () => {
             </div>
           </a>
           <div className="contentBox">
-            <a className="close-iconBtn" onClick={handleNavigate}>
+            <a className="close-iconBtn" style={{cursor: "Pointer"}} onClick={handleNavigate}>
               <svg
                 width="26"
                 height="26"
@@ -1295,7 +1295,7 @@ const validateFields = () => {
                         }}
                           placeholder="Name"
                         />
-                        <label htmlFor="floatingInput">Name</label>
+                        <label htmlFor="floatingInput">Nome</label>
                         {errorss?.groupName && <div className="invalid-feedback">{errorss.groupName}</div>}
                       </div>
                     </div>
@@ -1339,6 +1339,8 @@ const EditSection2 = ({handleEdit }) => {
   const [originalImageUrl, setOriginalImageUrl] = useState(null);
   const [imagefile, setImageFile] = useState(null)
   const [newTextData, setNewTextData] = useState("")
+  const [isWriteMode, setIsWriteMode] = useState(false);
+  const [texts, setTexts] = useState([]);
   const CLOSE_DISTANCE = 10;
   
   
@@ -1353,7 +1355,6 @@ const EditSection2 = ({handleEdit }) => {
       img.onload = () => setImage(img);
     }, [ originalImageUrl]);
   
-   
   
     const redraw = () => {
       const canvas = canvasRef.current;
@@ -1364,18 +1365,22 @@ const EditSection2 = ({handleEdit }) => {
   
       shapes.forEach((shape, index) => {
         const isSelected = index === selectedShapeIndex;
-        // shape.points.forEach((point) => drawPoint(ctx, point.x, point.y));
-        shape.points.forEach((point) => drawPoint(ctx, point.x, point.y, shape.withLines === true ? "black" : "red"));
-        // drawLines(ctx, shape.points, isSelected ? "green" : "#000000");
-        drawLines(ctx, shape.points, shape.withLines === true ? "black" : "red");
+        shape.points.forEach((point) => drawPoint(ctx, point.x, point.y, shape.withLines ? "black" : "red"));
+        drawLines(ctx, shape.points, shape.withLines ? "black" : "red");
         if (shape.withLines) fillWithDiagonalLines(ctx, shape.points, isSelected);
       });
   
       currentShape.forEach((point) => drawPoint(ctx, point.x, point.y, "black"));
       if (currentShape.length > 1) drawLines(ctx, currentShape, "black");
-    };
   
-    useEffect(() => redraw(), [shapes, currentShape, image, selectedShapeIndex]);
+      texts.forEach(({ text, x, y }) => {
+        ctx.fillStyle = "blue";
+        ctx.font = "18px Arial";
+        ctx.fillText(text, x, y);
+      });
+    };
+
+    useEffect(() => redraw(), [shapes, currentShape, image, selectedShapeIndex, texts]);
   
     const drawPoint = (ctx, x, y, color) => {
       ctx.beginPath();
@@ -1394,7 +1399,7 @@ const EditSection2 = ({handleEdit }) => {
       ctx.stroke();
     };
   
-    const fillWithDiagonalLines = async (ctx, points, isSelected) => {
+    const fillWithDiagonalLines = (ctx, points, isSelected) => {
       if (points.length < 3) return;
   
       const patternCanvas = document.createElement("canvas");
@@ -1418,27 +1423,86 @@ const EditSection2 = ({handleEdit }) => {
       ctx.restore();
     };
   
-  
-    const handleCanvasClick = (e) => {
+   
+    const handleCanvasClick = async (e) => {
       if (!imagefile) {
         Swal.fire({
-          title: "Attenzione!",
-          text: "Carica prima un'immagine per disegnare sulla tela.",
+          title: "Nessuna immagine disponibile",
+          text: "Carica un'immagine prima di disegnare sulla tela.",
           icon: "warning",
         });
         return;
       }
+  
       const canvas = canvasRef.current;
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
       const x = (e.clientX - rect.left) * scaleX;
       const y = (e.clientY - rect.top) * scaleY;
-      const clickedShapeIndex = shapes.findIndex((shape) => isPointInShape({ x, y }, shape.points));
-      if (clickedShapeIndex >= 0) setSelectedShapeIndex(clickedShapeIndex);
-      else setCurrentShape((prev) => [...prev, { x, y }]);
-    };
   
+      if (isWriteMode) {
+        const clickedTextIndex = texts.findIndex((t) => {
+          const textWidth = 100;
+          const textHeight = 20;
+          return x >= t.x && x <= t.x + textWidth && y <= t.y && y >= t.y - textHeight;
+        });
+  
+        if (clickedTextIndex !== -1) {
+          const { isConfirmed, isDenied } = await Swal.fire({
+            title: `Cosa vuoi fare con questo testo?`,
+            icon: "question",
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: "Modificare",
+            denyButtonText: "Eliminare",
+            cancelButtonText: "Cancellare",
+          });
+  
+          if (isDenied) {
+            setTexts((prev) => prev.filter((_, i) => i !== clickedTextIndex));
+          } else if (isConfirmed) {
+            const { value: newText } = await Swal.fire({
+              title: "Modifica testo",
+              input: "text",
+              inputValue: texts[clickedTextIndex].text,
+              showCancelButton: true,
+            });
+  
+            if (newText) {
+              setTexts((prev) =>
+                prev.map((t, i) =>
+                  i === clickedTextIndex ? { ...t, text: newText } : t
+                )
+              );
+            }
+          }
+          return;
+        }
+  
+        const { value: text } = await Swal.fire({
+          title: "Inserisci il testo",
+            input: "text",
+            inputPlaceholder: "Scrivi qualcosa...",
+            cancelButtonText: "Cancellare",
+            showCancelButton: true,
+        });
+  
+        if (text) {
+          setTexts((prev) => [...prev, { text, x, y }]);
+        }
+  
+        return;
+      }
+  
+      const clickedShapeIndex = shapes.findIndex((shape) => isPointInShape({ x, y }, shape.points));
+      if (clickedShapeIndex >= 0) {
+        setSelectedShapeIndex(clickedShapeIndex);
+      } else {
+        setCurrentShape((prev) => [...prev, { x, y }]);
+      }
+    };
+
     const isPointInShape = (point, shapePoints) => {
       let inside = false;
       for (let i = 0, j = shapePoints.length - 1; i < shapePoints.length; j = i++) {
@@ -1450,7 +1514,7 @@ const EditSection2 = ({handleEdit }) => {
       }
       return inside;
     };
-  
+
     const deleteSelectedShape = async () => {
       if (selectedShapeIndex === null) return;
       const result = await Swal.fire({
@@ -1568,6 +1632,12 @@ const EditSection2 = ({handleEdit }) => {
                 <input type="file" id="fileupload" style={{ display: "none" }} onChange={handleChange} />
               </div>
             </li>
+
+            <li onClick={() => setIsWriteMode((prev) => !prev)}>
+              <div className="right_photoItem" style={{ color: isWriteMode ? "green" : "inherit" }}>
+                ✍️ Modalità testo {isWriteMode ? "(On)" : ""}
+              </div>
+            </li>
           </ul>
           <div className="mt-auto">
 
@@ -1586,7 +1656,7 @@ const EditSection2 = ({handleEdit }) => {
                     setCapturedFile1(file);
 
                     // Call handleEdit inside the callback after file is created
-                    handleEdit(shapes, file, imagefile, newTextData);
+                    handleEdit(shapes, file, imagefile, newTextData, texts);
                   }
                 });
               }}
@@ -1785,7 +1855,7 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
                                     type="button"
                                     className="generate_aiBtn"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#aggiungiModal">
+                                    data-bs-target="#aggiungiModal2">
                                     + Aggiungi nuovo cluster
                                 </button>
                             </div>
@@ -1795,7 +1865,7 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
             </div>
 
              {/* Modal for adding new cluster */}
-             <div className="modal fade modalTheme" id="aggiungiModal" tabIndex="-1" aria-labelledby="aggiungiModalLabel" aria-hidden="true">
+             <div className="modal fade modalTheme" id="aggiungiModal2" tabIndex="-1" aria-labelledby="aggiungiModalLabel" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
@@ -1822,7 +1892,7 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
                                                       }}
 
                                                 />
-                                                <label htmlFor="floatingInput">Name</label>
+                                                <label htmlFor="floatingInput">Nome</label>
                                                 {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                                             </div>
                                         </div>
@@ -1841,7 +1911,7 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
                                                       }
                                                   }}
                                                 />
-                                                <label htmlFor="floatingInput1">Priority</label>
+                                                <label htmlFor="floatingInput1">Priorità</label>
                                                 {errors.priority && <div className="invalid-feedback">{errors.priority}</div>}
                                             </div>
                                         </div>

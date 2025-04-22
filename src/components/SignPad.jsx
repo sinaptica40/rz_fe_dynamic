@@ -44,7 +44,7 @@ const SignPad = ({ existingSignature = null, setNewTextData }) => {
     }
 
     if (!isModified) {
-      clearSignature(); 
+      clearSignature(); // Remove old signature on first draw
     }
     setIsModified(true);
 

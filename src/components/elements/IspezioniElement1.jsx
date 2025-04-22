@@ -9,6 +9,8 @@ const IspezioniElement1 = ({ areas, TableData1 }) => {
     (item) => item.table_fields.data_type !== "api"
   );
 
+  console.log(filteredData,'check column data order')
+
   const addRoute = areas?.table_columns.find(
     (item) => item.table_fields.data_type === "api"
   );

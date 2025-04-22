@@ -43,7 +43,7 @@ const LoginLayout = ({ areas }) => {
   const handleEmailBlur = () => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
-      setEmailError("Please enter a valid email address.");
+      setEmailError("Per favore, inserisci un indirizzo email valido.");
     } else {
       setEmailError("");
     }
@@ -82,12 +82,12 @@ const LoginLayout = ({ areas }) => {
     setPasswordError("");
 
     if (!email) {
-      setEmailError("Email is required.");
+      setEmailError("L'email è obbligatoria.");
       valid = false;
     }
 
     if (!password) {
-      setPasswordError("Password is required.");
+      setPasswordError("La password è obbligatoria.");
       valid = false;
     }
 
@@ -362,18 +362,18 @@ const LoginForgetElementModel = ({ isOpen, onClose,step, handleSendOtp, handlePa
     let newErrors = {};
 
     if (otp.some((digit) => digit === "")) {
-      newErrors.otp = "OTP must be 4 digits.";
+      newErrors.otp = " L'OTP deve essere composto da 4 cifre.";
     }
 
     if (!newPassword) {
-      newErrors.newPassword = "New password is required.";
+      newErrors.newPassword = "La nuova password è obbligatoria.";
     } else if (newPassword.length < 6) {
-      newErrors.newPassword = "Password must be at least 6 characters.";
+      newErrors.newPassword = "La password deve contenere almeno 6 caratteri.";
     }
     if (!confirmPassword) {
-      newErrors.confirmPassword = "Confirm password is required.";
+      newErrors.confirmPassword = "La conferma della password è obbligatoria.";
     } else if (newPassword !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match.";
+      newErrors.confirmPassword = "Le password non corrispondono.";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -412,7 +412,7 @@ const LoginForgetElementModel = ({ isOpen, onClose,step, handleSendOtp, handlePa
               </Form.Label>
               <Form.Control
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Inserisci la tua email"
                 value={email}
                 onChange={handleEmailChange}
               />
@@ -421,15 +421,14 @@ const LoginForgetElementModel = ({ isOpen, onClose,step, handleSendOtp, handlePa
             </div>
             <div className="text-center my-2">
             <Button variant="primary" onClick={handleEmailSubmit}>
-              Send OTP
+            Invia OTP
             </Button>
             </div>
           </Form>
         ) : (
           <Form>
             <Form.Group className="mb-3">
-            <p className="modal_form_desc">Don't worry! Resetting your password is easy, just type the email you used to register on RZ Solution.
-Non preoccuparti! Reimpostare la password è semplice, basta digitare l'e-mail con cui ti sei registrato su RZ Solution.</p>
+            <p className="modal_form_desc">Non preoccuparti! Reimpostare la password è semplice, basta digitare l'e-mail con cui ti sei registrato su RZ Solution.</p>
 
               <div className="otp_main_box">
                 {otp?.map((digit, index) => (
@@ -450,10 +449,10 @@ Non preoccuparti! Reimpostare la password è semplice, basta digitare l'e-mail c
             </Form.Group>
 
             <div className="form-group">
-              <Form.Label>New Password</Form.Label>
+              <Form.Label>Nuova password</Form.Label>
               <Form.Control
                 type="password"
-                placeholder="Enter new password"
+                placeholder="Inserisci la nuova password"
                 value={newPassword}
                 onChange={handlePasswordChange}
               />
@@ -461,10 +460,10 @@ Non preoccuparti! Reimpostare la password è semplice, basta digitare l'e-mail c
             </div>
 
             <div className="form-group">
-              <Form.Label>Confirm Password</Form.Label>
+              <Form.Label>Conferma password</Form.Label>
               <Form.Control
                 type="password"
-                placeholder="Confirm new password"
+                placeholder="Conferma la nuova password"
                 value={confirmPassword}
                 onChange={handleConfirmPasswordChange}
               />
@@ -473,7 +472,7 @@ Non preoccuparti! Reimpostare la password è semplice, basta digitare l'e-mail c
 
             <div className="text-center my-2">
             <Button variant="primary" onClick={handlePasswordResets}>
-              Reset Password
+            Reimposta password
             </Button>
             </div>
           </Form>

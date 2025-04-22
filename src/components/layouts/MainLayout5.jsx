@@ -131,10 +131,7 @@ const MainLayout5 = ({ areas }) => {
         refetchOnMountOrArgChange: true,
     } : null
     )
-
-
-
-
+    
     useCallback(() => {
         if (params["*"]) {
             refetch();

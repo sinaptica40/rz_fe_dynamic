@@ -7,8 +7,10 @@ const ProfileElement = ({ areas, userDetails }) => {
     const handleLogout = () => {
         if(isCheck){
             localStorage.clear()
+            sessionStorage.clear()
         }else{
             sessionStorage.clear()
+            localStorage.clear()
         }
         navigate('/login')
     }
@@ -45,7 +47,7 @@ const ProfileElement = ({ areas, userDetails }) => {
                         </div>
                         <ul>
                             <li className="cursor-pointer">
-                                <a onClick={() => navigate('/14')}>
+                                <a onClick={() => navigate('/profile')}>
                                     <i className="ion-android-person" /> My Profile
                                 </a>
                             </li>

@@ -17,6 +17,7 @@ const AccordionElement = ({ data }) => {
                     return (
                         <li
                             key={item.id_page}
+                            style={{cursor: "Pointer"}}
                             className="dash_nav_item"
                             onClick={() => handleClick(item.id_page)}
                         >
