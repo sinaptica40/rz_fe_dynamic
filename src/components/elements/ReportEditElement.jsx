@@ -93,6 +93,8 @@ export default function ReportEdit({ getApi }) {
       }).unwrap();
 
       if (response.status === "SUCCESS") {
+
+        console.log(response,'check response data')
         setData(response);
 
         setSelectedArea(response?.working_area_info?.id_working_area || {})
@@ -1338,7 +1340,7 @@ const EditReportGenerate = ({ data, defaultValue, subTitle, clientformData, clie
                 ></path>
               </svg>
             </span>{" "}
-            Upload Audio
+            Carica audio
           </label>
 
           <div className="records_photography_box space-0">

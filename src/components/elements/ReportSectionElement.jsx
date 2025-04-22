@@ -87,7 +87,6 @@ const ReportSectionElement = ({ areas, getApi }) => {
                   method: 'DELETE',
               }).unwrap();
               if (response?.status == 'success' || response?.status == 'SUCCESS') {
-                console.log("response",response);
                   setLoader(false)
                   toast.success(response?.message);
                   setInspectData(response.data)
@@ -419,8 +418,6 @@ const [addConformity ] = useAddConformityMutation();
           toast.error("Inspection point not be empty")
       }
       } catch (error) {
-          console.log(error);
-          // toast.error(error.message)
           setGroupName('')
       }
      
@@ -511,7 +508,6 @@ const validateFields = () => {
              toast.error(response?.message);
            }
          } catch (error) {
-           console.log(error);
            toast.error(error.data.message);
          }
        }
@@ -528,7 +524,6 @@ const validateFields = () => {
   const handleChange = (e) => {
       const file = e.target.files[0];
       if (file && file.type.startsWith('audio/')) {
-        console.log("uuuuuu",file);
         setAudioFile(file);
         setAudio_file_url(URL.createObjectURL(file));
       } 
@@ -1147,7 +1142,7 @@ const validateFields = () => {
                                 ></path>
                               </svg>
                             </span>{" "}
-                            Upload Audio
+                            Carica audio
                           </label>
 
                           <div className="records_photography_box space-0">
@@ -1558,6 +1553,41 @@ const EditSection2 = ({handleEdit }) => {
         </div>
         <div className="right_photographyBtn">
           <ul className="right_photographyList">
+
+          <li>
+              <div className="right_photoItem">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlnsXlink="http://www.w3.org/1999/xlink"
+                  viewBox="0 0 256 256"
+                  width="26px"
+                  height="26px"
+                  fillRule="nonzero"
+                >
+                  <g
+                    fill="#ed9604"
+                    fillRule="nonzero"
+                    stroke="none"
+                    strokeWidth="1"
+                    strokeLinecap="butt"
+                    strokeLinejoin="miter"
+                    strokeMiterlimit="10"
+                    fontFamily="none"
+                    fontWeight="none"
+                    fontSize="none"
+                    textAnchor="none"
+                    style={{ mixBlendMode: 'normal' }}
+                  >
+                    <g transform="scale(10.66667,10.66667)">
+                      <path d="M4,4c-1.09425,0 -2,0.90575 -2,2v12c0,1.09426 0.90575,2 2,2h16c1.09426,0 2,-0.90574 2,-2v-10c0,-1.09425 -0.90574,-2 -2,-2h-8l-2,-2zM4,6h5.17188l2,2h8.82813v10h-16z"></path>
+                    </g>
+                  </g>
+                </svg>
+                <label htmlFor="fileupload">Carica file</label>
+                <input type="file" id="fileupload" style={{ display: "none" }} onChange={handleChange} />
+              </div>
+            </li>
+
             <li onClick={() => {
 
               if (currentShape.length > 2) {
@@ -1599,39 +1629,6 @@ const EditSection2 = ({handleEdit }) => {
                 Poligono Pieno</div>
             </li>
 
-            <li>
-              <div className="right_photoItem">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlnsXlink="http://www.w3.org/1999/xlink"
-                  viewBox="0 0 256 256"
-                  width="26px"
-                  height="26px"
-                  fillRule="nonzero"
-                >
-                  <g
-                    fill="#ed9604"
-                    fillRule="nonzero"
-                    stroke="none"
-                    strokeWidth="1"
-                    strokeLinecap="butt"
-                    strokeLinejoin="miter"
-                    strokeMiterlimit="10"
-                    fontFamily="none"
-                    fontWeight="none"
-                    fontSize="none"
-                    textAnchor="none"
-                    style={{ mixBlendMode: 'normal' }}
-                  >
-                    <g transform="scale(10.66667,10.66667)">
-                      <path d="M4,4c-1.09425,0 -2,0.90575 -2,2v12c0,1.09426 0.90575,2 2,2h16c1.09426,0 2,-0.90574 2,-2v-10c0,-1.09425 -0.90574,-2 -2,-2h-8l-2,-2zM4,6h5.17188l2,2h8.82813v10h-16z"></path>
-                    </g>
-                  </g>
-                </svg>
-                <label htmlFor="fileupload">Upload File</label>
-                <input type="file" id="fileupload" style={{ display: "none" }} onChange={handleChange} />
-              </div>
-            </li>
 
             <li onClick={() => setIsWriteMode((prev) => !prev)}>
               <div className="right_photoItem" style={{ color: isWriteMode ? "green" : "inherit" }}>

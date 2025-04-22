@@ -7,7 +7,7 @@ import Swal from 'sweetalert2'
 import { setIsUpdate, setPageOpen } from "../../store/pageSlice";
 import Loader from "../../lib/loader/loader";
 const ReportComponentElement = ({ areas, page , inspectionData, areadata}) => {
-  const id_order = localStorage.getItem('id_order')
+  const id_order = localStorage.getItem('ispenzioEditID')
   const dispatch = useDispatch();
   const client = sessionStorage.getItem('client_info')
   const client2 = sessionStorage.getItem('creator_info')

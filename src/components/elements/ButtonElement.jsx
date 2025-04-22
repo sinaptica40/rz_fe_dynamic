@@ -1,12 +1,12 @@
 import React from "react";
 
-const ButtonElement = ({ areas, handleDeleteNotifiche }) => {
+const ButtonElement = ({ areas, handleDeleteNotifiche, handleModal }) => {
   const areaData = areas?.element_data;
   return (
     <>
       <button
         type="button"
-        onClick={() => handleDeleteNotifiche()}
+        onClick={() => handleModal()}
         className={`btn-primary btn-default`}
       >
         {areaData?.data?.html_name}

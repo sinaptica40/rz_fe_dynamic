@@ -55,7 +55,6 @@ export const loginLayoutApi = createApi({
     // api for get the details of edit Norme
     getEditNormData: builder.query({
       query: ({ url, params }) => {
-        console.log(url, params?.id, "urldata");
         return `${url}${params?.id}`;
       },
       keepUnusedDataFor: 0,
@@ -117,7 +116,6 @@ export const loginLayoutApi = createApi({
     EditMachinery: builder.mutation({
       query: (credentials) => {
         // const queryString = new URLSearchParams(credentials.params.id).toString();
-        console.log(credentials, "credentials");
         return {
           url: `${credentials.url}/${credentials.params}`, // Adjust the endpoint as needed
           method: credentials.method,
