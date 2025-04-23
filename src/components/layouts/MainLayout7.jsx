@@ -414,6 +414,7 @@ const MainLayout6 = ({ areas }) => {
   }, [MachineryData]);
 
   const handleFormPage = (item, index) => {
+    console.log(item,'check item ======')
     setShowNextForm(true);
     setshowButton("edit");
     setFormData([]);
@@ -421,6 +422,7 @@ const MainLayout6 = ({ areas }) => {
     setupDateOrderId(item?.id_order);
     setMachineryID(item?.machinery_info?.brand_name);
     setTopologyName(item?.machinery_info?.typology);
+    setErrors({})
   };
 
   const { data: normeDellData } = useGetMachineryIDOrderQuery(
@@ -564,13 +566,13 @@ const MainLayout6 = ({ areas }) => {
   // function for Submit Form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     if (!validateForm() && showButton == "add") {
       return;
     }
 
     if (showButton === "add") {
       try {
+        setLoading(true);
         let body = {
           description: clientformData?.description || null,
           created_by: clientformData?.Machinery_created_id || null,
@@ -668,6 +670,7 @@ const MainLayout6 = ({ areas }) => {
           }
         }
       } catch (error) {
+        setLoading(false);
         console.log(error);
       }
     } else {
