@@ -321,7 +321,7 @@ const MainLayout5 = ({ areas }) => {
                 {findAreaByKeyPrefix("FormArea8", areas) || <div>- -</div>}
               </div>
 
-              {findAreaByKeyPrefix("EditArea4") || <div>- -</div>}
+              {findAreaByKeyPrefix("EditArea4", areas) || <div>- -</div>}
             </div>
             <div className="form-input-block">
               <form onSubmit={handleSubmit}>

@@ -53,6 +53,10 @@ const fetchData = async (route, token) => {
     }
   }
 
+  if(pageId !== 95 || pageId !== 98){
+    localStorage.removeItem('formId')
+  }
+
   const url = pageId
     ? `${API_BASE_URL}/api/v1/page-data-retriever/${pageId}`
     : null;

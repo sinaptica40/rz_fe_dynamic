@@ -42,6 +42,11 @@ const EditTableElement = ({
     return null;
   };
 
+  const handleFormPages = (item, index) =>{
+    
+    handleFormPage(item, index)
+  }
+
   return (
     <>
       <div className="heading-bg-element">
@@ -71,7 +76,7 @@ const EditTableElement = ({
                   <td>{item?.machinery_info?.name ? item?.machinery_info?.name : "-"}</td>
                   <td>
                     <div className="table_action_list">
-                      <a onClick={() => handleFormPage(item, index)} className="table_actionBtn">
+                      <a onClick={() => handleFormPages(item, index)} className="table_actionBtn">
                         <img src={editIcon?.table_fields?.label} />
                       </a>
                       <a onClick={() => handleModal(item?.id_inspection)}

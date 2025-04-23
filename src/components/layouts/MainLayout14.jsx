@@ -182,7 +182,7 @@ const MainLayout14 = ({ areas }) => {
             {/* <div className="col-lg-12"> */}
             <div>
               <div className="cards-block">
-                {findAreaByKeyPrefix("EditArea4") || <div>- -</div>}
+                {findAreaByKeyPrefix("EditArea4", areas) || <div>- -</div>}
                 <div className="form-input-block">
                   <form onSubmit={handleSubmit}>
                     <div className="row row-gap">

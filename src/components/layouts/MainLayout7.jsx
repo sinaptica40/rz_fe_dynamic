@@ -344,6 +344,8 @@ const MainLayout6 = ({ areas }) => {
     const inspectorData = ispectorListing?.find(
       (item) => item?.id_user === parseInt(userId)
     );
+
+    localStorage.removeItem('formId')
     setFormData({
       ...formData,
       topologyDefaultValues: "",
@@ -413,16 +415,19 @@ const MainLayout6 = ({ areas }) => {
     }
   }, [MachineryData]);
 
-  const handleFormPage = (item, index) => {
-    console.log(item,'check item ======')
-    setShowNextForm(true);
-    setshowButton("edit");
-    setFormData([]);
-    seteditId(item?.id_inspection);
-    setupDateOrderId(item?.id_order);
-    setMachineryID(item?.machinery_info?.brand_name);
-    setTopologyName(item?.machinery_info?.typology);
-    setErrors({})
+  const handleFormPage = (item, index) => {  
+    const formid = localStorage.getItem('formId')
+    if(!formid ||  item?.id_inspection !== Number(formid)){
+      localStorage.setItem('formId',item?.id_inspection)
+      setShowNextForm(true);
+      setshowButton("edit");
+      setFormData([]);
+      seteditId(item?.id_inspection);
+      setupDateOrderId(item?.id_order);
+      setMachineryID(item?.machinery_info?.brand_name);
+      setTopologyName(item?.machinery_info?.typology);
+      setErrors({})
+    }
   };
 
   const { data: normeDellData } = useGetMachineryIDOrderQuery(
@@ -565,6 +570,7 @@ const MainLayout6 = ({ areas }) => {
 
   // function for Submit Form
   const handleSubmit = async (e) => {
+    localStorage.removeItem('formId')
     e.preventDefault();
     if (!validateForm() && showButton == "add") {
       return;
@@ -664,12 +670,15 @@ const MainLayout6 = ({ areas }) => {
             setNormeOptions([]);
             setCustomDropDownData(false);
             setLoading(false);
+            localStorage.removeItem('formId')
           } else {
+            localStorage.removeItem('formId')
             setLoading(false);
             toast.error(response?.data?.message);
           }
         }
       } catch (error) {
+        localStorage.removeItem('formId')
         setLoading(false);
         console.log(error);
       }
@@ -846,6 +855,7 @@ const MainLayout6 = ({ areas }) => {
       });
 
       if (response?.data?.status == "SUCCESS") {
+        localStorage.removeItem('formId')
         toast.success(response?.data?.message);
         setLoading(false);
         setShowNextForm(false);
@@ -884,10 +894,12 @@ const MainLayout6 = ({ areas }) => {
         response?.data?.status == "ERROR" ||
         response?.data?.status == "FAIL"
       ) {
+        localStorage.removeItem('formId')
         setLoading(false);
         toast.error(response?.data?.message);
       }
     } catch (error) {
+      localStorage.removeItem('formId')
       console.log("error", error);
       setLoading(false);
     }
@@ -975,12 +987,15 @@ const MainLayout6 = ({ areas }) => {
       }).unwrap();
 
       if (response?.status === "SUCCESS") {
+        localStorage.removeItem('formId')
         toast.success(response?.message);
         refetch();
       } else if (response.status === "ERROR" || response.status === "FAIL") {
+        localStorage.removeItem('formId')
         toast.error(response?.message);
       }
     } catch (error) {
+      localStorage.removeItem('formId')
       console.log(error);
       toast.error(error.data.message);
     }

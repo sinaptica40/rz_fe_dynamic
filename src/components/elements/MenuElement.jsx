@@ -5,6 +5,7 @@ const MenuElement = ({ areas, data }) => {
     const location = useLocation();
     const route = location.pathname.substring(1) || '/';
     const handleNavigation = (id_page) =>{
+        localStorage.removeItem('formId')
         sessionStorage.removeItem('subIndex')
         sessionStorage.removeItem('inspectId')
         sessionStorage.removeItem('sezione')
