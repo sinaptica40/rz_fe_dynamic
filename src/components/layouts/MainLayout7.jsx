@@ -1164,7 +1164,7 @@ const MainLayout6 = ({ areas }) => {
                       formData,
                     }) || <div>- -</div>}
 
-                    {findAreaByKeyPrefix("EditArea17", {
+                    {findAreaByKeyPrefix("EditArea17",areas, {
                       formData,
                       handleSelectNormeListing,
                       normeListing,

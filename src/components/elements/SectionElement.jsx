@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { getClassColorCode, getClassName } from "../../utils/helper";
+import moment from "moment";
 
 const SectionElement = ({ areas, TableData1 }) => {
   const navigate = useNavigate();
@@ -41,13 +42,6 @@ const SectionElement = ({ areas, TableData1 }) => {
             {TableData1?.data?.map((item, index) => (
               <tr key={index}>
                 <td>{item?.client}</td>
-                <td>{item?.order_code}</td>
-                {item?.inspections[0] && (
-                  <td>{item?.inspections[0]?.calendar_info?.date}</td>
-                )}
-                <td>
-                  <div className="descTableMax">{item?.description}</div>
-                </td>
                 {item?.id_state?.state && item?.inspections[0] && (
                   <td>
                     <div
@@ -79,6 +73,8 @@ const SectionElement = ({ areas, TableData1 }) => {
                     </div>
                   </td>
                 )}
+                <td>{item?.order_code}</td>
+
                 {item?.ispectors?.length > 0 && (
                   <td>
                     {item?.ispectors?.map((item, index) => (
@@ -89,6 +85,12 @@ const SectionElement = ({ areas, TableData1 }) => {
                     ))}
                   </td>
                 )}
+
+                <td>
+                  <div className="descTableMax">{item?.description}</div>
+                </td>
+                <td>{moment(item?.create_at).format("YYYY-MM-DD")}</td>
+
                 <td className="text-end">
                   <div className="btnRight">
                     <a

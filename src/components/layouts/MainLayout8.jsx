@@ -171,7 +171,7 @@ const MainLayout6 = ({ areas }) => {
                     <div key={index}>
                       <div className="heading-bg-element mb-4">
                         <div className="heading-elm-itle">
-                          {findAreaByKeyPrefix("ViewPageHeadingArea", {
+                          {findAreaByKeyPrefix("ViewPageHeadingArea",areas, {
                             index,
                           })}
                         </div>

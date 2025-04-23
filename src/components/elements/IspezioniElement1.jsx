@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { getClassColorCode, getClassName } from "../../utils/helper";
+import moment from "moment";
 
 const IspezioniElement1 = ({ areas, TableData1 }) => {
   const navigate = useNavigate();
@@ -8,7 +9,7 @@ const IspezioniElement1 = ({ areas, TableData1 }) => {
   const filteredData = areas?.table_columns.filter(
     (item) => item.table_fields.data_type !== "api"
   );
-
+ console.log(areas,'check areas table columns')
   const addRoute = areas?.table_columns.find(
     (item) => item.table_fields.data_type === "api"
   );
@@ -43,7 +44,7 @@ const IspezioniElement1 = ({ areas, TableData1 }) => {
                 <td>{item?.client}</td>
                 <td>{item?.order_code}</td>
                 {item?.inspections[0] && (
-                  <td>{item?.inspections[0]?.calendar_info?.date}</td>
+                  <td>{moment(item?.create_at).format('YYYY-MM-DD')}</td>
                 )}
                 <td>
                   <div className="descTableMax">{item?.description}</div>

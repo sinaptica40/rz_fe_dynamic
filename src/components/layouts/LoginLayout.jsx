@@ -165,7 +165,7 @@ const LoginLayout = ({ areas }) => {
     }
 
     if (genericErrorMessage) {
-      setGenericError(genericErrorMessage);
+      toast.error(genericErrorMessage);
     }
   };
 

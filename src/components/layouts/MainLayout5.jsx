@@ -96,7 +96,6 @@ const MainLayout5 = ({ areas }) => {
 
   const edit_id = localStorage.getItem("id_standard");
 
-  // console.warn("qwert",edit_id)
   const {
     data: editNormedata,
     isFetching,
@@ -128,7 +127,6 @@ const MainLayout5 = ({ areas }) => {
   useEffect(() => {
     if (editNormedata?.data && !isFetching) {
       const editValue = editNormedata?.data;
-      console.warn("Fetched data for editing:", editValue);
       setFormValues({
         fileName: editValue?.name || null,
         // file: editValue?.pdf_name || null,
@@ -228,7 +226,6 @@ const MainLayout5 = ({ areas }) => {
           data: formData,
         };
         const res = await EditNorme(objEdit);
-        console.warn("resss", res);
         if (res?.data?.status == "success" || res?.data?.status == "SUCCESS") {
           toast.success(res?.data?.message);
           setLoading(false);

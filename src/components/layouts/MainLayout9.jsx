@@ -17,8 +17,6 @@ const MainLayout3 = ({ areas }) => {
   const params = useParams();
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [showModal, setShowModal] = useState();
-  const modalRef = useRef(null);
 
   let allApis = areas?.filter((item) => {
     return item?.props?.children?.props?.children?.props?.api != null;
@@ -133,21 +131,6 @@ const MainLayout3 = ({ areas }) => {
     }
   };
 
-  useEffect(() => {
-    if (showModal) {
-      const handleOutsideClick = (e) => {
-        if (modalRef.current && !modalRef.current.contains(e.target)) {
-          setShowModal(false);
-        }
-      };
-      document.addEventListener("mousedown", handleOutsideClick, {
-        capture: true,
-      });
-      return () => {
-        document.removeEventListener("mousedown", handleOutsideClick);
-      };
-    }
-  }, [showModal]);
 
   // user details
   const { data: userDetails, isFetchingg } = useGetUserDetailsQuery({
@@ -155,10 +138,6 @@ const MainLayout3 = ({ areas }) => {
     method: getapi?.userDetailsApiMethod,
     refetchOnMountOrArgChange: true,
   });
-
-  const handleModal = (id) => {
-    setShowModal(true);
-  };
 
   return (
     <>
@@ -249,8 +228,7 @@ const MainLayout3 = ({ areas }) => {
                 {data?.data?.length > 0 && (
                   <div className="">
                     {findAreaByKeyPrefix("ButtonArea", areas, {
-                      handleDeleteNotifiche,
-                      handleModal,
+                      handleDeleteNotifiche
                     })}
                   </div>
                 )}
@@ -275,24 +253,6 @@ const MainLayout3 = ({ areas }) => {
           </div>
         </div>
       </div>
-      <div></div>
-
-      {showModal && (
-        <div className="modal-main-box">
-          <div className="modal-inner-box" ref={modalRef}>
-            hello
-            {findAreaByKeyPrefix("FormArea8", areas)}
-            {findAreaByKeyPrefix("FormArea9", areas)}
-            {findAreaByKeyPrefix("FormArea10", areas)}
-            <div className="modal-btn-group">
-              {findAreaByKeyPrefix("FormArea11", areas, {
-                deleteInspection: handleDeleteNotifiche,
-              })}
-              {findAreaByKeyPrefix("FormArea12", areas, { setShowModal })}
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };
