@@ -164,18 +164,20 @@ export default function ReportEdit({ getApi }) {
         toast.success(response?.message);
         setGroupName("");
         fetchInspectionPoints()
+        const cancelButton = document.querySelector('#aggiungiModal .modal_borderBtn');
+        if (cancelButton) {
+          cancelButton.click();
+        }
       }else{
         toast.error(response?.message);
+        setGroupName("");
       }
 
     } catch (error) {
       console.log(error);
       toast.error(error.data.message);
       setGroupName("");
-      const cancelButton = document.querySelector('#aggiungiModal .modal_borderBtn');
-      if (cancelButton) {
-        cancelButton.click();
-      }
+     
     }
   };
   const handleToggle1 = () => {
@@ -1019,7 +1021,7 @@ export default function ReportEdit({ getApi }) {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="aggiungiModalLabel">
-                Aggiungi nuovo gruppo
+                Aggiungi nuova gruppo
               </h5>
             </div>
             <div className="modal-body">
@@ -1055,14 +1057,14 @@ export default function ReportEdit({ getApi }) {
                 type="button"
                 className="modal_solidBtn"
               >
-                Confirm
+                Confermare
               </button>
               <button
                 type="button"
                 className="modal_borderBtn"
                 data-bs-dismiss="modal"
               >
-                Cancel
+                Cancellare
               </button>
             </div>
           </div>

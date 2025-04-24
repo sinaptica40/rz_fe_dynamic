@@ -61,8 +61,8 @@ const ConformityDetected = ({
           url: `/api/v1/conformity/create-cluster`,
           method: "POST",
           body: {
-            name: pointData?.name,
-            priority: pointData?.priority,
+            name: name,
+            priority: priority,
             id_not_conformity_type: clusterdata?.id_not_conformity_type,
           },
         }).unwrap();
@@ -73,10 +73,15 @@ const ConformityDetected = ({
           setPriority("")
           fetchedClusterPoints();
   
-          const closeButton = document.querySelector('#aggiungiModal .btn-close');
-          if (closeButton) closeButton.click();
+          const cancelButton = document.querySelector('#aggiungiModal0 .modal-footer .modal_borderBtn');
+          if (cancelButton) {
+            cancelButton.click();
+          }
+          setDisplay(false)
         }else{
           toast.error(response.message);
+          setName("")
+          setPriority("")
         }
       } catch (error) {
         console.log(error);
@@ -157,14 +162,9 @@ const ConformityDetected = ({
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="aggiungiModalLabel">
-                  Aggiungi nuovo gruppo
+                  Aggiungi nuova gruppo
                 </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
+             
               </div>
               <div className="modal-body">
                 <div className="form-input-block p-0">
@@ -220,14 +220,14 @@ const ConformityDetected = ({
                   type="button"
                   className="modal_solidBtn"
                 >
-                  Confirm
+                  Confermare
                 </button>
                 <button
                   type="button"
                   className="modal_borderBtn"
                   data-bs-dismiss="modal"
                 >
-                  Cancel
+                  Cancellare
                 </button>
               </div>
             </div>

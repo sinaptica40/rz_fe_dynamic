@@ -400,6 +400,7 @@ const [addConformity ] = useAddConformityMutation();
               fetchInspectionPoints();
           }else{
             toast.error(response.message)
+            setGroupName('')
           }
       }else{
           toast.error("Inspection point not be empty")
@@ -1252,7 +1253,7 @@ const validateFields = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="aggiungiModalLabel">
-                Aggiungi nuovo gruppo
+                Aggiungi nuova gruppo
               </h5>
             </div>
             <div className="modal-body">
@@ -1288,14 +1289,14 @@ const validateFields = () => {
                 type="button"
                 className="modal_solidBtn"
               >
-                Confirm
+                Confermare
               </button>
               <button
                 type="button"
                 className="modal_borderBtn"
                 data-bs-dismiss="modal"
               >
-                Cancel
+                Cancellare
               </button>
             </div>
           </div>
@@ -1694,7 +1695,7 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
                 {data?.data.map((value, index) => (
                   <div key={index} className="col-lg-4 col-sm-4 col-6 col-xxl-2">
                     <a className="d-block">
-                      <div className="finalizza_cardBox" onClick={() => handleCluster(value)}>
+                      <div style={{cursor: "pointer"}} className="finalizza_cardBox" onClick={() => handleCluster(value)}>
                       <img src={imagePaths[index] || "img/default.png"} alt={`Step ${index + 1}`} />
                         <h3>{value?.nc_name}</h3>
                       </div>
@@ -1783,14 +1784,19 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
                 toast.success(response.message);
                 setName("")
                 setPriority("")
+                
+                const cancelButton = document.querySelector('#aggiungiModal2 .modal-footer .modal_borderBtn');
+                if (cancelButton) {
+                  cancelButton.click();
+                }
+                setDisplay(false)
                 fetchedClusterPoints();
-
-                const closeButton = document.querySelector('#aggiungiModal .btn-close');
-                if (closeButton) closeButton.click();
 
             
             }else{
               toast.error(response.message);
+              setName("")
+              setPriority("")
             }
         } catch (error) {
             console.log(error);
@@ -1852,8 +1858,7 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id="aggiungiModalLabel">Aggiungi nuovo gruppo</h5>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 className="modal-title" id="aggiungiModalLabel">Aggiungi nuova gruppo</h5>
                         </div>
                         <div className="modal-body">
                             <div className="form-input-block p-0">
@@ -1908,10 +1913,10 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
                                 type="button"
                                 className="modal_solidBtn"
                                 >
-                                Confirm
+                                Confermare
                             </button>
                             <button type="button" className="modal_borderBtn" data-bs-dismiss="modal">
-                                Cancel
+                            Cancellare
                             </button>
                         </div>
                     </div>
