@@ -93,8 +93,6 @@ export default function ReportEdit({ getApi }) {
       }).unwrap();
 
       if (response.status === "SUCCESS") {
-
-        console.log(response,'check response data')
         setData(response);
 
         setSelectedArea(response?.working_area_info?.id_working_area || {})
@@ -166,6 +164,8 @@ export default function ReportEdit({ getApi }) {
         toast.success(response?.message);
         setGroupName("");
         fetchInspectionPoints()
+      }else{
+        toast.error(response?.message);
       }
 
     } catch (error) {
@@ -257,6 +257,8 @@ export default function ReportEdit({ getApi }) {
           setData(response)
           toast.success(response?.message)
           fetchData();
+        }else{
+          toast.error(response?.message)
         }
       }
     } catch (error) {
@@ -332,7 +334,7 @@ export default function ReportEdit({ getApi }) {
         setIsLoading(false);
         toast.success(response?.message);
       }
-      if (response.status === "ERROR") {
+      else {
         toast.error(response?.message);
         setIsLoading(false);
       }
@@ -514,7 +516,7 @@ export default function ReportEdit({ getApi }) {
                 <div className="reportNormativa d-flex justify-content-between align-items-center">
                   <h4>Non conformità</h4>
                   {flag ? (
-                    <a onClick={hanleToggleButton} className="">
+                    <a style={{cursor: "pointer"}} onClick={hanleToggleButton} className="">
                       <svg
                         width="26"
                         height="26"
@@ -1103,8 +1105,6 @@ const EditReportGenerate = ({ data, defaultValue, subTitle, clientformData, clie
 
   const handleEdit = async (shapes, snapshot_file, original_image_file, newTextData, texts) => {
     setIsLoading(true)
-    // if (validateFields()) {
-    // formData.append("id_not_conformity_detected", data?.id_not_conformity_detected)
     formData.append("id_machinery", data?.id_machinery);
     formData.append("id_cluster", subTitle?.id_cluster);
     formData.append("id_code", subTitle?.nc_code);
@@ -1138,7 +1138,7 @@ const EditReportGenerate = ({ data, defaultValue, subTitle, clientformData, clie
         setFlag(false)
         toast.success(response?.message)
       }
-      if (response.status === "ERROR") {
+      else {
         toast.error(response?.message)
         setIsLoading(false)
       }
@@ -1146,7 +1146,7 @@ const EditReportGenerate = ({ data, defaultValue, subTitle, clientformData, clie
     } catch (error) {
       console.log(error);
       setIsLoading(false)
-      // toast.error(error.data.message)
+
     }
 
   }
@@ -1323,6 +1323,7 @@ const EditReportGenerate = ({ data, defaultValue, subTitle, clientformData, clie
             style={{ display: "none" }}
           />
           <label
+            style={{cursor: "pointer"}}
             htmlFor="audioUpload"
             className="btn-primary btn-default text-center w-auto"
           >

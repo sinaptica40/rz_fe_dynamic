@@ -54,7 +54,6 @@ const ProfileElement = ({ areas, userDetails }) => {
                             <li className="cursor-pointer">
                                 <a
                                     onClick={handleLogout}
-                                // href="#!"
                                 >
                                     <i className="ion-log-out" /> Logout
                                 </a>

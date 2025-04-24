@@ -120,7 +120,6 @@ const MainLayout14 = ({ areas }) => {
 
   return (
     <>
-      {/* {(isFetching1) && <Loader />} */}
       <div className="loader-wrapper" style={{ display: "none" }}>
         <div className="loader">
           <img src="img/logo.png" alt="" />
@@ -164,7 +163,6 @@ const MainLayout14 = ({ areas }) => {
                 {findAreaByKeyPrefix("HeaderArea1", areas) || <div>- -</div>}
                 <div className="overlay" style={{ display: "none" }} />
                 {findAreaByKeyPrefix("HeaderArea2", areas) || <div>- -</div>}
-                {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
                 {findAreaByKeyPrefix("HeaderArea4", areas, { userDetails }) || (
                   <div>- -</div>
                 )}
@@ -179,7 +177,6 @@ const MainLayout14 = ({ areas }) => {
       <div className="webcontent-wrapper">
         <div className="container-fluid p-0">
           <div className="row">
-            {/* <div className="col-lg-12"> */}
             <div>
               <div className="cards-block">
                 {findAreaByKeyPrefix("EditArea4", areas) || <div>- -</div>}

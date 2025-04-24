@@ -18,17 +18,15 @@ const ReportSectionElement = ({ areas, getApi }) => {
   const mainIndex = localStorage.getItem('mainMenuIndex')
  const dispatch = useDispatch()
   const navigate = useNavigate()
-  // const dispatch = useDispatch()
   const [inspect, setInspectData] = useState()
   const sectionIndex = localStorage.getItem('section')
   const sezioneIndex = sessionStorage.getItem('sezione')
  const [getInspectionConformity] = useGetInspectionConformityMutation();
 
   if(mainIndex !== null){
-      // dispatch(setPageNumber(null))
+      
   }
   const getInspectConformity = async() => {
-      // dispatch(fetchInspectionStart());
       try {
           setIsLoading(true)
           const response = await getInspectionConformity({
@@ -38,16 +36,14 @@ const ReportSectionElement = ({ areas, getApi }) => {
           }).unwrap()
           if (response.status === "SUCCESS") {
               setIsLoading(false)
-              // dispatch(fetchInspectionSuccess(response.data));
               setInspectData(response.data);
           } else {
               setIsLoading(false)
               throw new Error("Failed to fetch conformity data");
           }
       } catch (err) {
-          // dispatch(fetchInspectionFailure(err.message));
           setIsLoading(false)
-          console.error("Error fetching conformity data:", err);
+          console.error(err);
       }
   };
 
@@ -58,8 +54,6 @@ const ReportSectionElement = ({ areas, getApi }) => {
   const [flag, setFlag] = useState(true)
   const [loader, setLoader] = useState(false)
   const handleConformity = async (id_not_conformity_detected, index) => {
-    // sessionStorage.removeItem('inspectId')
-    //  sessionStorage.removeItem('menuindex')
       sessionStorage.setItem('subIndex',`${sezioneIndex}.${index}`)
       sessionStorage.setItem('submenu', id_not_conformity_detected)
       navigate(`/edit-conformity`)
@@ -91,7 +85,6 @@ const ReportSectionElement = ({ areas, getApi }) => {
                   toast.success(response?.message);
                   setInspectData(response.data)
                   dispatch(setIsUpdate(1))
-                //   dispatch(deleteList(`${sectionId}`));
                   getInspectConformity()
                   window.location.href = `/${response?.navigate}`;
                  
@@ -115,7 +108,6 @@ const ReportSectionElement = ({ areas, getApi }) => {
        <>
             {flag ? <div className="">
                 <div className="container-fluid p-0">
-                {/* onClick={() => dispatch(setPageOpen(true)) */}
                     <a href="javascript:void(0);" className="dashIconFold" id="foldBtn" >
                         <div className="folded">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="17" viewBox="0 0 6 10"
@@ -139,7 +131,6 @@ const ReportSectionElement = ({ areas, getApi }) => {
                             <div className="reportHeader">
                           <div>Ispezione | {inspect?.order_info?.client}</div>
                           <div>{inspect?.order_info?.order_code}</div>
-                          {/* {moment(inspaction_date).format('YYYY-MM-DD')} */}
                           <div>Data Inizio Ispezione <span>{moment(inspect?.order_info?.create_at).format('YYYY-MM-DD')}</span></div>
                         </div>
                         <div className="report_innerBox">
@@ -151,7 +142,6 @@ const ReportSectionElement = ({ areas, getApi }) => {
                                             </svg></span>
                                              Aggiungi elemento Non-Conformita</button>
                                 <div className="sezione_titleBox">
-                                {/* {sectionId === "" ? sectionIndex : sectionId} */}
                                     <h3 className="sezione_tableTitle">Sezione {sezioneIndex}</h3>
                                     <ul className="nav nav-pills" id="pills-tab" role="tablist">
                                         <li className="nav-item" role="presentation">
@@ -199,7 +189,6 @@ const ReportSectionElement = ({ areas, getApi }) => {
                                                                             <path d="M2.9468 7.36671C2.9468 7.62636 2.86982 7.88017 2.72559 8.09607C2.58136 8.31197 2.37636 8.48026 2.1365 8.57967C1.89663 8.67908 1.63269 8.70514 1.37802 8.65455C1.12335 8.60397 0.88939 8.47902 0.705724 8.2955C0.522058 8.11197 0.396928 7.87811 0.346152 7.62348C0.295377 7.36885 0.321236 7.10488 0.420461 6.86494C0.519685 6.625 0.68782 6.41987 0.90361 6.27548C1.1194 6.13108 1.37316 6.05391 1.6328 6.05371C1.80531 6.05358 1.97616 6.08744 2.13557 6.15337C2.29499 6.2193 2.43985 6.31599 2.56188 6.43793C2.68391 6.55986 2.78071 6.70465 2.84676 6.86402C2.91281 7.02338 2.9468 7.1942 2.9468 7.36671Z" fill="#9B9696" />
                                                                         </svg>
                                                                     </button>
-                                                                    {/* sectionId === "" ? sectionIndex : sectionId}.{index+1} */}
                                                                      {value?.cluster_info?.nc_name} - {value?.cluster_info?.name}
                                                                 </div>
                                                             </td>
@@ -271,7 +260,6 @@ const ReportSectionElement = ({ areas, getApi }) => {
                                                                             : subValue?.originalImage_full_url
                                                                                 ? subValue.originalImage_full_url
                                                                                 : 'img/camera2.png'
-                                                                        // subValue?.snapShotImage_full_url === null ? "" : subValue?.snapShotImage_full_url 
                                                                     }
                                                                     alt="" />
                                                                 </div>
@@ -280,7 +268,6 @@ const ReportSectionElement = ({ areas, getApi }) => {
                                                                     <li><strong>{value?.cluster_info?.nc_code}</strong> {value?.cluster_info?.nc_name}</li>
                                                                     <li>Area Lavoro: {inspect?.working_area_info?.wa_name}</li>
                                                                     <li>Ispettore: {inspect?.ispector_info?.name}</li>
-                                                                    {/* <li className="sezioneCardStatus" style={{ borderColor: "#E23115" }}>Priorità media</li> */}
                                                                 </ul>
                                                             </div>
                                                         </div>
@@ -320,13 +307,11 @@ const ReportAdd = ({data, setFlag, getInspectConformity, sezioneIndex}) => {
   const fileInputRef = useRef(null);
   
   const [isLoading, setIsLoading] = useState(false)
-  // const dispatch = useDispatch()
   const [display, setDisplay] = useState(false)
   const [groupName, setGroupName] = useState('');
   const [subTitle, setSubTitle] = useState({})
   const [displayInspection, setDisplayInspection] = useState(false)
   const [defaultValue, setDefaultValue] = useState(null);
-  // const subInspection = useSelector((state: any) => state.page.subInspection);
   const [notes, setNote] = useState("")
   const [audioFile, setAudioFile] = useState(null);
   const [audio_file_url, setAudio_file_url] = useState(null)
@@ -413,6 +398,8 @@ const [addConformity ] = useAddConformityMutation();
                 cancelButton.click();
               }
               fetchInspectionPoints();
+          }else{
+            toast.error(response.message)
           }
       }else{
           toast.error("Inspection point not be empty")
@@ -450,9 +437,6 @@ const validateFields = () => {
     newErrors.subTitle = 'Non conformità Rilevata is required.';
   }
 
-//   if (defaultValue === '') {
-//     newErrors.defaultValue = 'Punto di ispezione is required.';
-//   }
 
   if (notes === undefined) {
       newErrors.notes = 'notes is required.';
@@ -463,6 +447,7 @@ const validateFields = () => {
 };
   // handleEdit 
   const handleEdit = async(shapes, snapshot_file, original_image_file, newTextData, texts) =>{
+    setIsLoading(true)
        if (validateFields()) {
          formData.append("id_machinery", data?.id_machinery);
          formData.append("id_cluster", subTitle?.id_cluster);
@@ -497,17 +482,18 @@ const validateFields = () => {
            const response = await addConformity(formData).unwrap();
 
            if (response.status === "SUCCESS") {
-             // setData(response)
-             // dispatch(deleteList("flag"))
+             setIsLoading(false)
              getInspectConformity();
              setFlag(true);
              window.location.href = location.pathname.split('/').pop();;
              toast.success(response?.message);
            }
-           if (response.status === "ERROR") {
+          else{
+            setIsLoading(false)
              toast.error(response?.message);
            }
          } catch (error) {
+          setIsLoading(false)
            toast.error(error.data.message);
          }
        }
@@ -934,7 +920,6 @@ const validateFields = () => {
                         </div>
                       </div>
 
-                      {/* {data?.rz_not_conformity?.map((value, index) => ( */}
                       <div className="col-12  mb-4">
                         <div class="col-xl-12">
                           <div class="generate_aiBox">
@@ -1125,6 +1110,7 @@ const validateFields = () => {
                             style={{ display: "none" }}
                           />
                           <label
+                            style={{cursor: "pointer"}}
                             for="audioUpload"
                             className="btn-primary btn-default text-center"
                           >
@@ -1187,7 +1173,6 @@ const validateFields = () => {
                             </div>
                           </div>
                           <div class="form-floating">
-                            {/* <input type="text" value={commento} class="form-control" onChange={(e) => setCommento(e.target.value)} id="floatingCommento" placeholder="Commento :" /> */}
                             <input
                               type="text"
                               value={clientformData?.commento}
@@ -1234,7 +1219,6 @@ const validateFields = () => {
                             </div>
                           </div>
                           <div class="form-floating">
-                            {/* <input type="text" value={commento2} class="form-control" onChange={(e) => setCommento2(e.target.value)} id="floatingCommento" placeholder="Commento :" /> */}
                             <input
                               type="text"
                               value={clientformData2?.commento}
@@ -1805,6 +1789,8 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
                 if (closeButton) closeButton.click();
 
             
+            }else{
+              toast.error(response.message);
             }
         } catch (error) {
             console.log(error);

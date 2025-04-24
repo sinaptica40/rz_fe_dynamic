@@ -146,10 +146,8 @@ const MainLayout4 = ({ areas }) => {
 
         setNormeOptions(normSpecificationOptions);
 
-        const previouslySelected =
-          [editValue?.norm_specification[0]?.id_standard] || [];
-
-        let arr = editValue?.norm_specification.map((it) => ({
+        const previouslySelected = editValue?.norm_specification?.map(item => item.id_standard) || [];
+        let arr = editValue?.norm_specification?.map((it) => ({
           value: it?.id_standard,
           label: it?.name,
         }));
@@ -162,6 +160,8 @@ const MainLayout4 = ({ areas }) => {
       }
     }
   }, [editNormedata, isFetching]);
+
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -211,6 +211,7 @@ const MainLayout4 = ({ areas }) => {
       [name]: "",
     }));
   };
+
 
   const handleSelectChange = (selectedOptions) => {
     const selectedValues = selectedOptions.map((option) => option.value);
@@ -299,7 +300,7 @@ const MainLayout4 = ({ areas }) => {
         }
       } else if (getapi?.editApi && getapi?.editApiMethod == "PUT") {
         const EditMachineryValue = {
-          brand_name: formValues?.brand_name || null,
+          brand_name: formValues?.brand_name || "Altro marchio",
           typology: formValues?.typology || null,
           atex: formValues?.atex || false,
           ce: formValues?.ce || false,
@@ -313,6 +314,7 @@ const MainLayout4 = ({ areas }) => {
           params: edit_id,
           data: EditMachineryValue,
         };
+
 
         const res = await EditMachinery(objEdit);
 

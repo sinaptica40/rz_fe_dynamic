@@ -15,7 +15,6 @@ function InputNumberElement({ areas, handleChange, formValues, errors }) {
           onChange={handleChange}
         />
         <label htmlFor="floatingInput">{areas?.element_data?.block_name}</label>
-        {/* {errors.year && <div className="invalid-feedback">{errors.year}</div>} */}
       </div>
     </div>
   )

@@ -282,7 +282,6 @@ const MainLayout6 = ({ areas }) => {
     if (validateClientForm()) {
       setShowNextForm(true);
       setAddButtonApi(true);
-      //   setSectionAdded(true);
     }
   };
 
@@ -394,7 +393,7 @@ const MainLayout6 = ({ areas }) => {
         toast.error(response?.data?.message);
       }
     } catch (error) {
-      console.error("Error deleting inspection:", error);
+      console.error(error);
     }
   };
 
@@ -450,6 +449,10 @@ const MainLayout6 = ({ areas }) => {
         ...formData,
         machineName: selectedoption,
         name: selectedoption.label,
+        ce:  null,
+        atex:  null,
+        year: "",
+        notes: ""
       });
     }
     if (!selectedoption?.__isNew__) {
@@ -607,14 +610,10 @@ const MainLayout6 = ({ areas }) => {
           id_state: status?.id_state,
           inspections: [
             {
-              // id_machinery_type: formData?.machineName?.label,
               id_machinery_type: null,
               id_ispector: formData?.inspectorId.inspectorId,
               notes: formData?.notes,
               id_working_area: formData?.areaId || null,
-              //   year: parseInt(formData?.year) || null,
-              //   atex: formData?.atex || false,
-              //   ce: formData?.ce || false,
 
               newMachine: {
                 name: formData?.name || null,
@@ -637,8 +636,7 @@ const MainLayout6 = ({ areas }) => {
           const response = await createInspectionData({
             url: filterApi?.createInspectionUrl,
             method: filterApi.CreateInspectionMethod,
-            body: customDropDownData ? newBody : body,
-            //body:body,
+            body: customDropDownData ? newBody : body
           });
           if (response?.data?.status == "SUCCESS") {
             toast.success(response?.data?.message);
@@ -794,7 +792,6 @@ const MainLayout6 = ({ areas }) => {
     try {
       setLoading(true);
       let body = {
-        // machineId: formData.machineId,
         description: clientformData?.description,
         created_by: clientformData?.Machinery_created_id,
         id_order: clientformData?.orderId,
@@ -827,7 +824,6 @@ const MainLayout6 = ({ areas }) => {
         id_state: status?.id_state,
         inspections: [
           {
-            // id_machinery_type: formData?.machineName?.label,
             id_machinery_type: null,
             id_ispector: formData?.inspectorId.inspectorId,
             notes: formData?.notes,
@@ -900,7 +896,7 @@ const MainLayout6 = ({ areas }) => {
       }
     } catch (error) {
       localStorage.removeItem('formId')
-      console.log("error", error);
+      console.log(error);
       setLoading(false);
     }
   };

@@ -9,7 +9,6 @@ const IspezioniElement1 = ({ areas, TableData1 }) => {
   const filteredData = areas?.table_columns.filter(
     (item) => item.table_fields.data_type !== "api"
   );
- console.log(areas,'check areas table columns')
   const addRoute = areas?.table_columns.find(
     (item) => item.table_fields.data_type === "api"
   );

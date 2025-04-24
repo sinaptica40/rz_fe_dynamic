@@ -76,10 +76,10 @@ const EditTableElement = ({
                   <td>{item?.machinery_info?.name ? item?.machinery_info?.name : "-"}</td>
                   <td>
                     <div className="table_action_list">
-                      <a onClick={() => handleFormPages(item, index)} className="table_actionBtn">
+                      <a style={{cursor: "pointer"}}  onClick={() => handleFormPages(item, index)} className="table_actionBtn">
                         <img src={editIcon?.table_fields?.label} />
                       </a>
-                      <a onClick={() => handleModal(item?.id_inspection)}
+                      <a style={{cursor: "pointer"}} onClick={() => handleModal(item?.id_inspection)}
                         className="table_actionBtn">
                         <img src={deleteIcon?.table_fields?.label} />
                       </a>

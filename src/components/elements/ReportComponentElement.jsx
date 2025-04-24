@@ -145,7 +145,7 @@ const ReportComponentElement = ({ areas, page , inspectionData, areadata}) => {
             </div>
             <div className="col-md-12 w-100 d-flex justify-content-end">
               <button type="submit" className="btn btn-primary text-center">
-                Submit
+                Salva
               </button>
             </div>
           </form>
@@ -332,6 +332,9 @@ const ReportDocs = ({id, areas}) =>{
           toast.success(res?.message)
           setLoading(false)
           refetch();
+        }else{
+          setLoading(false)
+          toast.error(res?.message);
         }
       }).catch((err) => {
         setLoading(false)
@@ -396,7 +399,7 @@ if (result.isConfirmed) {
         }
     }).catch((err) => {
         toast.error("Something went wrong");
-        console.error("Error Delete Report:", err);
+        console.error(err);
     
     })
 }
@@ -444,7 +447,7 @@ if(loading) return <Loader />
                     <thead className="thbold">
                       <tr>
                         <th scope="col">ID</th>
-                        <th scope="col">Report Name</th>
+                        <th scope="col">Report Nome</th>
                         <th scope="col">Data Ispezione</th>
                         <th scope="col"></th>
                       </tr>

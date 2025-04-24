@@ -364,9 +364,9 @@ const LoginForgetElementModel = ({
   const handleEmailSubmit = () => {
     let newErrors = {};
     if (!email) {
-      newErrors.email = "Email is required.";
+      newErrors.email = "L'e-mail è obbligatoria.";
     } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-      newErrors.email = "Enter a valid email.";
+      newErrors.email = "Inserisci un indirizzo email valido.";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -412,6 +412,8 @@ const LoginForgetElementModel = ({
       setNewPassword("");
       setConfirmPassword("");
       setOtp(["", "", "", ""]);
+    }else{
+      toast.error(resp)
     }
   };
 

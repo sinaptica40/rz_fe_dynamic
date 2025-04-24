@@ -86,12 +86,11 @@ const SignPad = ({ existingSignature = null, setNewTextData }) => {
       }
 
       const base64Image = canvas.toDataURL("image/png");
-      console.log("Base64 Signature:", base64Image);
       setNewTextData(base64Image);
       setImageURL(base64Image);
       setIsSignatureExists(true);
     } catch (error) {
-      console.error("Error saving signature:", error);
+      console.error("Error saving signature:");
     }
   };
 

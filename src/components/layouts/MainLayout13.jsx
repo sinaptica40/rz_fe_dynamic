@@ -125,7 +125,6 @@ const MainLayout13 = ({ areas }) => {
                   {findAreaByKeyPrefix("HeaderArea1", areas) || <div>- -</div>}
                   <div className="overlay" style={{ display: "none" }} />
                   {findAreaByKeyPrefix("HeaderArea2", areas) || <div>- -</div>}
-                  {/* {findAreaByKeyPrefix('HeaderArea3') || <div>- -</div>} */}
                   {findAreaByKeyPrefix("HeaderArea4", areas, {
                     userDetails,
                   }) || <div>- -</div>}

@@ -36,7 +36,6 @@ const EditSection = ({ data, handleEdit, handleImage, index = null }) => {
   const [original_image, setOriginal_image] = useState({});
   const [original_image_url, setOriginal_image_url] = useState({});
   const fileInputRef = useRef(null);
-  console.log(shapes, "check image url here");
   useEffect(() => {
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -396,10 +395,11 @@ const EditSection = ({ data, handleEdit, handleImage, index = null }) => {
           style={{ display: "none" }}
         />
         <label
+        style={{cursor: "pointer"}}
           for={`audioUpload-${index}`}
           className="btn-primary btn-default text-center w-auto"
         >
-          <span className="me-2">
+          <span className="me-2" >
             <svg
               width="18"
               height="19"

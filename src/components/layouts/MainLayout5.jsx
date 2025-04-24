@@ -129,14 +129,11 @@ const MainLayout5 = ({ areas }) => {
       const editValue = editNormedata?.data;
       setFormValues({
         fileName: editValue?.name || null,
-        // file: editValue?.pdf_name || null,
-        // /file_name: editValue?.name || null,
         id_standard_type: editValue.id_standard_type || null,
         language: editValue.language || null,
         full_url: editValue?.full_url,
         description: editValue.description || null,
         standard_code: editValue.standard_code || null,
-        // id_standard: editValue?.id_standard || null,
       });
     }
   }, [editNormedata, isFetching]);

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const EditElement16 = ({ areas, handleClose }) => {
   return (
-    <a className="close-iconBtn" onClick={handleClose}>
+    <a style={{cursor: "pointer"}} className="close-iconBtn" onClick={handleClose}>
       <img
         width={"18px"}
         height={"18px"}

@@ -16,8 +16,6 @@ const EditElement7 = ({
     label: item?.name,
   }));
 
-  console.log(formData,'check form data here')
-
   const currentValue = options?.find(
     (option) => option.id_machinery_type === formData?.machineId
   );

@@ -75,6 +75,8 @@ const ConformityDetected = ({
   
           const closeButton = document.querySelector('#aggiungiModal .btn-close');
           if (closeButton) closeButton.click();
+        }else{
+          toast.error(response.message);
         }
       } catch (error) {
         console.log(error);
