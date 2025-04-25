@@ -89,7 +89,7 @@ const SectionElement = ({ areas, TableData1 }) => {
                 <td>
                   <div className="descTableMax">{item?.description}</div>
                 </td>
-                <td>{moment(item?.create_at).format("YYYY-MM-DD")}</td>
+                <td>{moment(item?.create_at).format("DD-MM-YYYY")}</td>
 
                 <td className="text-end">
                   <div className="btnRight">

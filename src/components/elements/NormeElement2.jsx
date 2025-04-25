@@ -82,7 +82,7 @@ const NormaElement2 = ({ areas, data, nestedElements, handleDeleteNorme, handleM
                                         </td>
                                         }
                                         <td>{item?.title ? item?.title : item?.language}</td>
-                                        <td>{item?.created_at ? moment(item?.created_at).format('YYYY-MM-DD') : `${item?.standard_types?.type} (${item?.standard_types?.focus})`} </td>
+                                        <td>{item?.created_at ? moment(item?.created_at).format('DD-MM-YYYY') : `${item?.standard_types?.type} (${item?.standard_types?.focus})`} </td>
                                         <td style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>{item?.description}</td>
                                         <td>{item?.standard_code}</td>
 

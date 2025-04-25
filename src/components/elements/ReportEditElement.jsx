@@ -923,7 +923,7 @@ export default function ReportEdit({ getApi }) {
                                 <div>
                                   {!data?.date_1 && (
                                     <div className="ctm-label2 text-center">
-                                      yyyy /mm /dd
+                                      dd /mm/ yyyy
                                     </div>
                                   )}
                                 </div>
@@ -970,7 +970,7 @@ export default function ReportEdit({ getApi }) {
                                 <div>
                                   {!data?.date_2 && (
                                     <div className="ctm-label2 text-center">
-                                      yyyy /mm /dd
+                                      dd /mm/ yyyy
                                     </div>
                                   )}
                                 </div>

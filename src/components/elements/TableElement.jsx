@@ -40,14 +40,14 @@ const TableElement = ({ areas, reports }) => {
                     <tr key={index}>
                       <td>{item?.id_order}</td>
                       <td>{item?.order_code}</td>
-                      <td>{moment(item?.time).format("YYYY-MM-DD")}</td>
+                      <td>{moment(item?.time).format("DD-MM-YYYY")}</td>
                       <td>
                         <div className="download-icon">
                           <a
                             href={item?.report_full_url}
                             download={`${item?.report_name}${moment(
                               item?.time
-                            ).format("YYYY-MM-DD")}`}
+                            ).format("DD-MM-YYYY")}`}
                           >
                             <svg
                               width="23"

@@ -78,7 +78,7 @@ const TableElement2 = ({ areas, inspectionData }) => {
                                             <td className='wrapText'>
                                                 {client?.ispectors}
                                             </td>
-                                            <td>{moment(client?.create_at).format("YYYY-MM-DD")}</td>
+                                            <td>{moment(client?.create_at).format("DD-MM-YYYY")}</td>
                                             <td>
                                                 <div className={`complete-label  ${getClassName(client?.id_state?.id_state)}`} ><svg width="19" height="19"
                                                     viewBox="0 0 19 19" fill="none"

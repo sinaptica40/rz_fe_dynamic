@@ -117,7 +117,7 @@ const IspezioniElement2 = ({ areas, handleModal, deleteInspection, showModal, mo
                                 <td> {item?.ispectors?.map((inspector, index) =>
                                     index < item.ispectors.length - 1 ? `${inspector}, ` : inspector
                                 )}</td>
-                                <td>{moment(item?.create_at).format('YYYY-MM-DD')}</td>
+                                <td>{moment(item?.create_at).format('DD-MM-YYYY')}</td>
                                 <td>
                                     <div className="table_action_list">
                                         <a style={{cursor: "Pointer"}}

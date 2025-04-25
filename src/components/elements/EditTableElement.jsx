@@ -1,3 +1,4 @@
+import moment from "moment";
 import React from "react";
 
 const EditTableElement = ({
@@ -70,7 +71,7 @@ const EditTableElement = ({
             {showFormData?.data?.inspections?.map((item, index) => {
               return (
                 <tr key={index}>
-                  <td>{item?.calendar_info?.date ? item?.calendar_info?.date : "00/00/0000"}</td>
+                  <td>{item?.calendar_info?.date ? moment(item?.calendar_info?.date).format('DD-MM-YYYY') : "00/00/0000"}</td>
                   <td>{item?.ispector_info?.name ? item?.ispector_info?.name : "-"}</td>
                   <td>{item?.working_area_info?.wa_name ? item?.working_area_info?.wa_name : "-"}</td>
                   <td>{item?.machinery_info?.name ? item?.machinery_info?.name : "-"}</td>

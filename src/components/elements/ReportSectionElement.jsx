@@ -12,6 +12,7 @@ import { setIsUpdate } from '../../store/pageSlice'
 import Loader from '../../lib/loader/loader'
 import { getStatusColorCode } from '../../utils/helper'
 import SignPad from '../SignPad'
+import MyDatePicker from '../DatePicker'
 const ReportSectionElement = ({ areas, getApi }) => {
   const inspectId = sessionStorage.getItem('inspectId')
   const [isLoading, setIsLoading] = useState(false)
@@ -131,7 +132,7 @@ const ReportSectionElement = ({ areas, getApi }) => {
                             <div className="reportHeader">
                           <div>Ispezione | {inspect?.order_info?.client}</div>
                           <div>{inspect?.order_info?.order_code}</div>
-                          <div>Data Inizio Ispezione <span>{moment(inspect?.order_info?.create_at).format('YYYY-MM-DD')}</span></div>
+                          <div>Data Inizio Ispezione <span>{moment(inspect?.order_info?.create_at).format('DD-MM-YYYY')}</span></div>
                         </div>
                         <div className="report_innerBox">
                             <div className="tab_previewBox">
@@ -1157,10 +1158,10 @@ const validateFields = () => {
                                 <div>
                                   {!data?.date_1 && (
                                     <div className="ctm-label2 text-center">
-                                      yyyy /mm /dd
+                                      dd /mm /yyyy
                                     </div>
                                   )}
-                                </div>
+                                </div>  
                               )}
                               <MyDatePicker
                                 data={data?.date_1}
@@ -1203,7 +1204,7 @@ const validateFields = () => {
                                 <div>
                                   {!data?.date_2 && (
                                     <div className="ctm-label2 text-center">
-                                      yyyy /mm /dd
+                                       dd /mm /yyyy
                                     </div>
                                   )}
                                 </div>
@@ -1925,41 +1926,5 @@ const NonConformity2 = ({ setSubTitle, setDisplay }) => {
         </>
     );
 }
-
-
-
-// date picker components
-
-const MyDatePicker = ({ data, onDateChange, initialDate }) => {
-    const [date, setDate] = useState(initialDate || data);
-  
-    useEffect(() => {
-      if (initialDate) {
-        setDate(initialDate);
-      }
-    }, [initialDate]);
-  
-    const handleChange = (selectedDate) => {
-      setDate(selectedDate);
-      onDateChange(selectedDate);
-    };
-  
-    return (
-      <DatePicker
-        selected={date}
-        onChange={handleChange}
-        placeholderText=""
-        dateFormat="yyyy MMMM, d"
-        isClearable
-        popperPlacement="bottom-start"
-        className="form-control"
-        minDate={new Date()}
-      />
-    );
-  };
-  
-
-
-
 
 export default ReportSectionElement

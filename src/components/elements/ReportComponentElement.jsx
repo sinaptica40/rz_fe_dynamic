@@ -90,7 +90,7 @@ const ReportComponentElement = ({ areas, page , inspectionData, areadata}) => {
             <div>{inspectionData?.data?.order_code}</div>
             <div>
               Data Inizio Ispezione
-              <span> {moment(inspectionData?.data?.create_at).format('YYYY-MM-DD')}</span>
+              <span> {moment(inspectionData?.data?.create_at).format('DD-MM-YYYY')}</span>
             </div>
           </div>
           <div className="report_innerBox">
@@ -458,14 +458,14 @@ if(loading) return <Loader />
                           {/* <td>{index + 1}</td> */}
                           <td>{(currentPage - 1) * perPageItem + index + 1}</td>
                           <td>{item?.report_name.replace(".pdf", "")}</td>
-                          <td>{moment(item?.time).format("YYYY-MM-DD")}</td>
+                          <td>{moment(item?.time).format("DD-MM-YYYY")}</td>
                           <td className="table_action_list">
                             <a
                               className="table_actionBtn"
                               href={item?.report_full_url}
                               download={`${item?.report_name}${moment(
                                 item?.time
-                              ).format("YYYY-MM-DD")}`}
+                              ).format("DD-MM-YYYY")}`}
                             >
                               <span>
                                 <svg

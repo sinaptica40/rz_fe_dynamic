@@ -13,6 +13,7 @@ import { store } from "./store/store";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch } from "react-redux";
+import Loader from "./lib/loader/loader";
 import ScriptLoader from "./components/ScriptLoader";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -138,7 +139,7 @@ const AppContent = () => {
   }, [route]);
 
   if (!jsonData) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   return <PageBuilder jsonData={jsonData} />;

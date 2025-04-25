@@ -19,7 +19,7 @@ const MyDatePicker = ({ data, onDateChange, initialDate }) => {
         selected={date}
         onChange={handleChange}
         placeholderText=""
-        dateFormat="yyyy MMMM, d"
+        dateFormat="dd, MMMM yyyy"
         isClearable
         popperPlacement="bottom-start"
         className="form-control"
