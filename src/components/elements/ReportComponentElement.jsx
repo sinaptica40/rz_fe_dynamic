@@ -383,7 +383,7 @@ const handleDeleteReport = async(id) =>{
   const result = await Swal.fire({
     title: "Sei sicuro?",
     text: "Non potrai più tornare indietro!",
-    icon: "avvertimento",
+    icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#3085d6",
     cancelButtonColor: "#d33",
